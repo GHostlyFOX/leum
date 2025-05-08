@@ -10,7 +10,7 @@
         "production": "mix --production"
     },
     "devDependencies": {
-        "axios": "^1.8.4",
+        "axios": "^0.25",
         "browser-sync-webpack-plugin": "^2.3.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
@@ -20,6 +20,6 @@
         "sass-loader": "^12.1.0"
     },
     "dependencies": {
-        "browser-sync": "^3.0.4"
+        "browser-sync": "^2.27.9"
     }
 }

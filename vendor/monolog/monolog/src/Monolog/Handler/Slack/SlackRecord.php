@@ -100,7 +100,7 @@ class SlackRecord
         bool $useShortAttachment = false,
         bool $includeContextAndExtra = false,
         array $excludeFields = array(),
-        ?FormatterInterface $formatter = null
+        FormatterInterface $formatter = null
     ) {
         $this
             ->setChannel($channel)
@@ -146,14 +146,12 @@ class SlackRecord
 
         if ($this->useAttachment) {
             $attachment = array(
-                'fallback'    => $message,
-                'text'        => $message,
-                'color'       => $this->getAttachmentColor($record['level']),
-                'fields'      => array(),
-                'mrkdwn_in'   => array('fields'),
-                'ts'          => $record['datetime']->getTimestamp(),
-                'footer'      => $this->username,
-                'footer_icon' => $this->userIcon,
+                'fallback'  => $message,
+                'text'      => $message,
+                'color'     => $this->getAttachmentColor($record['level']),
+                'fields'    => array(),
+                'mrkdwn_in' => array('fields'),
+                'ts'        => $record['datetime']->getTimestamp(),
             );
 
             if ($this->useShortAttachment) {

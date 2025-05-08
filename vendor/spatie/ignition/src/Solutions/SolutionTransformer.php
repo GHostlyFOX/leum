@@ -5,7 +5,6 @@ namespace Spatie\Ignition\Solutions;
 use Illuminate\Contracts\Support\Arrayable;
 use Spatie\Ignition\Contracts\Solution;
 
-/** @implements Arrayable<string, array<string,string>|string|false> */
 class SolutionTransformer implements Arrayable
 {
     protected Solution $solution;
@@ -24,7 +23,6 @@ class SolutionTransformer implements Arrayable
             'links' => $this->solution->getDocumentationLinks(),
             'description' => $this->solution->getSolutionDescription(),
             'is_runnable' => false,
-            'ai_generated' => $this->solution->aiGenerated ?? false,
         ];
     }
 }

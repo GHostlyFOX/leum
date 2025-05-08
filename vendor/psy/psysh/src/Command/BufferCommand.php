@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2023 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -46,16 +46,12 @@ HELP
 
     /**
      * {@inheritdoc}
-     *
-     * @return int 0 if everything went fine, or an exit code
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $shell = $this->getShell();
-
-        $buf = $shell->getCodeBuffer();
+        $buf = $this->getApplication()->getCodeBuffer();
         if ($input->getOption('clear')) {
-            $shell->resetCodeBuffer();
+            $this->getApplication()->resetCodeBuffer();
             $output->writeln($this->formatLines($buf, 'urgent'), ShellOutput::NUMBER_LINES);
         } else {
             $output->writeln($this->formatLines($buf), ShellOutput::NUMBER_LINES);

@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2023 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -36,7 +36,7 @@ class ValidClassNamePass extends NamespaceAwarePass
     const INTERFACE_TYPE = 'interface';
     const TRAIT_TYPE = 'trait';
 
-    private int $conditionalScopes = 0;
+    private $conditionalScopes = 0;
 
     /**
      * Validate class, interface and trait definitions.
@@ -46,8 +46,6 @@ class ValidClassNamePass extends NamespaceAwarePass
      * trait methods.
      *
      * @param Node $node
-     *
-     * @return int|Node|null Replacement node (or special return value)
      */
     public function enterNode(Node $node)
     {
@@ -72,13 +70,13 @@ class ValidClassNamePass extends NamespaceAwarePass
 
     /**
      * @param Node $node
-     *
-     * @return int|Node|Node[]|null Replacement node (or special return value)
      */
     public function leaveNode(Node $node)
     {
         if (self::isConditional($node)) {
             $this->conditionalScopes--;
+
+            return;
         }
     }
 
@@ -260,11 +258,34 @@ class ValidClassNamePass extends NamespaceAwarePass
     }
 
     /**
+     * Get a symbol type key for storing in the scope name cache.
+     *
+     * @deprecated No longer used. Scope type should be passed into ensureCanDefine directly.
+     * @codeCoverageIgnore
+     *
+     * @param Stmt $stmt
+     *
+     * @return string
+     */
+    protected function getScopeType(Stmt $stmt): string
+    {
+        if ($stmt instanceof Class_) {
+            return self::CLASS_TYPE;
+        } elseif ($stmt instanceof Interface_) {
+            return self::INTERFACE_TYPE;
+        } elseif ($stmt instanceof Trait_) {
+            return self::TRAIT_TYPE;
+        }
+    }
+
+    /**
      * Check whether a class exists, or has been defined in the current code snippet.
      *
      * Gives `self`, `static` and `parent` a free pass.
      *
      * @param string $name
+     *
+     * @return bool
      */
     protected function classExists(string $name): bool
     {
@@ -282,6 +303,8 @@ class ValidClassNamePass extends NamespaceAwarePass
      * Check whether an interface exists, or has been defined in the current code snippet.
      *
      * @param string $name
+     *
+     * @return bool
      */
     protected function interfaceExists(string $name): bool
     {
@@ -292,6 +315,8 @@ class ValidClassNamePass extends NamespaceAwarePass
      * Check whether a trait exists, or has been defined in the current code snippet.
      *
      * @param string $name
+     *
+     * @return bool
      */
     protected function traitExists(string $name): bool
     {
@@ -318,9 +343,11 @@ class ValidClassNamePass extends NamespaceAwarePass
      *
      * @param string $msg
      * @param Stmt   $stmt
+     *
+     * @return FatalErrorException
      */
     protected function createError(string $msg, Stmt $stmt): FatalErrorException
     {
-        return new FatalErrorException($msg, 0, \E_ERROR, null, $stmt->getStartLine());
+        return new FatalErrorException($msg, 0, \E_ERROR, null, $stmt->getLine());
     }
 }

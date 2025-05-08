@@ -31,12 +31,6 @@ export default class Connection {
         let payload = message.payload()
         let csrfToken = getCsrfToken()
         let socketId = this.getSocketId()
-        let appUrl = window.livewire_app_url
-
-        if (this.shouldUseLocalePrefix(payload)) {
-            appUrl = `${appUrl}/${payload.fingerprint.locale}`
-        }
-
 
         if (window.__testing_request_interceptor) {
             return window.__testing_request_interceptor(payload, this)
@@ -44,7 +38,7 @@ export default class Connection {
 
         // Forward the query string for the ajax requests.
         fetch(
-            `${appUrl}/livewire/message/${payload.fingerprint.name}`,
+            `${window.livewire_app_url}/livewire/message/${payload.fingerprint.name}`,
             {
                 method: 'POST',
                 body: JSON.stringify(payload),
@@ -94,17 +88,6 @@ export default class Connection {
             .catch(() => {
                 this.onError(message)
             })
-    }
-
-    shouldUseLocalePrefix(payload) {
-        let path = payload.fingerprint.path
-        let locale = payload.fingerprint.locale
-
-        if (path.split('/')[0] == locale) {
-            return true
-        }
-
-        return false
     }
 
     isOutputFromDump(output) {

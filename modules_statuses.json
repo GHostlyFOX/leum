@@ -1,8 +1,0 @@
-{
-    "User": true,
-    "Auth": true,
-    "Club": true,
-    "Team": true,
-    "Trainings": true,
-    "Matches": true
-}

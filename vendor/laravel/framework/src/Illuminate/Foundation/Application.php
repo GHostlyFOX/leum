@@ -21,7 +21,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -31,14 +30,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
-    use Macroable;
-
     /**
      * The Laravel framework version.
      *
      * @var string
      */
-    const VERSION = '9.52.20';
+    const VERSION = '9.3.0';
 
     /**
      * The base path for the Laravel installation.
@@ -181,7 +178,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->registerBaseBindings();
         $this->registerBaseServiceProviders();
         $this->registerCoreContainerAliases();
-        $this->registerLaravelCloudServices();
     }
 
     /**
@@ -225,28 +221,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->register(new EventServiceProvider($this));
         $this->register(new LogServiceProvider($this));
         $this->register(new RoutingServiceProvider($this));
-    }
-
-    /**
-     * Register any services needed for Laravel Cloud.
-     *
-     * @return void
-     */
-    protected function registerLaravelCloudServices()
-    {
-        if (! laravel_cloud()) {
-            return;
-        }
-
-        $this['events']->listen(
-            'bootstrapping: *',
-            fn ($bootstrapper) => Cloud::bootstrapperBootstrapping($this, Str::after($bootstrapper, 'bootstrapping: '))
-        );
-
-        $this['events']->listen(
-            'bootstrapped: *',
-            fn ($bootstrapper) => Cloud::bootstrapperBootstrapped($this, Str::after($bootstrapper, 'bootstrapped: '))
-        );
     }
 
     /**
@@ -590,7 +564,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get or check the current application environment.
      *
-     * @param  string|array  ...$environments
+     * @param  string|array  $environments
      * @return string|bool
      */
     public function environment(...$environments)
@@ -632,9 +606,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = $this->runningInConsole() && isset($_SERVER['argv'])
-            ? $_SERVER['argv']
-            : null;
+        $args = $_SERVER['argv'] ?? null;
 
         return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
     }
@@ -681,7 +653,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function registerConfiguredProviders()
     {
         $providers = Collection::make($this->make('config')->get('app.providers'))
-                        ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
+                        ->partition(function ($provider) {
+                            return str_starts_with($provider, 'Illuminate\\');
+                        });
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
@@ -722,8 +696,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         if (property_exists($provider, 'singletons')) {
             foreach ($provider->singletons as $key => $value) {
-                $key = is_int($key) ? $value : $key;
-
                 $this->singleton($key, $value);
             }
         }
@@ -761,7 +733,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
+        return Arr::where($this->serviceProviders, function ($value) use ($name) {
+            return $value instanceof $name;
+        });
     }
 
     /**

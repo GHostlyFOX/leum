@@ -2,9 +2,14 @@
 
 namespace Modules\Auth\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -17,63 +22,103 @@ class AuthController extends Controller
         return view('auth::index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function credentials(Request $request)
     {
-        return view('auth::create');
+        $login = $request->input('login');
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        return [
+            $field => $login,
+            'password' => $request->input('password'),
+        ];
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+    public function showForm()
     {
-        //
+        return view('auth::forgot-password');
+    }
+    public function handleRequest(Request $request)
+    {
+        $request->validate([
+            'login' => 'required|string',
+        ]);
+
+        $login = $request->input('login');
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        /** @var User $user */
+        $user = User::where($field, $login)->first();
+
+        if (!$user) {
+            return back()->withErrors(['login' => 'Пользователь не найден']);
+        }
+
+        $token = $field === 'email' ? Str::random(64) : str_pad(random_int(10000, 99999), 5, '0', STR_PAD_LEFT);
+        $user->forgot_token = $token;
+        $user->save();
+
+        if ($field === 'email') {
+            Mail::send('auth::emails.password_reset', ['token' => $token], function ($message) use ($user) {
+                $message->to($user->email)
+                    ->subject('Восстановление пароля на liga.ru');
+            });
+            return back()->with('status', 'Ссылка отправлена на email');
+        }
+
+        // Здесь вставить логику отправки SMS
+        // SmsService::send($user->phone, "Код восстановления: $token");
+
+        return redirect()->route('password.sms.form')->with('phone', $user->phone);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function verifyToken($token)
     {
-        return view('auth::show');
+        $user = User::where('forgot_token', $token)->first();
+        if (!$user) {
+            return redirect()->route('password.request')->withErrors(['token' => 'Неверный токен']);
+        }
+
+        return redirect()->route('password.reset', ['token' => $token]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
+    public function showSmsForm()
     {
-        return view('auth::edit');
+        return view('auth::sms-verify');
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    public function verifySmsCode(Request $request)
     {
-        //
+        $request->validate(['code' => 'required|string|size:5']);
+        $user = User::where('forgot_token', $request->input('code'))->first();
+
+        if (!$user) {
+            return back()->withErrors(['code' => 'Неверный код']);
+        }
+
+        return redirect()->route('password.reset', ['token' => $user->forgot_token]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
+    public function showResetForm($token)
     {
-        //
+        return view('auth::reset-password', compact('token'));
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $user = User::where('forgot_token', $request->token)->first();
+
+        if (!$user) {
+            return back()->withErrors(['token' => 'Неверный токен']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->forgot_token = null;
+        $user->save();
+
+        return redirect()->route('login')->with('status', 'Пароль успешно обновлён');
     }
 }
