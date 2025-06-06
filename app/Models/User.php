@@ -67,4 +67,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(RefSex::class, 'ref_sex');
     }
+
+    public function headerName(){
+        if ($this->name != '')
+            return $this->name;
+        elseif ($this->lastname != '')
+            return $this->lastname;
+        else
+            return $this->email;
+    }
 }

@@ -4,6 +4,7 @@ namespace Modules\Auth\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,9 @@ class RegisterController extends Controller
 {
     public function index()
     {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
         return view('auth::register');
     }
     public function register(Request $request)

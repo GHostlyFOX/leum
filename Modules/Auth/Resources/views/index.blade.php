@@ -22,9 +22,14 @@
                 <div class="container-login100">
                     <div class="wrap-login100 p-0">
                         <div class="card-body">
-                            <form method="POST" action="{{ route('login') }}" class="login100-form validate-form">
+                            <form method="POST" action="{{ route('auth.login') }}" class="login100-form validate-form">
                                 @csrf
-
+                                {{-- Общая ошибка авторизации --}}
+                                @if($errors->has('login'))
+                                    <div class="alert alert-danger mb-4">
+                                        {{ $errors->first('login') }}
+                                    </div>
+                                @endif
                                 <span class="login100-form-title">
                             Вход
                         </span>
@@ -72,21 +77,6 @@
                                     <p class="text-dark mb-0">Нет аккаунта? <a href="{{ route('register') }}" class="text-primary ms-1">Зарегистрироваться</a></p>
                                 </div>
                             </form>
-                        </div>
-
-                        <!-- Соц. входы -->
-                        <div class="card-footer">
-                            <div class="d-flex justify-content-center my-3">
-                                <a href="javascript:void(0)" class="social-login text-center me-4">
-                                    <i class="fa fa-google"></i>
-                                </a>
-                                <a href="javascript:void(0)" class="social-login text-center me-4">
-                                    <i class="fa fa-facebook"></i>
-                                </a>
-                                <a href="javascript:void(0)" class="social-login text-center">
-                                    <i class="fa fa-twitter"></i>
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>

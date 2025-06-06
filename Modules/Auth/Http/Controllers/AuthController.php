@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -19,7 +21,49 @@ class AuthController extends Controller
      */
     public function index()
     {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
         return view('auth::index');
+    }
+
+    /**
+     * Обработать попытку входа.
+     */
+    public function login(Request $request)
+    {
+        $data = $request->validate([
+            'login'    => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
+
+        // Определяем, это email или телефон
+        $field = filter_var($data['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $credentials = [
+            $field    => $data['login'],
+            'password'=> $data['password'],
+        ];
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->route('home');
+        }
+
+        throw ValidationException::withMessages([
+            'login' => 'Неверный E-Mail или телефон, или неверный пароль.',
+        ]);
+    }
+
+    /**
+     * Выход из системы.
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('auth.loginForm');
     }
 
     public function credentials(Request $request)
@@ -119,6 +163,6 @@ class AuthController extends Controller
         $user->forgot_token = null;
         $user->save();
 
-        return redirect()->route('login')->with('status', 'Пароль успешно обновлён');
+        return redirect()->route('auth.index')->with('status', 'Пароль успешно обновлён');
     }
 }

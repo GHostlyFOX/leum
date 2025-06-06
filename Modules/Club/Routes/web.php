@@ -11,9 +11,12 @@
 |
 */
 
-Route::prefix('club')->group(function() {
-    Route::get('/', 'ClubController@index');
+Route::prefix('club')->middleware('auth')->group(function() {
+    Route::get('/', 'ClubController@index')->name('home');
+    Route::get('list', 'ClubController@list')->name('club-list');
+    Route::get('add', 'ClubController@add')->name('club-add');
     Route::get('team/list', 'ClubController@teamList')->name('team-list');
+    Route::get('team/add', 'ClubController@teamAdd')->name('team-add');
     Route::get('staff', 'ClubController@index')->name('stuff');
     Route::get('refs', 'ClubController@index')->name('refs');
 });

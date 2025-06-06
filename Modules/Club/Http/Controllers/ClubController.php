@@ -27,9 +27,24 @@ class ClubController extends Controller
         return view('club::index');
     }
 
+    public function list()
+    {
+        return view('club::list');
+    }
+
+    public function add()
+    {
+        return view('club::add');
+    }
+
     public function teamList()
     {
         return view('club::team.list');
+    }
+
+    public function teamAdd()
+    {
+        return view('club::team.add');
     }
 
     /**

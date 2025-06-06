@@ -50,7 +50,7 @@
                                 <div class="card-footer">
                                     <div class="text-center pt-3">
                                         <p class="text-dark mb-0">
-                                            Вспомнили пароль? <a href="{{ route('login') }}" class="text-primary ms-1">Войти</a>
+                                            Вспомнили пароль? <a href="{{ route('auth.index') }}" class="text-primary ms-1">Войти</a>
                                         </p>
                                     </div>
                                 </div>

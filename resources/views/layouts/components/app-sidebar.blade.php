@@ -59,7 +59,7 @@
                                 <a class="side-menu__item has-link" data-bs-toggle="slide" href="{{url('club')}}">
                                     <i class="icon icon-people side-menu__icon"></i>
                                     <span class="side-menu__label">
-                                        Команды
+                                        Клубы и Команды
                                     </span>
                                 </a>
                             </li>

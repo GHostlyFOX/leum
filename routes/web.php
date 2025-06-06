@@ -138,9 +138,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('livewire.index');
-});
+Route::get('/', Landing::class);
 
 Route::get('about', About::class);
 Route::get('accordion', Accordion::class);

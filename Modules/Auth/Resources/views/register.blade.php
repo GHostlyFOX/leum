@@ -119,7 +119,7 @@
                                 <div class="text-center pt-3">
                                     <p class="text-dark mb-0">
                                         Уже есть аккаунт?
-                                        <a href="{{ route('login') }}" class="text-primary ms-1">Войти</a>
+                                        <a href="{{ route('auth.index') }}" class="text-primary ms-1">Войти</a>
                                     </p>
                                 </div>
                             </form>
