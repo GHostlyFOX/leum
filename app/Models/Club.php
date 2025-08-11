@@ -6,19 +6,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Club extends Model
 {
-    protected $table = 'clubs';
+    protected $table = 'club';
 
     protected $fillable = [
         'name',
         'logo',
         'description',
         'ref_type_sport',
-        'coutry',
-        'sity',
+        'country',
+        'city',
         'address',
         'email',
         'phones',
         'ref_type_club',
+        'updated_at',
+        'created_at',
+        'created_by',
+        'updated_by',
+        'count_employees',
+        'count_players',
+        'website',
+        'admin_id'
     ];
 
     protected $casts = [

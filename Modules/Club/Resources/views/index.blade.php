@@ -30,7 +30,7 @@
                                     </a>
                                 </div>
                                 <nav class="nav card-body p-1 project-type">
-                                    <a href="/club/team/add" class="btn btn-primary">
+                                    <a href="{{route('club-add')}}" class="btn btn-primary">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-inner-icn text-white" enable-background="new 0 0 24 24" viewBox="0 0 24 24"><path d="M16,11.5h-3.5V8c0-0.276123-0.223877-0.5-0.5-0.5S11.5,7.723877,11.5,8v3.5H8c-0.276123,0-0.5,0.223877-0.5,0.5s0.223877,0.5,0.5,0.5h3.5v3.5005493C11.5001831,16.2765503,11.723999,16.5001831,12,16.5h0.0006104C12.2765503,16.4998169,12.5001831,16.276001,12.5,16v-3.5H16c0.276123,0,0.5-0.223877,0.5-0.5S16.276123,11.5,16,11.5z M12,2C6.4771729,2,2,6.4771729,2,12s4.4771729,10,10,10c5.5202026-0.0062866,9.9937134-4.4797974,10-10C22,6.4771729,17.5228271,2,12,2z M12,21c-4.9705811,0-9-4.0294189-9-9s4.0294189-9,9-9c4.9682617,0.0056152,8.9943848,4.0317383,9,9C21,16.9705811,16.9705811,21,12,21z"></path></svg>
                                         Добавить клуб
                                     </a>
@@ -41,6 +41,7 @@
                 </div>
             </div>
             <div class="row">
+                @foreach($clubs as $club)
                 <div class="col-sm-12 col-md-12 col-lg-12 col-xl-4">
                     <div class="card">
                         <div class="card-body">
@@ -53,8 +54,8 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-icn text-white" enable-background="new 0 0 24 24" viewBox="0 0 24 24"><path d="M4.2069702,12l5.1464844-5.1464844c0.1871338-0.1937866,0.1871338-0.5009155,0-0.6947021C9.1616211,5.9602051,8.8450928,5.9547119,8.6464844,6.1465454l-5.5,5.5c-0.000061,0-0.0001221,0.000061-0.0001221,0.0001221c-0.1951904,0.1951904-0.1951294,0.5117188,0.0001221,0.7068481l5.5,5.5C8.7401123,17.9474487,8.8673706,18.0001831,9,18c0.1325684,0,0.2597046-0.0526733,0.3533936-0.1464233c0.1953125-0.1952515,0.1953125-0.5118408,0.0001221-0.7070923L4.2069702,12z M20.8534546,11.6465454l-5.5-5.5c-0.1937256-0.1871948-0.5009155-0.1871948-0.6947021,0c-0.1986084,0.1918335-0.2041016,0.5083618-0.0122681,0.7069702L19.7930298,12l-5.1465454,5.1464844c-0.09375,0.09375-0.1464233,0.2208862-0.1464233,0.3534546C14.5,17.776062,14.723877,17.999939,15,18c0.1326294,0.0001221,0.2598267-0.0525513,0.3534546-0.1464844l5.5-5.5c0.000061-0.000061,0.0001221-0.000061,0.0001831-0.0001221C21.0487671,12.1581421,21.0487061,11.8416748,20.8534546,11.6465454z"></path></svg>
                                                 </div>
                                                 <div class="ms-1">
-                                                    <h6 class="mb-1"> <a href="https://liga.itex.kz/project-details" class="float-start">ФК Столица</a> </h6>
-                                                    <span class="text-muted border-end pe-2 fs-11 float-start mt-1">28 сотрудников</span>
+                                                    <h6 class="mb-1"> <a href="https://liga.itex.kz/project-details" class="float-start">{{ $club->name }}</a> </h6>
+                                                    <span class="text-muted border-end pe-2 fs-11 float-start mt-1">{{ $club->count_employees }} сотрудников</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -82,13 +83,13 @@
                                                 <span class="avatar bradius cover-image" data-bs-image-src="https://liga.itex.kz/assets/images/users/11.jpg" style="background: url(&quot;https://liga.itex.kz/assets/images/users/11.jpg&quot;) center center;"></span>
                                                 <span class="avatar bradius cover-image" data-bs-image-src="https://liga.itex.kz/assets/images/users/1.jpg" style="background: url(&quot;https://liga.itex.kz/assets/images/users/1.jpg&quot;) center center;"></span>
                                                 <span class="avatar bradius cover-image" data-bs-image-src="https://liga.itex.kz/assets/images/users/6.jpg" style="background: url(&quot;https://liga.itex.kz/assets/images/users/6.jpg&quot;) center center;"></span>
-                                                <span class="avatar bradius bg-primary">+15</span>
+                                                <span class="avatar bradius bg-primary">{{ $club->count_players }}</span>
                                             </div>
                                         </div>
                                         <div class="col-auto">
                                             <p class="mb-0">
                                                 <span class="text-muted d-block">Дата создания</span>
-                                                <span class="text-danger">11 Nov 21</span>
+                                                <span class="text-danger">{{ $club->created_at->format('d.m.Y') }}</span>
                                             </p>
                                         </div>
                                     </div>
@@ -97,6 +98,7 @@
                         </div>
                     </div>
                 </div>
+                @endforeach
             </div>
         </div>
     </div>

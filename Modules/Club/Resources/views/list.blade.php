@@ -81,29 +81,30 @@
                                     <thead class="table-head">
                                     <tr role="row">
                                         <th class="bg-transparent border-bottom-0 sorting" tabindex="0" aria-controls="project-table" rowspan="1" colspan="1" aria-label="Title: activate to sort column ascending" style="width: 156.413px;">
-                                            Наименование клуба
+                                            <strong>Наименование клуба</strong>
                                         </th>
                                         <th class="bg-transparent border-bottom-0 sorting" tabindex="0" aria-controls="project-table" rowspan="1" colspan="1" aria-label="Tasks: activate to sort column ascending" style="width: 40.1px;">
-                                            Кол-во команд
+                                            <strong>Кол-во команд</strong>
                                         </th>
                                         <th class="bg-transparent border-bottom-0 sorting" tabindex="0" aria-controls="project-table" rowspan="1" colspan="1" aria-label="Date: activate to sort column ascending" style="width: 47.2375px;">
-                                            Дата
+                                            <strong>Дата</strong>
                                         </th>
                                         <th class="bg-transparent border-bottom-0 sorting" tabindex="0" aria-controls="project-table" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending" style="width: 66.5125px;">
-                                            Активность
+                                            <strong>Активность</strong>
                                         </th>
                                         <th class="bg-transparent border-bottom-0 no-btn sorting" tabindex="0" aria-controls="project-table" rowspan="1" colspan="1" aria-label="Action: activate to sort column ascending" style="width: 54px;">
-                                            Действия
+                                            <strong>Действия</strong>
                                         </th>
                                     </tr>
                                     </thead>
                                     <tbody class="table-body">
+                                    @foreach($clubs as $club)
                                     <tr class="odd">
                                         <td>
-                                            <h6 class="mb-0 fs-14 fw-semibold">ФК Столица - 2015</h6>
+                                            <h6 class="mb-0 fs-14 fw-semibold">{{ $club->name }}</h6>
                                         </td>
-                                        <td class="text-muted fs-15 fw-semibold">3</td>
-                                        <td class="text-muted fs-15 fw-semibold">10 Aug 21</td>
+                                        <td class="text-muted fs-15 fw-semibold">0</td>
+                                        <td class="text-muted fs-15 fw-semibold">{{ $club->created_at->format('d.m.Y') }}</td>
                                         <td>
                                             <span class="mb-0 mt-1 badge rounded-pill text-success bg-success-transparent">Работает</span>
                                         </td>
@@ -117,36 +118,19 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr class="even">
-                                        <td>
-                                            <h6 class="mb-0 fs-14 fw-semibold">ФК Столица - 2012</h6>
-                                        </td>
-                                        <td class="text-muted fs-15 fw-semibold">5</td>
-                                        <td class="text-muted fs-15 fw-semibold">21 Jan 21</td>
-                                        <td>
-                                            <span class="mb-0 mt-1 badge rounded-pill text-danger bg-danger-transparent">Не работает</span>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-stretch">
-                                                <a href="#" class="border br-5 px-2 py-1 text-muted d-flex align-items-center" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fe fe-more-vertical"></i></a>
-                                                <div class="dropdown-menu dropdown-menu-start">
-                                                    <a class="dropdown-item" href="#"><i class="fe fe-edit-2 me-2"></i> Изменить</a>
-                                                    <a class="dropdown-item" href="#"><i class="fe fe-delete me-2"></i> Удалить</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12 col-md-5">
-                                <div class="dataTables_info" id="project-table_info" role="status" aria-live="polite">Showing 1 to 10 of 12 entries</div>
+                                {{--<div class="dataTables_info" id="project-table_info" role="status" aria-live="polite">Showing 1 to 10 of 12 entries</div>--}}
                             </div>
                             <div class="col-sm-12 col-md-7">
                                 <div class="dataTables_paginate paging_simple_numbers" id="project-table_paginate">
-                                    <ul class="pagination">
+                                    {{ $clubs->links() }}
+                                    {{--<ul class="pagination">
                                         <li class="paginate_button page-item previous disabled" id="project-table_previous">
                                             <a href="#" aria-controls="project-table" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
                                         </li>
@@ -159,7 +143,7 @@
                                         <li class="paginate_button page-item next" id="project-table_next">
                                             <a href="#" aria-controls="project-table" data-dt-idx="3" tabindex="0" class="page-link">Next</a>
                                         </li>
-                                    </ul>
+                                    </ul>--}}
                                 </div>
                             </div>
                         </div>
