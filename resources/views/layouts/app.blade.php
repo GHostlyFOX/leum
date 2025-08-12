@@ -1,7 +1,6 @@
 <!doctype html>
-<html lang="en" dir="ltr"> <!-- This "app.blade.php" master page is used for all the pages content present in "views/livewire" except "custom" and "switcher" pages -->
+<html lang="en" dir="ltr">
 	<head>
-
 		<!-- META DATA -->
 		<meta charset="UTF-8">
 		<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
@@ -14,45 +13,37 @@
 
     </head>
 
-    <body class="ltr app sidebar-mini light-mode">
+    <body class="bg-gray-50">
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden fixed top-4 left-4 z-30">
+            <button id="menuBtn" class="p-2 rounded-md bg-blue-600 text-white">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
 
-        <!-- GLOBAL-LOADER -->
-		<div id="global-loader">
-			<img src="{{asset('assets/images/loader.svg')}}" class="loader-img" alt="Loader">
-		</div>
-		<!-- /GLOBAL-LOADER -->
+        <!-- Overlay for mobile menu -->
+        <div id="overlay" class="overlay"></div>
 
-        <!-- PAGE -->
-		<div class="page">
-			<div class="page-main">
+        @include('layouts.components.app-sidebar')
 
-                @include('layouts.components.app-header')
+        <!-- Main Content -->
+        <div class="md:ml-64 min-h-screen">
+            @include('layouts.components.app-header')
 
-                @include('layouts.components.app-sidebar')
+            <!--app-content open-->
+            <div class="app-content main-content mt-0">
+                <div class="side-app">
 
-                <!--app-content open-->
-                <div class="app-content main-content mt-0">
-                    <div class="side-app">
+                    <!-- CONTAINER -->
+                    <div class="main-container container-fluid">
 
-                        <!-- CONTAINER -->
-                        <div class="main-container container-fluid">
+                            @yield('content')
 
-                                @yield('content')
-
-                        </div>
                     </div>
                 </div>
-                    <!-- CONTAINER CLOSED -->
-             </div>
-
-            @include('layouts.components.modal')
-
-            @yield('modal')
-
-            @include('layouts.components.footer')
-
+            </div>
+                <!-- CONTAINER CLOSED -->
         </div>
-        <!-- page -->
 
         @include('layouts.components.scripts')
 
