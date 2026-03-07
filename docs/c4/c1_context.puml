@@ -1,0 +1,42 @@
+@startuml c1_context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title System Context — Детская лига (Level 1)
+
+' ─── Actors ───────────────────────────────────────────────────────────────────
+Person(admin,      "Администратор",  "Управляет клубом, командами,\nтренировками, турнирами и матчами")
+Person(coach,      "Тренер",         "Ведёт тренировки, фиксирует\nпосещаемость и результаты матчей")
+Person(parent,     "Родитель",       "Подтверждает посещаемость,\nпросматривает статистику ребёнка")
+Person(player,     "Игрок",          "Просматривает расписание,\nсостав команды и статистику")
+
+' ─── Core System ──────────────────────────────────────────────────────────────
+System(detskaya_liga, "Детская лига",
+    "Веб-сайт + мобильное приложение\nдля управления детскими\nспортивными командами")
+
+' ─── External Systems ─────────────────────────────────────────────────────────
+System_Ext(push_service,   "Push-уведомления\n(FCM / APNs)",   "Доставка push-уведомлений\nна мобильные устройства")
+System_Ext(google_cal,     "Google Calendar",                  "Синхронизация расписания\nтренировок и матчей")
+System_Ext(apple_cal,      "Apple Calendar",                   "Синхронизация расписания\nдля пользователей iOS")
+System_Ext(telegram,       "Telegram Bot API",                 "Отправка уведомлений\nчерез Telegram")
+System_Ext(google_auth,    "Google Identity",                  "OAuth2 авторизация\nчерез Google")
+System_Ext(apple_auth,     "Sign in with Apple",               "OAuth2 авторизация\nчерез Apple ID")
+System_Ext(excel_import,   "Excel / CSV",                      "Импорт/экспорт списков\nигроков и данных")
+
+' ─── Relationships ────────────────────────────────────────────────────────────
+Rel(admin,  detskaya_liga, "Управляет клубом,\nкомандами, турнирами",     "HTTPS / Web")
+Rel(coach,  detskaya_liga, "Ведёт тренировки,\nфиксирует матчи",          "HTTPS / Web + Mobile")
+Rel(parent, detskaya_liga, "Подтверждает посещаемость,\nсмотрит статистику", "HTTPS / Mobile")
+Rel(player, detskaya_liga, "Просматривает расписание\nи статистику",       "HTTPS / Mobile")
+
+Rel(detskaya_liga, push_service, "Отправляет push-уведомления",  "HTTPS / API")
+Rel(detskaya_liga, google_cal,   "Экспортирует расписание",       "CalDAV / iCal")
+Rel(detskaya_liga, apple_cal,    "Экспортирует расписание",       "CalDAV / iCal")
+Rel(detskaya_liga, telegram,     "Отправляет уведомления",        "Bot API")
+Rel(detskaya_liga, google_auth,  "OAuth2 авторизация",            "OAuth2 / OIDC")
+Rel(detskaya_liga, apple_auth,   "OAuth2 авторизация",            "Sign in with Apple")
+Rel(admin,         excel_import, "Импортирует списки игроков",    "XLSX / CSV")
+Rel(detskaya_liga, excel_import, "Экспортирует отчёты",           "XLSX / CSV")
+
+@enduml

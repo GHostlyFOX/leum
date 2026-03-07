@@ -1,0 +1,196 @@
+@startuml er_02_trainings
+!theme plain
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+
+skinparam entity {
+    BackgroundColor #EEF4FF
+    BorderColor #1168BD
+    FontColor #111111
+}
+
+hide empty methods
+hide circle
+
+title ER-диаграмма — Тренировки\n(Schema 2)
+
+' ════════════════════════════════════════════════════════════════════════
+' ВНЕШНИЕ ТАБЛИЦЫ (из Schema 1) — показаны для контекста
+' ════════════════════════════════════════════════════════════════════════
+
+entity "users" as usr <<Schema 1>> {
+    * id        : BIGSERIAL <<PK>>
+    --
+    ...
+}
+
+entity "clubs" as club <<Schema 1>> {
+    * id        : BIGSERIAL <<PK>>
+    --
+    ...
+}
+
+entity "teams" as team <<Schema 1>> {
+    * id        : BIGSERIAL <<PK>>
+    --
+    ...
+}
+
+entity "countries" as country <<Schema 1>> {
+    * id        : SMALLSERIAL <<PK>>
+    --
+    * name      : VARCHAR(100)
+}
+
+entity "cities" as city <<Schema 1>> {
+    * id        : SERIAL <<PK>>
+    --
+    * name      : VARCHAR(100)
+    * country_id: SMALLINT <<FK>>
+}
+
+entity "files" as file <<Schema 1>> {
+    * id        : BIGSERIAL <<PK>>
+    --
+    * path      : TEXT
+      mime_type : VARCHAR(100)
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СПРАВОЧНИКИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "ref_training_types" as ttype <<справочник>> {
+    * id          : SERIAL <<PK>>
+    --
+    * club_id     : BIGINT <<FK>>
+    * name        : VARCHAR(255)
+      description : TEXT
+}
+
+entity "venues" as venue {
+    * id         : SERIAL <<PK>>
+    --
+    * name       : VARCHAR(255)
+    * country_id : SMALLINT <<FK>>
+    * city_id    : INT <<FK>>
+    * address    : TEXT
+      club_id    : BIGINT <<FK>>
+    * created_at : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ШАБЛОНЫ РЕГУЛЯРНЫХ ТРЕНИРОВОК
+' ════════════════════════════════════════════════════════════════════════
+
+entity "recurring_trainings" as recurring {
+    * id             : BIGSERIAL <<PK>>
+    --
+    * club_id        : BIGINT <<FK>>
+    * team_id        : BIGINT <<FK>>
+    * schedule       : JSONB
+    ' [{day_of_week, start_time, venue_id,
+    '   coach_id, duration_minutes}]
+    * auto_create    : JSONB
+    ' {advance_days, until_date}
+    * notify_parents : BOOLEAN
+    * require_rsvp   : BOOLEAN
+    * is_active      : BOOLEAN
+    * created_at     : TIMESTAMPTZ
+    * updated_at     : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ТРЕНИРОВКИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "trainings" as training {
+    * id               : BIGSERIAL <<PK>>
+    --
+    * coach_id         : BIGINT <<FK>>
+    * club_id          : BIGINT <<FK>>
+    * team_id          : BIGINT <<FK>>
+    * training_date    : DATE
+    * start_time       : TIME
+    * duration_minutes : SMALLINT
+    * venue_id         : INT <<FK>>
+    * training_type_id : INT <<FK>>
+    * status           : ENUM(scheduled,completed,cancelled)
+    * notify_parents   : BOOLEAN
+    * require_rsvp     : BOOLEAN
+      comment          : TEXT
+      recurring_id     : BIGINT <<FK>>
+    * created_at       : TIMESTAMPTZ
+    * updated_at       : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ПОСЕЩАЕМОСТЬ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "training_attendance" as attendance {
+    * id                 : BIGSERIAL <<PK>>
+    --
+    * training_id        : BIGINT <<FK>>
+    * player_user_id     : BIGINT <<FK>>
+    * marked_by_user_id  : BIGINT <<FK>>
+    * attendance_status  : ENUM(pending,present,absent)
+      confirmed_at       : TIMESTAMPTZ
+      absence_reason     : TEXT
+    * created_at         : TIMESTAMPTZ
+    * updated_at         : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' МЕДИА
+' ════════════════════════════════════════════════════════════════════════
+
+entity "training_media" as media {
+    * id          : BIGSERIAL <<PK>>
+    --
+    * training_id : BIGINT <<FK>>
+    * file_id     : BIGINT <<FK>>
+    * sort_order  : SMALLINT
+    * created_at  : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ — справочники
+' ════════════════════════════════════════════════════════════════════════
+
+club    ||--o{ ttype    : "виды тренировок"
+club    ||--o{ venue    : "площадки клуба"
+country ||--o{ venue    : ""
+city    ||--o{ venue    : ""
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ — шаблон ↔ тренировки
+' ════════════════════════════════════════════════════════════════════════
+
+club    ||--o{ recurring : ""
+team    ||--o{ recurring : ""
+recurring |o--o{ training : "порождает"
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ — тренировка
+' ════════════════════════════════════════════════════════════════════════
+
+usr   ||--o{ training   : "тренер"
+club  ||--o{ training   : ""
+team  ||--o{ training   : ""
+venue ||--o{ training   : "место"
+ttype ||--o{ training   : "вид"
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ — посещаемость и медиа
+' ════════════════════════════════════════════════════════════════════════
+
+training ||--o{ attendance : "состав"
+usr      ||--o{ attendance : "игрок"
+usr      ||--o{ attendance : "отметил"
+
+training ||--o{ media : "медиафайлы"
+file     ||--o{ media : ""
+
+@enduml

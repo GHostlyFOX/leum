@@ -1,0 +1,73 @@
+@startuml c2_container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Container Diagram — Детская лига (Level 2)
+
+' ─── Actors ───────────────────────────────────────────────────────────────────
+Person(admin,  "Администратор / Тренер", "Управление клубом, командами,\nтренировками и матчами")
+Person(parent, "Родитель / Игрок",       "Просмотр расписания,\nподтверждение посещаемости")
+
+' ─── System boundary ──────────────────────────────────────────────────────────
+System_Boundary(c1, "Детская лига") {
+
+    Container(web_app, "Веб-приложение",
+        "PHP 8 / Laravel + Blade / Vue.js",
+        "SPA / SSR интерфейс для\nадминистраторов и тренеров.\nПервичная регистрация клуба\nи команды")
+
+    Container(mobile_app, "Мобильное приложение",
+        "React Native / Flutter",
+        "Кроссплатформенное приложение\n(Android + iOS) для всех ролей.\nПоддержка офлайн-режима")
+
+    Container(api, "Backend API",
+        "PHP 8 / Laravel (REST)",
+        "Бизнес-логика системы.\nАутентификация, управление\nклубами/командами/игроками,\nтренировками, матчами, статистикой")
+
+    ContainerDb(db, "База данных",
+        "PostgreSQL 15",
+        "Хранение всех данных:\nпользователи, клубы, команды,\nигроки, тренировки, матчи,\nтурниры, посещаемость")
+
+    Container(file_storage, "Файловое хранилище",
+        "S3-совместимое / локальное",
+        "Фотографии игроков и тренеров,\nлоготипы команд")
+
+    Container(queue, "Очередь задач",
+        "Laravel Queue / Redis",
+        "Асинхронная отправка\nуведомлений, обработка\nимпорта Excel")
+
+    Container(scheduler, "Планировщик задач",
+        "Laravel Scheduler / Cron",
+        "Автоматические напоминания\nо тренировках и матчах")
+}
+
+' ─── External Systems ─────────────────────────────────────────────────────────
+System_Ext(push_service, "FCM / APNs",            "Push-уведомления\nдля Android и iOS")
+System_Ext(google_cal,   "Google / Apple Calendar","Синхронизация\nрасписания (CalDAV)")
+System_Ext(messengers,   "Telegram",               "Мессенджер-уведомления")
+System_Ext(oauth,        "Google / Apple OAuth2",  "Внешняя авторизация")
+System_Ext(excel,        "Excel / CSV",            "Импорт/экспорт данных")
+
+' ─── Relationships ────────────────────────────────────────────────────────────
+Rel(admin,      web_app,    "Использует",             "HTTPS")
+Rel(admin,      mobile_app, "Использует",             "HTTPS / Mobile")
+Rel(parent,     mobile_app, "Использует",             "HTTPS / Mobile")
+
+Rel(web_app,    api,        "REST API запросы",       "HTTPS / JSON")
+Rel(mobile_app, api,        "REST API запросы",       "HTTPS / JSON")
+
+Rel(api,        db,          "Чтение/запись данных",  "TCP / SQL")
+Rel(api,        file_storage,"Хранение файлов",       "S3 API")
+Rel(api,        queue,       "Постановка задач",      "Redis / DB")
+Rel(api,        oauth,       "OAuth2 авторизация",    "HTTPS")
+
+Rel(queue,      push_service,"Отправка push",         "HTTPS / API")
+Rel(queue,      messengers,  "Отправка сообщений",    "HTTPS / Bot API")
+
+Rel(scheduler,  api,         "Вызов заданий",         "Internal")
+Rel(scheduler,  queue,       "Запуск задач по расписанию", "Internal")
+
+Rel(api,        google_cal,  "Экспорт iCal/CalDAV",  "HTTPS")
+Rel(api,        excel,       "Импорт/экспорт данных","XLSX / CSV")
+
+@enduml

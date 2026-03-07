@@ -1,0 +1,236 @@
+@startuml er_01_users_clubs_teams
+!theme plain
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+
+skinparam entity {
+    BackgroundColor #EEF4FF
+    BorderColor #1168BD
+    FontColor #111111
+}
+skinparam class {
+    BackgroundColor #F5F5F5
+    BorderColor #999999
+    FontColor #333333
+}
+
+hide empty methods
+hide circle
+
+title ER-диаграмма — Пользователи, клубы и команды\n(Schema 1)
+
+' ════════════════════════════════════════════════════════════════════════
+' СПРАВОЧНИКИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "ref_sport_types" as sport <<справочник>> {
+    * id           : SMALLSERIAL <<PK>>
+    --
+    * name         : VARCHAR(100)
+}
+
+entity "ref_club_types" as club_type <<справочник>> {
+    * id           : SMALLSERIAL <<PK>>
+    --
+    * name         : VARCHAR(100)
+}
+
+entity "ref_user_roles" as user_role <<справочник>> {
+    * id           : SMALLSERIAL <<PK>>
+    --
+    * name         : VARCHAR(50)
+}
+
+entity "ref_positions" as position <<справочник>> {
+    * id             : SMALLSERIAL <<PK>>
+    --
+    * name           : VARCHAR(100)
+    * sport_type_id  : SMALLINT <<FK>>
+}
+
+entity "ref_dominant_feet" as foot <<справочник>> {
+    * id           : SMALLSERIAL <<PK>>
+    --
+    * name         : VARCHAR(20)
+}
+
+entity "ref_kinship_types" as kinship <<справочник>> {
+    * id           : SMALLSERIAL <<PK>>
+    --
+    * name         : VARCHAR(50)
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ГЕОГРАФИЯ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "countries" as country <<география>> {
+    * id           : SMALLSERIAL <<PK>>
+    --
+    * name         : VARCHAR(100)
+}
+
+entity "cities" as city <<география>> {
+    * id           : SERIAL <<PK>>
+    --
+    * name         : VARCHAR(100)
+    * country_id   : SMALLINT <<FK>>
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ФАЙЛЫ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "files" as file {
+    * id           : BIGSERIAL <<PK>>
+    --
+    * path         : TEXT
+      mime_type    : VARCHAR(100)
+      size_bytes   : BIGINT
+    * created_at   : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ПОЛЬЗОВАТЕЛИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "users" as usr {
+    * id               : BIGSERIAL <<PK>>
+    --
+    * first_name       : VARCHAR(100)
+    * last_name        : VARCHAR(100)
+      middle_name      : VARCHAR(100)
+    * email            : VARCHAR(255) <<UNIQUE>>
+      phone            : VARCHAR(30)
+    * password_hash    : VARCHAR(255)
+      photo_file_id    : BIGINT <<FK>>
+    * notifications_on : BOOLEAN
+    * birth_date       : DATE
+    * gender           : ENUM(male, female)
+    * created_at       : TIMESTAMPTZ
+    * updated_at       : TIMESTAMPTZ
+}
+
+entity "user_parent_player" as parent_link {
+    * id               : BIGSERIAL <<PK>>
+    --
+    * parent_user_id   : BIGINT <<FK>>
+    * player_user_id   : BIGINT <<FK>>
+    * kinship_type_id  : SMALLINT <<FK>>
+}
+
+entity "player_profiles" as player {
+    * id               : BIGSERIAL <<PK>>
+    --
+    * user_id          : BIGINT <<FK, UNIQUE>>
+    * dominant_foot_id : SMALLINT <<FK>>
+      position_id      : SMALLINT <<FK>>
+    * sport_type_id    : SMALLINT <<FK>>
+}
+
+entity "coach_profiles" as coach {
+    * id               : BIGSERIAL <<PK>>
+    --
+    * user_id          : BIGINT <<FK, UNIQUE>>
+    * sport_type_id    : SMALLINT <<FK>>
+      specialty_id     : SMALLINT <<FK>>
+      career_start     : DATE
+      license_number   : VARCHAR(100)
+      license_expires  : DATE
+      achievements     : JSONB
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' КЛУБЫ И КОМАНДЫ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "clubs" as club {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * name          : VARCHAR(255)
+      logo_file_id  : BIGINT <<FK>>
+      description   : TEXT
+    * club_type_id  : SMALLINT <<FK>>
+    * sport_type_id : SMALLINT <<FK>>
+    * country_id    : SMALLINT <<FK>>
+    * city_id       : INT <<FK>>
+    * address       : VARCHAR(255)
+      email         : VARCHAR(255)
+      phones        : JSONB
+    * created_at    : TIMESTAMPTZ
+    * updated_at    : TIMESTAMPTZ
+}
+
+entity "teams" as team {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * name          : VARCHAR(255)
+      description   : TEXT
+    * gender        : ENUM(boys, girls, mixed)
+      logo_file_id  : BIGINT <<FK>>
+    * birth_year    : SMALLINT
+    * club_id       : BIGINT <<FK>>
+    * sport_type_id : SMALLINT <<FK>>
+      country_id    : SMALLINT <<FK>>
+      city_id       : INT <<FK>>
+    * created_at    : TIMESTAMPTZ
+    * updated_at    : TIMESTAMPTZ
+}
+
+entity "team_members" as member {
+    * id        : BIGSERIAL <<PK>>
+    --
+    * user_id   : BIGINT <<FK>>
+    * club_id   : BIGINT <<FK>>
+    * team_id   : BIGINT <<FK>>
+    * role_id   : SMALLINT <<FK>>
+      joined_at : DATE
+    * is_active : BOOLEAN
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ
+' ════════════════════════════════════════════════════════════════════════
+
+' --- справочники ---
+sport   ||--o{ position    : "вид спорта"
+sport   ||--o{ player      : ""
+sport   ||--o{ coach       : ""
+sport   ||--o{ club        : ""
+sport   ||--o{ team        : ""
+
+position ||--o{ player     : "позиция игрока"
+position ||--o{ coach      : "специализация"
+
+foot     ||--o{ player     : "рабочая нога"
+kinship  ||--o{ parent_link: "тип родства"
+
+club_type ||--o{ club      : "вид клуба"
+user_role ||--o{ member    : "роль"
+
+' --- география ---
+country ||--o{ city        : "страна"
+country ||--o{ club        : ""
+country ||--o{ team        : ""
+city    ||--o{ club        : ""
+city    ||--o{ team        : ""
+
+' --- файлы ---
+file ||--o| usr    : "фото профиля"
+file ||--o| club   : "логотип клуба"
+file ||--o| team   : "логотип команды"
+
+' --- пользователи ---
+usr ||--o| player       : "профиль игрока"
+usr ||--o| coach        : "профиль тренера"
+usr ||--o{ member       : "участие в командах"
+usr ||--o{ parent_link  : "как родитель"
+usr ||--o{ parent_link  : "как ребёнок"
+
+' --- клубы / команды ---
+club ||--o{ team        : "команды клуба"
+club ||--o{ member      : ""
+team ||--o{ member      : "состав"
+
+@enduml

@@ -1,0 +1,121 @@
+@startuml c3_component_mobile
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram — Mobile Application (Level 3)
+
+' ─── Actors ───────────────────────────────────────────────────────────────────
+Person(admin,  "Администратор / Тренер", "")
+Person(parent, "Родитель",               "")
+Person(player, "Игрок",                  "")
+
+' ─── Mobile App boundary ──────────────────────────────────────────────────────
+Container_Boundary(mobile, "Мобильное приложение (React Native / Flutter)") {
+
+    ' Navigation
+    Component(nav_comp, "Navigation & Auth Guard",
+        "React Navigation / go_router",
+        "Роутинг экранов, защита маршрутов\nпо роли пользователя (RBAC),\nGlobal state (Redux / Riverpod)")
+
+    ' Auth
+    Component(auth_screen, "Auth Screen",
+        "UI Component",
+        "Вход по email/телефону + пароль.\nSign in with Google / Apple.\nСброс пароля.\nХранение токена (Secure Storage)")
+
+    ' Dashboard / Home
+    Component(home_screen, "Home / Dashboard",
+        "UI Component",
+        "Ближайшие тренировки и матчи,\nбыстрые действия по роли.\nСводка по команде")
+
+    ' Team
+    Component(team_comp, "Team Screen",
+        "UI Component",
+        "Состав команды: фото, позиция,\nконтакты. Карточка игрока.\nКарточка тренера с быстрым\nзвонком / сообщением")
+
+    ' Schedule / Calendar
+    Component(calendar_comp, "Calendar Screen",
+        "UI Component",
+        "Тренировки и матчи в виде\nкалендаря (месяц/неделя) или\nсписка. Прошедшие — серым,\nпредстоящие — выделены.\nПереключение вид/список")
+
+    ' Attendance
+    Component(attendance_comp, "Attendance Screen",
+        "UI Component",
+        "Родитель: подтверждение /\nотмена присутствия на тренировке\nи матче. Выбор причины отсутствия.\nАвто-пометка при травме.\nТренер: ручные отметки, просмотр\nподтверждений родителей")
+
+    ' Training Detail
+    Component(training_detail, "Training Detail Screen",
+        "UI Component",
+        "Дата, время, место, тренер.\nСписок игроков: подтвердили /\nотказались / нет ответа.\nВид тренировки (справочник)")
+
+    ' Match / Tournament
+    Component(match_comp, "Match & Tournament Screen",
+        "UI Component",
+        "Карточка матча: состав, место,\nсоперник, счёт в реальном времени.\nТаймер, голы, ассисты, замены.\nТурниры: статус, сетка, результаты")
+
+    ' Player Stats
+    Component(stats_comp, "Statistics Screen",
+        "UI Component",
+        "Посещаемость тренировок и\nматчей по игроку/команде.\nГолы, ассисты, игровое время.\nФильтр по периоду")
+
+    ' Notifications
+    Component(notif_comp, "Notifications Screen",
+        "UI Component",
+        "Список уведомлений: матчи,\nизменения, результаты.\nНастройки: включить/выключить\nуведомления по типу")
+
+    ' Offline Sync
+    Component(sync_comp, "Offline Sync Layer",
+        "SQLite / Hive + Sync Service",
+        "Локальный кэш данных.\nОпределение состояния сети.\nОчередь отложенных запросов\n(посещаемость, отметки).\nАвто-синхронизация при сети")
+
+    ' API Client
+    Component(api_client, "API Client",
+        "Dio / Retrofit / http",
+        "REST-клиент: авторизация\n(Bearer token), interceptors,\nretry-логика, обработка ошибок.\nWebSocket-клиент для live-матча")
+
+    ' Push Handler
+    Component(push_handler, "Push Notification Handler",
+        "FCM / APNs SDK",
+        "Получение и обработка\npush-уведомлений.\nDeep-link навигация\nна нужный экран")
+}
+
+' ─── External ─────────────────────────────────────────────────────────────────
+Container(backend_api, "Backend API",         "Laravel REST + WS", "")
+System_Ext(push_service, "FCM / APNs",        "Push-уведомления")
+System_Ext(os_calendar,  "OS Calendar",       "Системный календарь\nAndroid / iOS")
+
+' ─── Relationships — User → Screens ──────────────────────────────────────────
+Rel(admin,  auth_screen,      "Входит в систему",           "")
+Rel(admin,  training_detail,  "Создаёт / корректирует",     "")
+Rel(admin,  match_comp,       "Ведёт матч в реальном времени","")
+Rel(admin,  attendance_comp,  "Проставляет посещаемость",   "")
+Rel(parent, auth_screen,      "Входит в систему",           "")
+Rel(parent, attendance_comp,  "Подтверждает присутствие",   "")
+Rel(parent, stats_comp,       "Смотрит статистику ребёнка", "")
+Rel(player, team_comp,        "Просматривает состав",       "")
+Rel(player, calendar_comp,    "Смотрит расписание",         "")
+
+' ─── Relationships — Internal ─────────────────────────────────────────────────
+Rel(nav_comp,      auth_screen,      "Маршрутизация",         "")
+Rel(nav_comp,      home_screen,      "Маршрутизация",         "")
+Rel(home_screen,   calendar_comp,    "Открывает расписание",  "")
+Rel(home_screen,   match_comp,       "Открывает матч",        "")
+Rel(calendar_comp, training_detail,  "Открывает тренировку",  "")
+Rel(calendar_comp, match_comp,       "Открывает матч",        "")
+Rel(training_detail, attendance_comp,"Посещаемость",          "")
+Rel(attendance_comp, sync_comp,      "Кэширует отметки",      "")
+Rel(push_handler,  nav_comp,         "Deep-link на экран",    "")
+
+' ─── Relationships — to/from API ──────────────────────────────────────────────
+Rel(api_client,    backend_api,    "REST / WebSocket",        "HTTPS / WSS")
+Rel(sync_comp,     api_client,     "Синхронизация данных",    "Internal")
+Rel(auth_screen,   api_client,     "POST /auth/*",            "Internal")
+Rel(team_comp,     api_client,     "GET /teams, /players",    "Internal")
+Rel(training_detail, api_client,   "GET/POST /trainings",     "Internal")
+Rel(match_comp,    api_client,     "GET /matches, WS events", "Internal")
+Rel(stats_comp,    api_client,     "GET /statistics",         "Internal")
+Rel(notif_comp,    api_client,     "PATCH /notifications",    "Internal")
+Rel(push_handler,  push_service,   "Регистрация токена,\nполучение пушей", "FCM / APNs SDK")
+Rel(calendar_comp, os_calendar,    "Добавить событие в\nсистемный календарь", "OS API")
+
+@enduml

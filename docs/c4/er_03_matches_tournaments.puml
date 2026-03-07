@@ -1,0 +1,242 @@
+@startuml er_03_matches_tournaments
+!theme plain
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+
+skinparam entity {
+    BackgroundColor #EEF4FF
+    BorderColor #1168BD
+    FontColor #111111
+}
+
+hide empty methods
+hide circle
+
+title ER-диаграмма — Матчи и турниры\n(Schema 3)
+
+' ════════════════════════════════════════════════════════════════════════
+' ВНЕШНИЕ ТАБЛИЦЫ (из Schema 1 и 2)
+' ════════════════════════════════════════════════════════════════════════
+
+entity "users" as usr <<Schema 1>> {
+    * id : BIGSERIAL <<PK>>
+    --
+    ...
+}
+
+entity "clubs" as club <<Schema 1>> {
+    * id : BIGSERIAL <<PK>>
+    --
+    ...
+}
+
+entity "teams" as team <<Schema 1>> {
+    * id : BIGSERIAL <<PK>>
+    --
+    ...
+}
+
+entity "ref_sport_types" as sport <<Schema 1>> {
+    * id   : SMALLSERIAL <<PK>>
+    --
+    * name : VARCHAR(100)
+}
+
+entity "ref_positions" as position <<Schema 1>> {
+    * id   : SMALLSERIAL <<PK>>
+    --
+    * name : VARCHAR(100)
+}
+
+entity "venues" as venue <<Schema 2>> {
+    * id      : SERIAL <<PK>>
+    --
+    * name    : VARCHAR(255)
+    * address : TEXT
+}
+
+entity "files" as file <<Schema 1>> {
+    * id   : BIGSERIAL <<PK>>
+    --
+    * path : TEXT
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СПРАВОЧНИКИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "ref_tournament_types" as ttype <<справочник>> {
+    * id            : SMALLSERIAL <<PK>>
+    --
+    * name          : VARCHAR(255)
+    * sport_type_id : SMALLINT <<FK>>
+}
+
+entity "ref_match_event_types" as etype <<справочник>> {
+    * id   : SMALLSERIAL <<PK>>
+    --
+    * name : VARCHAR(100)
+    ' goal, penalty_scored, assist,
+    ' yellow_card, red_card,
+    ' goal_conceded, save,
+    ' penalty_awarded, penalty_saved
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СОПЕРНИКИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "opponents" as opponent {
+    * id         : SERIAL <<PK>>
+    --
+    * name       : VARCHAR(255)
+      city_id    : INT <<FK>>
+      country_id : SMALLINT <<FK>>
+    * created_at : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ТУРНИРЫ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "tournaments" as tournament {
+    * id                    : BIGSERIAL <<PK>>
+    --
+    * tournament_type_id    : SMALLINT <<FK>>
+    * name                  : VARCHAR(255)
+      logo_file_id          : BIGINT <<FK>>
+    * starts_at             : DATE
+    * ends_at               : DATE
+    * half_duration_minutes : SMALLINT
+    * halves_count          : SMALLINT
+      organizer             : VARCHAR(255)
+    * created_at            : TIMESTAMPTZ
+    * updated_at            : TIMESTAMPTZ
+}
+
+entity "tournament_teams" as tour_team {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * tournament_id : BIGINT <<FK>>
+    * club_id       : BIGINT <<FK>>
+    * team_id       : BIGINT <<FK>>
+    * status        : ENUM(participating,disqualified)
+    ' UNIQUE(tournament_id, team_id)
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' МАТЧИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "matches" as match {
+    * id                    : BIGSERIAL <<PK>>
+    --
+    * match_type            : ENUM(friendly,tournament_group,tournament_playoff)
+      tournament_id         : BIGINT <<FK>>
+    * sport_type_id         : SMALLINT <<FK>>
+    * venue_id              : INT <<FK>>
+    * name                  : VARCHAR(255)
+      description           : TEXT
+    * club_id               : BIGINT <<FK>>
+    * team_id               : BIGINT <<FK>>
+      opponent_team_id      : BIGINT <<FK>>
+      opponent_id           : INT <<FK>>
+    ' CHECK: ровно одно из двух
+    * scheduled_at          : TIMESTAMPTZ
+    * half_duration_minutes : SMALLINT
+    * halves_count          : SMALLINT
+    * is_away               : BOOLEAN
+      actual_start_at       : TIMESTAMPTZ
+      actual_end_at         : TIMESTAMPTZ
+    * created_at            : TIMESTAMPTZ
+    * updated_at            : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СОСТАВЫ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "match_coaches" as mcoach {
+    * id             : BIGSERIAL <<PK>>
+    --
+    * match_id       : BIGINT <<FK>>
+    * club_id        : BIGINT <<FK>>
+    * team_id        : BIGINT <<FK>>
+    * coach_user_id  : BIGINT <<FK>>
+    ' UNIQUE(match_id, coach_user_id)
+}
+
+entity "match_players" as mplayer {
+    * id               : BIGSERIAL <<PK>>
+    --
+    * match_id         : BIGINT <<FK>>
+    * club_id          : BIGINT <<FK>>
+    * team_id          : BIGINT <<FK>>
+    * player_user_id   : BIGINT <<FK>>
+    * position_id      : SMALLINT <<FK>>
+    * is_starter       : BOOLEAN
+      absence_reason   : TEXT
+      parent_user_id   : BIGINT <<FK>>
+    ' UNIQUE(match_id, player_user_id)
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СОБЫТИЯ МАТЧА
+' ════════════════════════════════════════════════════════════════════════
+
+entity "match_events" as mevent {
+    * id                 : BIGSERIAL <<PK>>
+    --
+    * match_id           : BIGINT <<FK>>
+    * event_type_id      : SMALLINT <<FK>>
+    * match_minute       : SMALLINT
+    * player_user_id     : BIGINT <<FK>>
+      assistant_user_id  : BIGINT <<FK>>
+    * event_at           : TIMESTAMPTZ
+    * created_at         : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ
+' ════════════════════════════════════════════════════════════════════════
+
+' --- справочники ---
+sport    ||--o{ ttype      : "вид спорта"
+
+' --- турниры ---
+ttype    ||--o{ tournament  : "тип турнира"
+file     |o--o{ tournament  : "логотип"
+tournament ||--o{ tour_team : "команды"
+club     ||--o{ tour_team   : ""
+team     ||--o{ tour_team   : ""
+
+' --- матчи ---
+tournament |o--o{ match     : "в рамках турнира"
+venue      ||--o{ match     : "место"
+sport      ||--o{ match     : "вид спорта"
+club       ||--o{ match     : "наш клуб"
+team       ||--o{ match     : "наша команда"
+team       |o--o{ match     : "соперник (внутр.)"
+opponent   |o--o{ match     : "соперник (внешн.)"
+
+' --- составы ---
+match    ||--o{ mcoach      : "тренерский штаб"
+club     ||--o{ mcoach      : ""
+team     ||--o{ mcoach      : ""
+usr      ||--o{ mcoach      : "тренер"
+
+match    ||--o{ mplayer     : "состав игроков"
+club     ||--o{ mplayer     : ""
+team     ||--o{ mplayer     : ""
+usr      ||--o{ mplayer     : "игрок"
+position ||--o{ mplayer     : "позиция"
+usr      |o--o{ mplayer     : "родитель"
+
+' --- события ---
+match    ||--o{ mevent      : "события матча"
+etype    ||--o{ mevent      : "тип события"
+usr      ||--o{ mevent      : "игрок"
+usr      |o--o{ mevent      : "ассистент"
+
+@enduml
