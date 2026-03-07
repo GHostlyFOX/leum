@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="en" dir="ltr"> <!-- This "landing-app.blade.php" master page is used only for "landing" page content present in "views/livewire" -->
+<html lang="ru" dir="ltr">
 	<head>
 
 		<!-- META DATA -->
 		<meta charset="UTF-8">
 		<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="description" content="Noa - Laravel Bootstrap 5 Admin & Dashboard Template">
-		<meta name="author" content="Spruko Technologies Private Limited">
-		<meta name="keywords" content="laravel admin template, bootstrap admin template, admin dashboard template, admin dashboard, admin template, admin, bootstrap 5, laravel admin, laravel admin dashboard template, laravel ui template, laravel admin panel, admin panel, laravel admin dashboard, laravel template, admin ui dashboard">
+		<meta name="description" content="Детская лига — платформа для управления детскими спортивными командами, клубами и турнирами">
+		<meta name="author" content="Детская лига">
+		<meta name="keywords" content="детский спорт, спортивные команды, детская лига, турниры, тренировки, управление клубом, расписание тренировок">
 
         @include('layouts.components.landing.styles')
 

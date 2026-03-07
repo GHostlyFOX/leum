@@ -3,6 +3,7 @@
 namespace Modules\Reference\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Match\Models\MatchEvent;
 
 class RefMatchEventType extends Model
 {
@@ -10,4 +11,9 @@ class RefMatchEventType extends Model
     public $timestamps = false;
 
     protected $fillable = ['name'];
+
+    public function matchEvents()
+    {
+        return $this->hasMany(MatchEvent::class, 'event_type_id');
+    }
 }

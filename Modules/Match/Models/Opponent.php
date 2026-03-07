@@ -26,4 +26,9 @@ class Opponent extends Model
     {
         return $this->belongsTo(Country::class, 'country_id');
     }
+
+    public function matches()
+    {
+        return $this->hasMany(GameMatch::class, 'opponent_id');
+    }
 }

@@ -14,6 +14,8 @@ use Modules\Training\Models\Venue;
 use Modules\Training\Models\RecurringTraining;
 use Modules\Training\Models\Training;
 use Modules\Training\Models\RefTrainingType;
+use Modules\Match\Models\GameMatch;
+use Modules\Tournament\Models\TournamentTeam;
 
 class Club extends Model
 {
@@ -84,5 +86,15 @@ class Club extends Model
     public function trainings()
     {
         return $this->hasMany(Training::class, 'club_id');
+    }
+
+    public function matches()
+    {
+        return $this->hasMany(GameMatch::class, 'club_id');
+    }
+
+    public function tournamentTeams()
+    {
+        return $this->hasMany(TournamentTeam::class, 'club_id');
     }
 }

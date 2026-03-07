@@ -4,6 +4,7 @@ namespace Modules\Training\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Club\Models\Club;
+use Modules\Match\Models\GameMatch;
 use Modules\Reference\Models\Country;
 use Modules\Reference\Models\City;
 
@@ -33,5 +34,15 @@ class Venue extends Model
     public function club()
     {
         return $this->belongsTo(Club::class, 'club_id');
+    }
+
+    public function trainings()
+    {
+        return $this->hasMany(Training::class, 'venue_id');
+    }
+
+    public function matches()
+    {
+        return $this->hasMany(GameMatch::class, 'venue_id');
     }
 }

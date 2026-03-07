@@ -9,7 +9,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Modules\Auth\Models\Permission;
 use Modules\Club\Models\Club;
 use Modules\File\Models\File;
+use Modules\Match\Models\MatchCoach;
+use Modules\Match\Models\MatchEvent;
+use Modules\Match\Models\MatchPlayer;
 use Modules\Team\Models\TeamMember;
+use Modules\Training\Models\Training;
+use Modules\Training\Models\TrainingAttendance;
 
 class User extends Authenticatable
 {
@@ -78,6 +83,35 @@ class User extends Authenticatable
     public function parents()
     {
         return $this->hasMany(UserParentPlayer::class, 'player_user_id');
+    }
+
+    // ── Training relationships ───────────────────────────────────
+
+    public function coachedTrainings()
+    {
+        return $this->hasMany(Training::class, 'coach_id');
+    }
+
+    public function trainingAttendances()
+    {
+        return $this->hasMany(TrainingAttendance::class, 'player_user_id');
+    }
+
+    // ── Match relationships ──────────────────────────────────────
+
+    public function matchCoaches()
+    {
+        return $this->hasMany(MatchCoach::class, 'coach_user_id');
+    }
+
+    public function matchPlayers()
+    {
+        return $this->hasMany(MatchPlayer::class, 'player_user_id');
+    }
+
+    public function matchEvents()
+    {
+        return $this->hasMany(MatchEvent::class, 'player_user_id');
     }
 
     // ── Accessors ──────────────────────────────────────────────

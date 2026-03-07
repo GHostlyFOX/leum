@@ -16,4 +16,9 @@ class RefTrainingType extends Model
     {
         return $this->belongsTo(Club::class, 'club_id');
     }
+
+    public function trainings()
+    {
+        return $this->hasMany(Training::class, 'training_type_id');
+    }
 }

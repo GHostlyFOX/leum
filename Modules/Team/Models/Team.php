@@ -11,6 +11,9 @@ use Modules\Reference\Models\Country;
 use Modules\Reference\Models\City;
 use Modules\Training\Models\Training;
 use Modules\Training\Models\RecurringTraining;
+use Modules\Match\Models\MatchCoach;
+use Modules\Match\Models\MatchPlayer;
+use Modules\Tournament\Models\TournamentTeam;
 
 class Team extends Model
 {
@@ -71,5 +74,25 @@ class Team extends Model
     public function matches()
     {
         return $this->hasMany(GameMatch::class, 'team_id');
+    }
+
+    public function opponentMatches()
+    {
+        return $this->hasMany(GameMatch::class, 'opponent_team_id');
+    }
+
+    public function matchCoaches()
+    {
+        return $this->hasMany(MatchCoach::class, 'team_id');
+    }
+
+    public function matchPlayers()
+    {
+        return $this->hasMany(MatchPlayer::class, 'team_id');
+    }
+
+    public function tournamentTeams()
+    {
+        return $this->hasMany(TournamentTeam::class, 'team_id');
     }
 }
