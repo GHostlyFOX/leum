@@ -67,6 +67,9 @@ rectangle "Веб-приложение\n(Laravel + Vue.js)" as web #EBF5FB {
     component "[match] Матчи / Турниры" as web_match
     component "[stats] Статистика" as web_stats
     component "[import] Excel-импорт" as web_import
+    component "[rsvp] RSVP (Родитель)" as web_rsvp
+    component "[calendar] Календарь (Родитель/Игрок)" as web_cal
+    component "[notify] Уведомления" as web_notify
 }
 
 rectangle "Мобильное приложение\n(React Native / Flutter)" as mobile #EBF5FB {
@@ -127,8 +130,10 @@ cloud "Excel / CSV\nИмпорт игроков" as excel
 admin --> web : "управление клубом,\nкомандами, игроками,\nтренировками, матчами"
 coach --> web : "тренировки, матчи,\nстатистика (веб)"
 coach --> mobile : "attendance, live-матч,\nкалендарь (моб.)"
-parent --> mobile : "RSVP, календарь,\nстатистика ребёнка"
-player --> mobile : "расписание,\nстатистика"
+parent --> web : "RSVP, календарь,\nстатистика ребёнка (веб)"
+parent --> mobile : "RSVP, календарь,\nстатистика ребёнка (моб.)"
+player --> web : "расписание,\nстатистика (веб)"
+player --> mobile : "расписание,\nстатистика (моб.)"
 
 ' ═══════════════════════════════════════════════════════════
 ' СВЯЗИ: ФРОНТЕНДЫ → API
@@ -141,6 +146,11 @@ web_training --> api_train : "training CRUD,\nattendance update"
 web_match --> api_match : "match CRUD,\nmatch_events,\nlive timer"
 web_stats --> api_stats : "stats query"
 web_import --> api_import : "Excel file upload"
+web_rsvp --> api_train : "PATCH attendance_status (веб)"
+web_rsvp --> api_match : "PATCH match_players (веб)"
+web_cal --> api_train : "GET trainings (веб)"
+web_cal --> api_match : "GET matches (веб)"
+web_notify --> api_notify : "GET/PATCH notifications (веб)"
 
 mob_auth --> api_auth : "credentials / OAuth token"
 mob_cal --> api_train : "GET trainings"

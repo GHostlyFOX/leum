@@ -14,11 +14,11 @@ System_Boundary(c1, "Детская лига") {
 
     Container(web_app, "Веб-приложение",
         "PHP 8 / Laravel + Blade / Vue.js",
-        "SPA / SSR интерфейс для\nадминистраторов и тренеров.\nПервичная регистрация клуба\nи команды")
+        "SPA / SSR интерфейс для всех ролей.\nАдмин/тренер: полное управление.\nРодитель/игрок: RSVP, календарь,\nстатистика, уведомления.\nПервичная регистрация клуба")
 
     Container(mobile_app, "Мобильное приложение",
         "React Native / Flutter",
-        "Кроссплатформенное приложение\n(Android + iOS) для всех ролей.\nПоддержка офлайн-режима")
+        "Кроссплатформенное приложение\n(Android + iOS) для всех ролей.\nRSVP, live-матч, push, offline.\nДублирует функции веб для\nродителей и игроков")
 
     Container(api, "Backend API",
         "PHP 8 / Laravel (REST)",
@@ -51,9 +51,10 @@ System_Ext(excel,        "Excel / CSV",            "Импорт/экспорт 
 ' ─── Relationships ────────────────────────────────────────────────────────────
 Rel(admin,      web_app,    "Использует",             "HTTPS")
 Rel(admin,      mobile_app, "Использует",             "HTTPS / Mobile")
-Rel(parent,     mobile_app, "Использует",             "HTTPS / Mobile")
-Rel(parent,     web_app,    "Использует",             "HTTPS")
-Rel(player,     web_app,    "Использует",             "HTTPS")
+Rel(parent,     mobile_app, "RSVP, календарь, статистика", "HTTPS / Mobile")
+Rel(parent,     web_app,    "RSVP, календарь, статистика", "HTTPS")
+Rel(player,     mobile_app, "Расписание, статистика",      "HTTPS / Mobile")
+Rel(player,     web_app,    "Расписание, статистика",      "HTTPS")
 
 Rel(web_app,    api,        "REST API запросы",       "HTTPS / JSON")
 Rel(mobile_app, api,        "REST API запросы",       "HTTPS / JSON")

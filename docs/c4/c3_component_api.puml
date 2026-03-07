@@ -84,11 +84,17 @@ Rel(web_app,    training_comp, "CRUD /trainings",            "HTTPS / JSON")
 Rel(web_app,    match_comp,    "CRUD /matches, /tournaments","HTTPS / JSON")
 Rel(web_app,    import_comp,   "POST /import, GET /export",  "HTTPS / JSON")
 
+Rel(web_app,    stats_comp,    "GET /statistics",            "HTTPS / JSON")
+Rel(web_app,    notif_comp,    "PATCH /notifications/prefs", "HTTPS / JSON")
+
 Rel(mobile_app, auth_comp,     "POST /auth/*",               "HTTPS / JSON")
+Rel(mobile_app, club_comp,     "GET /clubs, /teams",         "HTTPS / JSON")
+Rel(mobile_app, people_comp,   "GET /players, /coaches",     "HTTPS / JSON")
 Rel(mobile_app, training_comp, "GET/PATCH /trainings",       "HTTPS / JSON")
 Rel(mobile_app, match_comp,    "GET /matches, live events",  "HTTPS / JSON + WS")
 Rel(mobile_app, stats_comp,    "GET /statistics",            "HTTPS / JSON")
 Rel(mobile_app, notif_comp,    "PATCH /notifications/prefs", "HTTPS / JSON")
+Rel(mobile_app, import_comp,   "GET /export",                "HTTPS / JSON")
 
 ' ─── Relationships — components → infrastructure ──────────────────────────────
 Rel(auth_comp,     db,           "users, roles, tokens",      "SQL")
