@@ -1,0 +1,212 @@
+@startuml sequence_match_live
+!theme plain
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam sequenceArrowThickness 1.5
+skinparam responseMessageBelowArrow true
+skinparam sequenceParticipantBorderColor #6C3483
+skinparam sequenceParticipantBackgroundColor #E8DAEF
+skinparam sequenceActorBorderColor #6C3483
+skinparam sequenceActorBackgroundColor #D7BDE2
+skinparam sequenceDatabaseBorderColor #1E8449
+skinparam sequenceDatabaseBackgroundColor #E9F7EF
+skinparam backgroundColor #FFFFFF
+skinparam noteBorderColor #D4AC0D
+skinparam noteBackgroundColor #FEF9E7
+
+title Sequence: Live-матч\n(Создание → Состав → Запуск → События → Итог → Статистика)
+
+actor "Тренер /\nАдминистратор" as coach
+actor "Родитель А\n(мобильный)" as parentA
+actor "Родитель Б\n(мобильный)" as parentB
+participant "Веб / Моб.\n(Тренер)" as coach_app
+participant "Backend API" as api
+database "PostgreSQL" as db
+queue "Redis Queue" as queue
+participant "FCM / APNs\nTelegram" as push
+participant "Моб. приложение\n(Родители)" as parent_app
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 1: СОЗДАНИЕ МАТЧА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 1: Создание матча ==
+
+coach -> coach_app : Создаёт матч:\n• Тип: товарищеский / в турнире\n• Соперник (из списка или новый)\n• Дата, время, место\n• Домашний / выездной\n• Длительность тайма × кол-во таймов\n• Состав: RSVP или авто-выбор
+
+coach_app -> api : POST /matches\n{match_type, team_id, opponent_id,\nscheduled_at, venue_id, sport_type_id,\nhalf_duration_minutes, halves_count,\nis_away, rsvp_required:true}
+api -> db : INSERT matches
+
+alt Новый соперник
+    api -> db : INSERT opponents {name, city_id}
+    db --> api : opponent_id
+end
+
+api --> coach_app : {match_id}
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 2: ФОРМИРОВАНИЕ СОСТАВА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 2: Состав и RSVP ==
+
+alt RSVP от родителей
+    api -> db : INSERT match_players × N\n(все активные, is_starter=true по умолчанию)
+    api -> queue : dispatch: SendMatchRsvpNotify {match_id}
+    queue -> api : consume
+    api -> db : SELECT parent_users of team_members
+    db --> api : [parent_user_ids + push_tokens]
+
+    api -> push : Push родителям:\n«Матч 12 авг vs Спартак 10:00\n[✅ Приедем] [❌ Не приедем]»
+    push --> parentA : Push / Telegram
+    push --> parentB : Push / Telegram
+
+    parentA -> parent_app : Нажимает ✅ «Приедем»
+    parent_app -> api : PATCH /match_players/{id}\n{present:true}
+    api -> db : UPDATE match_players SET present=true
+
+    parentB -> parent_app : Нажимает ❌ «Не приедем»\nПричина: травма
+    parent_app -> api : PATCH /match_players/{id}\n{present:false, reason:injury}
+    api -> db : UPDATE match_players SET present=false, reason
+
+else Авто-состав
+    api -> db : SELECT team_members\nWHERE is_active=true\nAND no active injury
+    db --> api : [player_ids]
+    api -> db : INSERT match_players\n(все допущенные, is_starter=true)
+end
+
+coach -> coach_app : Корректирует состав:\n• Стартовый / Запасной\n• Позиция на игру\n• Добавляет / исключает игрока
+
+coach_app -> api : PATCH /match_players/{id}\n{is_starter, position_id}
+api -> db : UPDATE match_players
+
+api -> db : INSERT match_coaches\n{match_id, coach_user_id, team_id}
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 3: УВЕДОМЛЕНИЕ О МАТЧЕ
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 3: Уведомление — матч завтра ==
+
+note over queue
+    Scheduler: за 24 ч до scheduled_at
+    dispatch: SendMatchReminder
+end note
+
+api -> queue : dispatch: SendMatchReminder {match_id}
+queue -> api : consume
+api -> push : Push всем родителям и игрокам:\n«Завтра матч в 10:00 vs Спартак\nМесто: Стадион Лужники, ул. …»
+push --> parentA : Push / Telegram
+push --> parentB : Push / Telegram
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 4: ЗАПУСК МАТЧА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 4: Запуск матча ==
+
+coach -> coach_app : Нажимает «▶ Начать матч»
+coach_app -> api : PATCH /matches/{id}\n{actual_start_at: now()}
+api -> db : UPDATE matches\nSET actual_start_at=now(), status=in_progress
+db --> api : ok
+api --> coach_app : {status: in_progress}
+coach_app --> coach : Таймер запущен ▶ 00:00
+
+api -> queue : dispatch: SendMatchStartedNotify {match_id}
+queue -> api : consume
+api -> push : Push всем родителям:\n«Матч начался! vs Спартак»
+push --> parentA : «Матч начался!»
+push --> parentB : «Матч начался!»
+parentA -> parent_app : Открывает Live-экран
+parentB -> parent_app : Открывает Live-экран
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 5: LIVE — СОБЫТИЯ МАТЧА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 5: Live — фиксация событий ==
+
+coach -> coach_app : ⚽ Нажимает «Гол»
+coach_app --> coach : Выбирает игрока + ассистента\n(минута подставляется автоматически)
+coach -> coach_app : Подтверждает: Иван Петров (23 мин)\nАссистент: Сергей Иванов
+
+coach_app -> api : POST /matches/{id}/events\n{event_type: goal,\nplayer_user_id: Ivan_id,\nassistant_user_id: Sergey_id,\nmatch_minute: 23}
+api -> db : INSERT match_events\n{match_id, event_type_id, match_minute,\nplayer_user_id, assistant_user_id}
+db --> api : event_id
+
+api -> queue : dispatch: SendGoalNotify\n{match_id, scorer, minute, score}
+queue -> api : consume
+api -> db : SELECT score (COUNT goals)\nfrom match_events
+db --> api : score = 1:0
+api -> push : Push всем родителям:\n«⚽ ГОЛ! Иван Петров, 23 мин\nСчёт: 1:0»
+push --> parentA : «⚽ ГОЛ! 1:0»
+push --> parentB : «⚽ ГОЛ! 1:0»
+
+parentA -> parent_app : Live-экран обновляется:\n1:0 — Иван Петров (23')
+
+note over coach, parentB
+    Аналогично для других событий:
+    🟡 Жёлтая карточка → event_type=yellow_card
+    🔴 Красная карточка → event_type=red_card
+    🥅 Пропущенный гол → event_type=goal_conceded
+    Каждое событие → Push родителям
+end note
+
+== Перерыв ==
+
+coach -> coach_app : Нажимает «⏸ Перерыв»
+coach_app -> api : PATCH /matches/{id}/halftime
+api -> db : Сохраняет состояние таймера
+api --> coach_app : {halftime: true}
+coach_app --> coach : Таймер остановлен ⏸ 20:00
+
+coach -> coach_app : Нажимает «▶ Продолжить»
+coach_app -> api : PATCH /matches/{id}/resume
+api --> coach_app : Таймер возобновлён
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 6: ЗАВЕРШЕНИЕ МАТЧА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 6: Завершение матча ==
+
+coach -> coach_app : Нажимает «⏹ Завершить матч»
+coach_app -> api : PATCH /matches/{id}\n{actual_end_at: now(), status: completed}
+api -> db : UPDATE matches\nSET actual_end_at, status=completed
+api -> db : SELECT COUNT(goal) as our_goals,\nCOUNT(goal_conceded) as their_goals\nFROM match_events WHERE match_id=X
+db --> api : {our: 2, their: 1}
+api -> db : UPDATE matches\nSET score_home=2, score_away=1 (if home)\nor score_away=2, score_home=1 (if away)
+db --> api : ok
+
+api -> queue : dispatch: SendMatchResultNotify {match_id}
+queue -> api : consume
+
+api -> db : SELECT all parents+players of team
+db --> api : [users]
+api -> push : Push всем:\n«🏆 Победа 2:1 над Спартаком!\nГолы: Иван (23'), Максим (67')\nАссисты: Сергей, Алексей»
+push --> parentA : «🏆 Победа 2:1!»
+push --> parentB : «🏆 Победа 2:1!»
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 7: СТАТИСТИКА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 7: Обновление статистики ==
+
+note over api, db
+    После завершения матча статистика
+    пересчитывается по запросу (не денормализована):
+    • Голы игрока = COUNT(match_events WHERE type=goal)
+    • Ассисты = COUNT(match_events WHERE assistant_id=player)
+    • Минуты на поле = рассчитываются из substitutions (будущая функция)
+    • Посещаемость матчей = COUNT(match_players WHERE present=true)
+end note
+
+parentA -> parent_app : Открывает карточку ребёнка
+parent_app -> api : GET /players/{id}/match-stats?season=2025
+api -> db : SELECT match_events, match_players\nWHERE player_user_id=X
+db --> api : {matches:8, goals:3, assists:2, minutes:420}
+api --> parent_app : статистика
+parent_app --> parentA : «Иван: 8 матчей, 3 гола, 2 ассиста»
+
+@enduml

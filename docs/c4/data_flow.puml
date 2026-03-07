@@ -1,0 +1,199 @@
+@startuml data_flow
+!theme plain
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam linetype ortho
+skinparam ArrowColor #444444
+skinparam ArrowFontSize 10
+skinparam ArrowFontColor #555555
+skinparam backgroundColor #FFFFFF
+skinparam roundCorner 8
+
+skinparam actor {
+    BackgroundColor #D6EAF8
+    BorderColor #2E86C1
+    FontColor #1A252F
+}
+skinparam component {
+    BackgroundColor #EBF5FB
+    BorderColor #2E86C1
+    FontColor #1A252F
+}
+skinparam database {
+    BackgroundColor #E9F7EF
+    BorderColor #1E8449
+    FontColor #1A252F
+}
+skinparam queue {
+    BackgroundColor #FEF9E7
+    BorderColor #D4AC0D
+    FontColor #1A252F
+}
+skinparam cloud {
+    BackgroundColor #F4F6F7
+    BorderColor #7F8C8D
+    FontColor #1A252F
+}
+skinparam rectangle {
+    BackgroundColor #FDFEFE
+    BorderColor #BDC3C7
+    FontColor #1A252F
+}
+skinparam node {
+    BackgroundColor #F8F9FA
+    BorderColor #AEB6BF
+}
+
+title Карта движения данных — Детская лига\n(System Data Flow)
+
+' ═══════════════════════════════════════════════════════════
+' АКТОРЫ
+' ═══════════════════════════════════════════════════════════
+
+actor "Администратор" as admin
+actor "Тренер" as coach
+actor "Родитель" as parent
+actor "Игрок" as player
+
+' ═══════════════════════════════════════════════════════════
+' ФРОНТЕНД
+' ═══════════════════════════════════════════════════════════
+
+rectangle "Веб-приложение\n(Laravel + Vue.js)" as web #EBF5FB {
+    component "[auth] Логин / OAuth" as web_auth
+    component "[club] Клуб и команды" as web_club
+    component "[people] Игроки и тренеры" as web_people
+    component "[training] Тренировки" as web_training
+    component "[match] Матчи / Турниры" as web_match
+    component "[stats] Статистика" as web_stats
+    component "[import] Excel-импорт" as web_import
+}
+
+rectangle "Мобильное приложение\n(React Native / Flutter)" as mobile #EBF5FB {
+    component "[auth] Вход / OAuth" as mob_auth
+    component "[calendar] Календарь" as mob_cal
+    component "[rsvp] Подтверждение RSVP" as mob_rsvp
+    component "[match_live] Live-матч" as mob_live
+    component "[stats] Моя статистика" as mob_stats
+    component "[notify] Уведомления" as mob_notify
+    component "[offline] Offline-кэш\n(SQLite / Hive)" as mob_offline
+}
+
+' ═══════════════════════════════════════════════════════════
+' BACKEND API
+' ═══════════════════════════════════════════════════════════
+
+rectangle "Backend API (Laravel REST)" as api #D6EAF8 {
+    component "AuthModule\nJWT / Sanctum / OAuth2" as api_auth
+    component "ClubTeamModule\nCRUD клубов, команд" as api_club
+    component "PeopleModule\nИгроки, тренеры, родители" as api_people
+    component "TrainingModule\nРасписание, посещаемость" as api_train
+    component "MatchModule\nМатчи, турниры, события" as api_match
+    component "StatsModule\nАгрегация статистики" as api_stats
+    component "NotifyModule\nПуш, Telegram" as api_notify
+    component "CalendarModule\niCal-экспорт" as api_cal
+    component "ImportExportModule\nExcel / CSV" as api_import
+    component "FileModule\nS3 upload/download" as api_file
+}
+
+' ═══════════════════════════════════════════════════════════
+' ХРАНИЛИЩА ДАННЫХ
+' ═══════════════════════════════════════════════════════════
+
+rectangle "PostgreSQL 15" as pg #E9F7EF {
+    database "Схема 1\nusers · clubs · teams\nteam_members · profiles" as pg1
+    database "Схема 2\ntrainings · venues\nattendance · media" as pg2
+    database "Схема 3\nmatches · tournaments\nmatch_events" as pg3
+}
+
+database "S3 / File Storage\nфото, логотипы, медиа" as s3 #E9F7EF
+queue "Redis Queue\nАсинхронные задачи" as redis #FEF9E7
+queue "Cron / Scheduler\nАвто-генерация тренировок" as cron #FEF9E7
+
+' ═══════════════════════════════════════════════════════════
+' ВНЕШНИЕ СЕРВИСЫ
+' ═══════════════════════════════════════════════════════════
+
+cloud "Google OAuth2\nApple Sign In" as oauth
+cloud "FCM (Android)\nAPNs (iOS)" as push
+cloud "Telegram Bot API" as telegram
+cloud "Google Calendar\nApple Calendar (iCal)" as gcal
+cloud "Excel / CSV\nИмпорт игроков" as excel
+
+' ═══════════════════════════════════════════════════════════
+' СВЯЗИ: АКТОРЫ → ФРОНТЕНДЫ
+' ═══════════════════════════════════════════════════════════
+
+admin --> web : "управление клубом,\nкомандами, игроками,\nтренировками, матчами"
+coach --> web : "тренировки, матчи,\nстатистика (веб)"
+coach --> mobile : "attendance, live-матч,\nкалендарь (моб.)"
+parent --> mobile : "RSVP, календарь,\nстатистика ребёнка"
+player --> mobile : "расписание,\nстатистика"
+
+' ═══════════════════════════════════════════════════════════
+' СВЯЗИ: ФРОНТЕНДЫ → API
+' ═══════════════════════════════════════════════════════════
+
+web_auth --> api_auth : "credentials / OAuth token"
+web_club --> api_club : "club/team CRUD"
+web_people --> api_people : "user + profile CRUD"
+web_training --> api_train : "training CRUD,\nattendance update"
+web_match --> api_match : "match CRUD,\nmatch_events,\nlive timer"
+web_stats --> api_stats : "stats query"
+web_import --> api_import : "Excel file upload"
+
+mob_auth --> api_auth : "credentials / OAuth token"
+mob_cal --> api_train : "GET trainings"
+mob_cal --> api_match : "GET matches"
+mob_rsvp --> api_train : "PATCH attendance_status"
+mob_rsvp --> api_match : "PATCH match_players"
+mob_live --> api_match : "POST match_events\n(goal, card, timer)"
+mob_stats --> api_stats : "GET player stats"
+mob_offline ..> api_train : "sync queue\n(offline → online)"
+mob_offline ..> api_match : "sync queue\n(offline → online)"
+
+' ═══════════════════════════════════════════════════════════
+' СВЯЗИ: API → ХРАНИЛИЩА
+' ═══════════════════════════════════════════════════════════
+
+api_auth --> pg1 : "users (R/W)"
+api_club --> pg1 : "clubs, teams,\nteam_members (R/W)"
+api_people --> pg1 : "users, profiles,\nparent_player (R/W)"
+api_train --> pg2 : "trainings, attendance,\nrecurring, media (R/W)"
+api_train --> pg1 : "venues, users (R)"
+api_match --> pg3 : "matches, events,\ntournaments (R/W)"
+api_match --> pg2 : "venues (R)"
+api_stats --> pg1 : "team_members (R)"
+api_stats --> pg2 : "attendance (R)"
+api_stats --> pg3 : "match_events,\nmatch_players (R)"
+api_file --> s3 : "PUT / GET объект"
+api_file --> pg1 : "files (R/W)"
+api_people --> s3 : "фото профиля"
+api_club --> s3 : "логотип клуба/команды"
+api_train --> s3 : "медиа тренировок"
+
+' ═══════════════════════════════════════════════════════════
+' СВЯЗИ: API → ОЧЕРЕДИ
+' ═══════════════════════════════════════════════════════════
+
+api_train --> redis : "dispatch: SendTrainingNotify\nSendAttendanceReminder"
+api_match --> redis : "dispatch: SendMatchNotify\nSendLiveEventNotify"
+api_people --> redis : "dispatch: SendInviteEmail"
+api_notify --> redis : "dispatch: PushBatch"
+cron --> api_train : "GenerateRecurringTrainings\n(ежедневно)"
+redis --> api_notify : "consume job"
+
+' ═══════════════════════════════════════════════════════════
+' СВЯЗИ: API / ОЧЕРЕДИ → ВНЕШНИЕ СЕРВИСЫ
+' ═══════════════════════════════════════════════════════════
+
+api_auth <--> oauth : "OAuth2 code flow\n(login / register)"
+api_notify --> push : "push payload\n(FCM / APNs)"
+api_notify --> telegram : "sendMessage\n(Bot API)"
+api_cal --> gcal : "iCal (.ics) export"
+api_import <-- excel : "multipart/form-data\n(xlsx / csv)"
+
+push --> mob_notify : "push notification"
+telegram ..> parent : "уведомление\nв Telegram"
+
+@enduml

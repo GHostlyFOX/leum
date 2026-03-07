@@ -1,0 +1,178 @@
+@startuml sequence_training
+!theme plain
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam sequenceArrowThickness 1.5
+skinparam responseMessageBelowArrow true
+skinparam sequenceParticipantBorderColor #117A65
+skinparam sequenceParticipantBackgroundColor #D5F0E8
+skinparam sequenceActorBorderColor #117A65
+skinparam sequenceActorBackgroundColor #A9DFBF
+skinparam sequenceDatabaseBorderColor #1E8449
+skinparam sequenceDatabaseBackgroundColor #E9F7EF
+skinparam backgroundColor #FFFFFF
+skinparam noteBorderColor #D4AC0D
+skinparam noteBackgroundColor #FEF9E7
+
+title Sequence: Жизненный цикл тренировки\n(Создание → Уведомления → RSVP → Проведение → Статистика)
+
+actor "Тренер /\nАдминистратор" as coach
+actor "Родитель" as parent
+participant "Веб /\nМобильный" as app
+participant "Backend API" as api
+participant "Cron /\nScheduler" as cron
+database "PostgreSQL" as db
+queue "Redis Queue" as queue
+participant "FCM / APNs\nTelegram" as push
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 1: СОЗДАНИЕ ТРЕНИРОВКИ
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 1: Создание тренировки ==
+
+coach -> app : Создаёт регулярное расписание:\n• Дни недели + время\n• Место, тренер, вид тренировки\n• advance_days = 7 (генерировать за 7 дней)
+app -> api : POST /recurring-trainings\n{team_id, schedule:[…], auto_create:{…},\nnotify_parents:true, require_rsvp:true}
+api -> db : INSERT recurring_trainings\n{schedule JSONB, auto_create JSONB}
+db --> api : recurring_id
+api --> app : {recurring_id}
+app --> coach : «Расписание сохранено»
+
+note over cron
+    Cron запускается ежедневно в 00:00
+    Ищет шаблоны с auto_create.advance_days,
+    у которых нет созданных тренировок
+    на нужную дату. Создаёт их.
+end note
+
+cron -> api : (ежедневно) GenerateRecurringTrainings
+api -> db : SELECT recurring_trainings WHERE is_active=true
+db --> api : [шаблоны]
+
+loop для каждого шаблона × каждый день расписания
+    api -> db : INSERT trainings\n{recurring_id, team_id, coach_id,\ntraining_date, start_time,\nvenue_id, status=scheduled}
+    api -> db : INSERT training_attendance × N\n(для каждого игрока команды,\nstatus=pending)
+    api -> queue : dispatch: SendTrainingNotify\n{training_id, team_id}
+end
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 2: УВЕДОМЛЕНИЕ РОДИТЕЛЕЙ
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 2: Уведомление родителей ==
+
+queue -> api : consume: SendTrainingNotify
+api -> db : SELECT users WHERE role=parent\nAND linked to team players
+db --> api : [parent_users с push_tokens]
+
+loop для каждого родителя
+    api -> push : FCM/APNs: send\n{title: «Тренировка назначена»,\nbody: «5 авг, 10:00, стадион №3»,\ndata: {training_id, action:rsvp}}
+    push --> parent : Push-уведомление
+    opt Telegram подключён
+        api -> push : Telegram: sendMessage\n{chat_id, text: «Тренировка 5 авг…\n[✅ Придём] [❌ Не придём]»}
+        push --> parent : Telegram-сообщение с кнопками
+    end
+end
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 3: ПОДТВЕРЖДЕНИЕ RSVP
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 3: RSVP от родителей ==
+
+parent -> app : Открывает уведомление\n(deep link → карточка тренировки)
+app -> api : GET /trainings/{id}
+api -> db : SELECT training + attendance для ребёнка
+db --> api : {training, attendance{status:pending}}
+api --> app : данные тренировки
+app --> parent : Экран: «Придёт / Не придёт»
+
+alt Родитель подтверждает присутствие
+    parent -> app : Нажимает ✅ «Придём»
+    app -> api : PATCH /attendance/{id}\n{status: present}
+    api -> db : UPDATE training_attendance\n{status=present, confirmed_at=now()}
+    db --> api : ok
+    api --> app : {status: present}
+
+else Родитель отклоняет с причиной
+    parent -> app : Нажимает ❌ «Не придём»
+    app --> parent : Запрос причины:\n• Болезнь / Травма / Семейные / Опоздание
+    parent -> app : Выбирает «Травма»\nУказывает срок до: 20 авг
+
+    app -> api : PATCH /attendance/{id}\n{status: absent,\nabsence_reason: injury,\ninjury_until: 2025-08-20}
+    api -> db : UPDATE training_attendance\n{status=absent, reason, …}
+
+    note over api
+        Для всех тренировок team_member
+        до injury_until → авто-UPDATE
+        training_attendance.status = absent,
+        absence_reason = injury (auto)
+    end note
+
+    api -> db : UPDATE training_attendance\nWHERE player=X AND date ≤ 2025-08-20\nSET status=absent, reason=injury_auto
+    db --> api : rows_updated
+    api --> app : {status: absent, auto_applied: 3}
+    app --> parent : «Отмечено для 3 тренировок до 20 авг»
+end
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 4: ДЕНЬ ТРЕНИРОВКИ
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 4: День тренировки — отметка посещаемости ==
+
+coach -> app : Открывает тренировку в мобильном\n(видит: подтвердили 10, отказали 2, не ответили 3)
+app -> api : GET /trainings/{id}/attendance
+api -> db : SELECT training_attendance\nJOIN users ON player_user_id
+db --> api : [{player, status, reason}]
+api --> app : список участников
+app --> coach : Список: ✅ подтвердили / ❌ отказали / ⏳ не ответили
+
+loop для каждого игрока
+    coach -> app : Отмечает фактическое присутствие
+    app -> api : PATCH /attendance/{id}\n{status: present/absent,\nmarked_by_user_id: coach_id}
+    api -> db : UPDATE training_attendance\n{status, marked_by=coach_id,\nconfirmed_at=now()}
+end
+
+coach -> app : Нажимает «Завершить тренировку»
+app -> api : PATCH /trainings/{id}\n{status: completed}
+api -> db : UPDATE trainings SET status=completed
+db --> api : ok
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 5: ИЗМЕНЕНИЕ / ОТМЕНА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 5 (альтернатива): Изменение или отмена ==
+
+coach -> app : Редактирует тренировку:\nМеняет место / время
+app -> api : PATCH /trainings/{id}\n{venue_id, start_time}
+api -> db : UPDATE trainings
+
+opt notify_parents=true
+    api -> queue : dispatch: SendTrainingChangedNotify\n{training_id, changes:[venue, time]}
+    queue -> api : consume
+    api -> push : Push всем родителям:\n«Тренировка 5 авг изменена:\nновое время 11:00»
+    push --> parent : Push / Telegram
+end
+
+note over coach, parent
+    Аналогично для отмены тренировки:
+    PATCH {status: cancelled}
+    → dispatch: SendTrainingCancelledNotify
+end note
+
+' ═══════════════════════════════════════════════════════════
+' ФАЗА 6: СТАТИСТИКА
+' ═══════════════════════════════════════════════════════════
+
+== Фаза 6: Статистика посещаемости ==
+
+coach -> app : Открывает Статистику → Посещаемость
+app -> api : GET /stats/attendance\n?team_id={}&from={}&to={}
+api -> db : SELECT training_attendance\nGROUP BY player_user_id\nCOUNT present/absent
+db --> api : [{player_id, total, present%, absent%,\ntop_reason}]
+api --> app : статистика
+app --> coach : Таблица посещаемости по игрокам\n+ график по месяцам
+
+@enduml

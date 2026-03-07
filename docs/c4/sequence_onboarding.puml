@@ -1,0 +1,162 @@
+@startuml sequence_onboarding
+!theme plain
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam sequenceArrowThickness 1.5
+skinparam responseMessageBelowArrow true
+skinparam sequenceParticipantBorderColor #2E86C1
+skinparam sequenceParticipantBackgroundColor #EBF5FB
+skinparam sequenceActorBorderColor #2E86C1
+skinparam sequenceActorBackgroundColor #D6EAF8
+skinparam sequenceDatabaseBorderColor #1E8449
+skinparam sequenceDatabaseBackgroundColor #E9F7EF
+skinparam sequenceGroupBorderColor #7F8C8D
+skinparam backgroundColor #FFFFFF
+skinparam noteBorderColor #D4AC0D
+skinparam noteBackgroundColor #FEF9E7
+
+title Sequence: Онбординг клуба\n(Регистрация → Клуб → Команда → Тренеры → Игроки)
+
+actor "Администратор" as admin
+participant "Веб-приложение" as web
+participant "Backend API" as api
+participant "Auth Service\n(OAuth / Email)" as auth
+database "PostgreSQL" as db
+participant "S3 Storage" as s3
+participant "Email / Push" as notify
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 1: РЕГИСТРАЦИЯ
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 1: Регистрация администратора ==
+
+admin -> web : Открывает сайт\nНажимает «Зарегистрироваться»
+web -> api : POST /auth/register\n{email, password}
+api -> db : INSERT users\n{email, password_hash, role=admin}
+db --> api : user_id
+api --> web : JWT access_token + refresh_token
+web --> admin : Перенаправление на онбординг
+
+note over admin, db
+    Альтернатива: OAuth (Google/Apple)
+    POST /auth/oauth { provider, code }
+    → обмен code → profile → upsert users
+end note
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 2: СОЗДАНИЕ КЛУБА
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 2: Создание клуба ==
+
+admin -> web : Заполняет форму клуба:\nНазвание, вид, адрес,\nemail, телефоны
+web -> api : POST /clubs\n{name, club_type_id, country_id,\ncity_id, address, email, phones:[…]}
+api -> db : INSERT clubs
+db --> api : club_id
+
+opt Загружает логотип
+    admin -> web : Выбирает файл логотипа
+    web -> api : POST /files\nContent-Type: multipart/form-data
+    api -> s3 : PUT object\n(key = clubs/{id}/logo.jpg)
+    s3 --> api : S3 URL / key
+    api -> db : INSERT files {path, mime, size}
+    db --> api : file_id
+    api -> db : UPDATE clubs SET logo_file_id
+end
+
+api --> web : {club_id, …}
+web --> admin : «Клуб создан» → Шаг 3
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 3: СОЗДАНИЕ КОМАНДЫ
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 3: Создание команды ==
+
+admin -> web : Заполняет форму команды:\nГод рождения, пол, название (необяз.)
+web -> api : POST /teams\n{club_id, birth_year, gender,\nname, sport_type_id}
+api -> db : INSERT teams
+db --> api : team_id
+api --> web : {team_id}
+web --> admin : «Команда создана» → Шаг 4
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 4: ДОБАВЛЕНИЕ ТРЕНЕРА
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 4: Добавление тренера ==
+
+admin -> web : Заполняет форму тренера:\nФИО, телефон, email,\nпозиция, лицензия, достижения\n[x] Отправить приглашение
+web -> api : POST /coaches\n{first_name, last_name, email,\nphone, team_id, send_invite: true,\ncoach_profile: {specialty_id,\nlicense_number, …, achievements:[…]}}
+api -> db : INSERT users {email, role=coach}
+api -> db : INSERT coach_profiles {user_id, …}
+api -> db : INSERT team_members\n{user_id, team_id, club_id, role=coach}
+db --> api : user_id
+
+api -> notify : Dispatch: SendInviteEmail\n{email, activation_link}
+notify --> admin : (фоново — письмо тренеру)
+
+api --> web : {coach_user_id}
+web --> admin : «Тренер добавлен, приглашение отправлено»
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 5А: ДОБАВЛЕНИЕ ИГРОКОВ — ФОРМА
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 5а: Добавление игроков через форму ==
+
+loop по каждому игроку
+    admin -> web : Заполняет форму игрока:\nФИО, дата рожд., пол, нога, позиция,\nтелефон, email
+    web -> api : POST /players\n{user_data, player_profile,\nteam_id, parents:[{…}]}
+
+    api -> db : INSERT users {игрок}
+    api -> db : INSERT player_profiles
+    api -> db : INSERT team_members {role=player}
+
+    loop по каждому родителю
+        api -> db : INSERT users {родитель} или находит существующего
+        api -> db : INSERT user_parent_player\n{parent_user_id, player_user_id,\nkinship_type_id}
+    end
+
+    opt Отправить приглашение родителям
+        api -> notify : Dispatch: SendParentInviteEmail\n{parent_email, activation_link,\nchild_name}
+    end
+
+    api --> web : {player_id}
+end
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 5Б: ДОБАВЛЕНИЕ ИГРОКОВ — EXCEL
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 5б: Импорт игроков из Excel ==
+
+admin -> web : Нажимает «Скачать шаблон»
+web -> api : GET /players/import/template
+api --> web : players_template.xlsx
+web --> admin : Скачивает шаблон
+
+admin -> web : Заполняет шаблон\n(Excel: ФИО, дата рожд., позиция,\nтелефон, email родителей, …)\nЗагружает файл
+web -> api : POST /players/import\n{team_id, file: multipart}
+api -> api : Парсит xlsx (PhpSpreadsheet)\nВалидирует строки\nСоздаёт пакет записей
+
+api -> db : BEGIN TRANSACTION\n INSERT users × N\n INSERT player_profiles × N\n INSERT team_members × N\n INSERT user_parent_player × N\n COMMIT
+
+db --> api : [player_ids]
+
+api -> notify : Dispatch: SendBulkInviteEmails\n(для каждого родителя с email)
+
+api --> web : {imported: N, errors: [{row, msg}]}
+web --> admin : «Импортировано 18 игроков,\n2 строки с ошибками»
+
+' ═══════════════════════════════════════════════════════════
+' ЗАВЕРШЕНИЕ ОНБОРДИНГА
+' ═══════════════════════════════════════════════════════════
+
+== Онбординг завершён ==
+
+web --> admin : Перенаправление на Дашборд клуба
+note over admin : Дашборд: состав команды, 0 тренировок,\n0 матчей. Готово к работе.
+
+@enduml
