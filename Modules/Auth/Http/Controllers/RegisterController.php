@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\Auth\Http\Controllers;
 
 use App\Models\User;
@@ -7,7 +8,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -18,33 +18,37 @@ class RegisterController extends Controller
         }
         return view('auth::register');
     }
+
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'lastname' => ['required', 'string', 'max:255'],
-            'middlename' => ['nullable', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'regex:/^(\+7|8)\d{10}$/', 'unique:users,phone'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'consent_personal_data' => ['accepted'],
-            'is_send_notifications' => ['nullable'],
+            'first_name'  => ['required', 'string', 'max:100'],
+            'last_name'   => ['required', 'string', 'max:100'],
+            'middle_name' => ['nullable', 'string', 'max:100'],
+            'email'       => ['nullable', 'email', 'max:255', 'unique:users,email'],
+            'phone'       => ['required', 'regex:/^(\+7|8)\d{10}$/', 'unique:users,phone'],
+            'password'    => ['required', 'confirmed', Rules\Password::defaults()],
+            'birth_date'  => ['required', 'date'],
+            'gender'      => ['required', 'in:male,female'],
+            'consent_personal_data'  => ['accepted'],
+            'notifications_on'       => ['nullable'],
         ], [
             'phone.regex' => 'Телефон должен быть в формате +7XXXXXXXXXX или 8XXXXXXXXXX',
             'consent_personal_data.accepted' => 'Вы должны согласиться с условиями обработки персональных данных.',
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
-            'lastname' => $validated['lastname'],
-            'middlename' => $validated['middlename'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
-            'is_send_notifications' => isset($validated['is_send_notifications']),
+            'first_name'       => $validated['first_name'],
+            'last_name'        => $validated['last_name'],
+            'middle_name'      => $validated['middle_name'] ?? null,
+            'email'            => $validated['email'] ?? null,
+            'phone'            => $validated['phone'],
+            'password_hash'    => Hash::make($validated['password']),
+            'birth_date'       => $validated['birth_date'],
+            'gender'           => $validated['gender'],
+            'notifications_on' => isset($validated['notifications_on']),
         ]);
 
-        // Если хочешь автоматически логинить пользователя:
         auth()->login($user);
 
         return redirect()->route('home');

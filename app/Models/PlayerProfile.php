@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,30 +9,34 @@ class PlayerProfile extends Model
 {
     protected $table = 'player_profiles';
 
+    public $timestamps = false;
+
     protected $fillable = [
-        'user',
-        'leg',
-        'ref_position',
-        'ref_type_sport',
-        'address',
+        'user_id',
+        'dominant_foot_id',
+        'position_id',
+        'sport_type_id',
     ];
 
-    protected $casts = [
-        'leg' => 'integer',
-    ];
+    // ── Связи ────────────────────────────────────────────────────────────
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function dominantFoot(): BelongsTo
+    {
+        return $this->belongsTo(RefDominantFoot::class, 'dominant_foot_id');
     }
 
     public function position(): BelongsTo
     {
-        return $this->belongsTo(RefPosition::class, 'ref_position');
+        return $this->belongsTo(RefPosition::class, 'position_id');
     }
 
-    public function sport(): BelongsTo
+    public function sportType(): BelongsTo
     {
-        return $this->belongsTo(RefTypeSport::class, 'ref_type_sport');
+        return $this->belongsTo(RefSportType::class, 'sport_type_id');
     }
 }

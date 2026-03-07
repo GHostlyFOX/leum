@@ -18,8 +18,8 @@ return new class extends Migration
     public function up(): void
     {
         // ── ENUM-типы ──────────────────────────────────────────────────────────
-        DB::statement("CREATE TYPE training_status AS ENUM ('scheduled', 'completed', 'cancelled')");
-        DB::statement("CREATE TYPE attendance_status AS ENUM ('pending', 'present', 'absent')");
+        DB::statement("DO $$ BEGIN CREATE TYPE training_status AS ENUM ('scheduled', 'completed', 'cancelled'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
+        DB::statement("DO $$ BEGIN CREATE TYPE attendance_status AS ENUM ('pending', 'present', 'absent'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
 
         // ── Виды тренировок (per-club) ─────────────────────────────────────────
 

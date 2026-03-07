@@ -17,8 +17,8 @@ return new class extends Migration
     public function up(): void
     {
         // ── ENUM-типы ──────────────────────────────────────────────────────────
-        DB::statement("CREATE TYPE user_gender AS ENUM ('male', 'female')");
-        DB::statement("CREATE TYPE team_gender AS ENUM ('boys', 'girls', 'mixed')");
+        DB::statement("DO $$ BEGIN CREATE TYPE user_gender AS ENUM ('male', 'female'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
+        DB::statement("DO $$ BEGIN CREATE TYPE team_gender AS ENUM ('boys', 'girls', 'mixed'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
 
         // ── Справочники ────────────────────────────────────────────────────────
 

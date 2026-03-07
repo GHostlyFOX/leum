@@ -54,46 +54,46 @@
                                     <input class="form-control file-input @error('logo') is-invalid @enderror" type="file" name="logo" id="logo" accept="image/*">
                                 </div>
                                 <div class="form-group">
-                                    <label for="ref_type_club" class="form-label"><b>Вид клуба</b> <span class="text-danger">*</span></label>
+                                    <label for="club_type_id" class="form-label"><b>Вид клуба</b> <span class="text-danger">*</span></label>
                                     <select
-                                        name="ref_type_club"
-                                        id="ref_type_club"
-                                        class="form-select @error('ref_type_club') is-invalid @enderror"
+                                        name="club_type_id"
+                                        id="club_type_id"
+                                        class="form-select @error('club_type_id') is-invalid @enderror"
                                         required
                                     >
                                         <option value="">— Выберите тип клуба —</option>
                                         @foreach($typeClubs as $typeClub)
                                             <option
                                                 value="{{ $typeClub->id }}"
-                                                @if(old('ref_type_club') == $typeClub->id || count($typeClubs) == 1) selected @endif
+                                                @if(old('club_type_id') == $typeClub->id || count($typeClubs) == 1) selected @endif
                                             >
                                                 {{ $typeClub->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('ref_type_club')
+                                    @error('club_type_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group">
-                                    <label for="ref_type_sport" class="form-label"><b>Вид спорта</b> <span class="text-danger">*</span></label>
+                                    <label for="sport_type_id" class="form-label"><b>Вид спорта</b> <span class="text-danger">*</span></label>
                                     <select
-                                        name="ref_type_sport"
-                                        id="ref_type_sport"
-                                        class="form-select @error('ref_type_sport') is-invalid @enderror"
+                                        name="sport_type_id"
+                                        id="sport_type_id"
+                                        class="form-select @error('sport_type_id') is-invalid @enderror"
                                         required
                                     >
                                         <option value="">— Выберите вид спорта —</option>
                                         @foreach($typeSports as $typeSport)
                                             <option
                                                 value="{{ $typeSport->id }}"
-                                                @if(old('ref_type_sport') == $typeSport->id || count($typeSports) == 1) selected @endif
+                                                @if(old('sport_type_id') == $typeSport->id || count($typeSports) == 1) selected @endif
                                             >
                                                 {{ $typeSport->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('ref_type_sport')
+                                    @error('sport_type_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -120,44 +120,44 @@
                                 <div class="form-group">
                                     <label for="country" class="form-label"><b>Страна</b> <span class="text-danger">*</span></label>
                                     <select
-                                        name="country"
-                                        id="country"
-                                        class="form-select @error('country') is-invalid @enderror"
+                                        name="country_id"
+                                        id="country_id"
+                                        class="form-select @error('country_id') is-invalid @enderror"
                                         required
                                     >
                                         <option value="">— Выберите страну —</option>
                                         @foreach($countries as $country)
                                             <option
                                                 value="{{ $country->id }}"
-                                                @if(old('country') == $country->id || count($countries) == 1) selected @endif
+                                                @if(old('country_id') == $country->id || count($countries) == 1) selected @endif
                                             >
                                                 {{ $country->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('country')
+                                    @error('country_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group">
                                     <label for="city" class="form-label"><b>Город</b> <span class="text-danger">*</span></label>
                                     <select
-                                        name="city"
-                                        id="city"
-                                        class="form-select @error('city') is-invalid @enderror"
+                                        name="city_id"
+                                        id="city_id"
+                                        class="form-select @error('city_id') is-invalid @enderror"
                                         required
                                     >
                                         <option value="">— Выберите город —</option>
                                         @foreach($cities as $city)
                                             <option
                                                 value="{{ $city->id }}"
-                                                @if(old('city') == $city->id) selected @endif
+                                                @if(old('city_id') == $city->id) selected @endif
                                             >
                                                 {{ $city->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('city')
+                                    @error('city_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

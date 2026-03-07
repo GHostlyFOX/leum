@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,21 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RefPosition extends Model
 {
-    protected $table = 'ref_position';
+    protected $table = 'ref_positions';
+
+    public $timestamps = false;
 
     protected $fillable = [
         'name',
-        'ref_type_sport',
-        'club',
+        'sport_type_id',
     ];
 
-    public function sport(): BelongsTo
-    {
-        return $this->belongsTo(RefTypeSport::class, 'ref_type_sport');
-    }
+    // ── Связи ────────────────────────────────────────────────────────────
 
-    public function club(): BelongsTo
+    public function sportType(): BelongsTo
     {
-        return $this->belongsTo(Club::class, 'club');
+        return $this->belongsTo(RefSportType::class, 'sport_type_id');
     }
 }

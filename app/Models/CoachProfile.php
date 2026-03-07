@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,34 +9,38 @@ class CoachProfile extends Model
 {
     protected $table = 'coach_profiles';
 
+    public $timestamps = false;
+
     protected $fillable = [
-        'user',
-        'ref_position',
-        'date_begin',
-        'license',
-        'date_end_license',
-        'awards',
-        'ref_type_sport',
+        'user_id',
+        'sport_type_id',
+        'specialty_id',
+        'career_start',
+        'license_number',
+        'license_expires',
+        'achievements',
     ];
 
     protected $casts = [
-        'date_begin' => 'date',
-        'date_end_license' => 'date',
-        'awards' => 'array',
+        'career_start'    => 'date',
+        'license_expires' => 'date',
+        'achievements'    => 'array',
     ];
+
+    // ── Связи ────────────────────────────────────────────────────────────
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function position(): BelongsTo
+    public function sportType(): BelongsTo
     {
-        return $this->belongsTo(RefPosition::class, 'ref_position');
+        return $this->belongsTo(RefSportType::class, 'sport_type_id');
     }
 
-    public function sport(): BelongsTo
+    public function specialty(): BelongsTo
     {
-        return $this->belongsTo(RefTypeSport::class, 'ref_type_sport');
+        return $this->belongsTo(RefPosition::class, 'specialty_id');
     }
 }

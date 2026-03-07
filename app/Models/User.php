@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -15,65 +17,88 @@ class User extends Authenticatable
     protected $table = 'users';
 
     protected $fillable = [
-        'name',
-        'lastname',
-        'middlename',
+        'first_name',
+        'last_name',
+        'middle_name',
         'email',
         'phone',
-        'photo',
-        'is_send_notifications',
-        'birthdate',
-        'ref_sex',
-        'kindred_spirit',
-        'password',
-        'remember_token',
-        'forgot_token',
-        'email_verified_at',
-        'phone_verified_at',
+        'password_hash',
+        'photo_file_id',
+        'notifications_on',
+        'birth_date',
+        'gender',
     ];
 
-    protected $dates = [
-        'birthdate',
-        'email_verified_at',
-        'phone_verified_at',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-
-    public $timestamps = false;
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
-        'forgot_token'
+        'password_hash',
+    ];
+
+    protected $casts = [
+        'birth_date'       => 'date',
+        'notifications_on' => 'boolean',
+        'created_at'       => 'datetime',
+        'updated_at'       => 'datetime',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Указываем Laravel, что колонка пароля называется password_hash.
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    public function sex()
+    public function getAuthPassword(): string
     {
-        return $this->belongsTo(RefSex::class, 'ref_sex');
+        return $this->password_hash;
     }
 
-    public function headerName(){
-        if ($this->name != '')
-            return $this->name;
-        elseif ($this->lastname != '')
-            return $this->lastname;
-        else
-            return $this->email;
+    // ── Связи ────────────────────────────────────────────────────────────
+
+    public function photoFile(): BelongsTo
+    {
+        return $this->belongsTo(File::class, 'photo_file_id');
+    }
+
+    public function playerProfile(): HasOne
+    {
+        return $this->hasOne(PlayerProfile::class, 'user_id');
+    }
+
+    public function coachProfile(): HasOne
+    {
+        return $this->hasOne(CoachProfile::class, 'user_id');
+    }
+
+    public function teamMemberships(): HasMany
+    {
+        return $this->hasMany(TeamMember::class, 'user_id');
+    }
+
+    /**
+     * Дети (если пользователь — родитель).
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(UserParentPlayer::class, 'parent_user_id');
+    }
+
+    /**
+     * Родители (если пользователь — игрок).
+     */
+    public function parents(): HasMany
+    {
+        return $this->hasMany(UserParentPlayer::class, 'player_user_id');
+    }
+
+    // ── Вспомогательные методы ───────────────────────────────────────────
+
+    public function getFullNameAttribute(): string
+    {
+        return trim("{$this->last_name} {$this->first_name} {$this->middle_name}");
+    }
+
+    public function getShortNameAttribute(): string
+    {
+        $initials = mb_substr($this->first_name, 0, 1) . '.';
+        if ($this->middle_name) {
+            $initials .= ' ' . mb_substr($this->middle_name, 0, 1) . '.';
+        }
+        return "{$this->last_name} {$initials}";
     }
 }

@@ -32,7 +32,7 @@
 
                                 <!-- Имя -->
                                 <div class="wrap-input100 validate-input" data-bs-validate="Введите имя">
-                                    <input class="input100" type="text" name="name" value="{{ old('name') }}" placeholder="Имя *" required>
+                                    <input class="input100" type="text" name="first_name" value="{{ old('first_name') }}" placeholder="Имя *" required>
                                     <span class="focus-input100"></span>
                                     <span class="symbol-input100">
             <i class="mdi mdi-account-outline" aria-hidden="true"></i>
@@ -41,7 +41,7 @@
 
                                 <!-- Фамилия -->
                                 <div class="wrap-input100 validate-input" data-bs-validate="Введите фамилию">
-                                    <input class="input100" type="text" name="lastname" value="{{ old('lastname') }}" placeholder="Фамилия *" required>
+                                    <input class="input100" type="text" name="last_name" value="{{ old('last_name') }}" placeholder="Фамилия *" required>
                                     <span class="focus-input100"></span>
                                     <span class="symbol-input100">
             <i class="mdi mdi-account" aria-hidden="true"></i>
@@ -50,7 +50,7 @@
 
                                 <!-- Отчество -->
                                 <div class="wrap-input100">
-                                    <input class="input100" type="text" name="middlename" value="{{ old('middlename') }}" placeholder="Отчество">
+                                    <input class="input100" type="text" name="middle_name" value="{{ old('middle_name') }}" placeholder="Отчество">
                                     <span class="focus-input100"></span>
                                     <span class="symbol-input100">
             <i class="mdi mdi-account-circle-outline" aria-hidden="true"></i>
@@ -72,6 +72,28 @@
                                     <span class="focus-input100"></span>
                                     <span class="symbol-input100">
             <i class="mdi mdi-phone" aria-hidden="true"></i>
+        </span>
+                                </div>
+
+                                <!-- Дата рождения -->
+                                <div class="wrap-input100 validate-input" data-bs-validate="Укажите дату рождения">
+                                    <input class="input100" type="date" name="birth_date" value="{{ old('birth_date') }}" placeholder="Дата рождения *" required>
+                                    <span class="focus-input100"></span>
+                                    <span class="symbol-input100">
+            <i class="mdi mdi-calendar" aria-hidden="true"></i>
+        </span>
+                                </div>
+
+                                <!-- Пол -->
+                                <div class="wrap-input100 validate-input">
+                                    <select class="input100" name="gender" required>
+                                        <option value="" disabled {{ old('gender') ? '' : 'selected' }}>Пол *</option>
+                                        <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Мужской</option>
+                                        <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Женский</option>
+                                    </select>
+                                    <span class="focus-input100"></span>
+                                    <span class="symbol-input100">
+            <i class="mdi mdi-gender-male-female" aria-hidden="true"></i>
         </span>
                                 </div>
 
@@ -103,7 +125,7 @@
 
                                 <!-- Согласие на уведомления -->
                                 <label class="custom-control custom-checkbox mt-2">
-                                    <input type="checkbox" class="custom-control-input" name="is_send_notifications" {{ old('is_send_notifications') ? 'checked' : '' }}>
+                                    <input type="checkbox" class="custom-control-input" name="notifications_on" {{ old('notifications_on') ? 'checked' : '' }}>
                                     <span class="custom-control-label">
             Хочу получать уведомления и рассылки
         </span>

@@ -3,10 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\RefSex;
-use App\Models\RefTypeSport;
-use App\Models\RefRegion;
-use App\Models\Club;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Team extends Model
 {
@@ -15,39 +13,65 @@ class Team extends Model
     protected $fillable = [
         'name',
         'description',
-        'ref_sex',
-        'logo',
-        'kids_year',
-        'club',
-        'ref_type_sport',
-        'country',
-        'sity',
+        'gender',
+        'logo_file_id',
+        'birth_year',
+        'club_id',
+        'sport_type_id',
+        'country_id',
+        'city_id',
     ];
 
-    public $timestamps = false;
+    protected $casts = [
+        'birth_year' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    public function sex()
+    // ── Связи ────────────────────────────────────────────────────────────
+
+    public function club(): BelongsTo
     {
-        return $this->belongsTo(RefSex::class, 'ref_sex');
+        return $this->belongsTo(Club::class, 'club_id');
     }
 
-    public function typeSport()
+    public function logoFile(): BelongsTo
     {
-        return $this->belongsTo(RefTypeSport::class, 'ref_type_sport');
+        return $this->belongsTo(File::class, 'logo_file_id');
     }
 
-    public function countryRegion()
+    public function sportType(): BelongsTo
     {
-        return $this->belongsTo(RefRegion::class, 'country');
+        return $this->belongsTo(RefSportType::class, 'sport_type_id');
     }
 
-    public function cityRegion()
+    public function country(): BelongsTo
     {
-        return $this->belongsTo(RefRegion::class, 'sity');
+        return $this->belongsTo(Country::class, 'country_id');
     }
 
-    public function club()
+    public function city(): BelongsTo
     {
-        return $this->belongsTo(Club::class, 'club');
+        return $this->belongsTo(City::class, 'city_id');
+    }
+
+    public function members(): HasMany
+    {
+        return $this->hasMany(TeamMember::class, 'team_id');
+    }
+
+    public function trainings(): HasMany
+    {
+        return $this->hasMany(Training::class, 'team_id');
+    }
+
+    public function recurringTrainings(): HasMany
+    {
+        return $this->hasMany(RecurringTraining::class, 'team_id');
+    }
+
+    public function matches(): HasMany
+    {
+        return $this->hasMany(GameMatch::class, 'team_id');
     }
 }

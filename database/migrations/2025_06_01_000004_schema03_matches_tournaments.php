@@ -20,8 +20,8 @@ return new class extends Migration
     public function up(): void
     {
         // ── ENUM-типы ──────────────────────────────────────────────────────────
-        DB::statement("CREATE TYPE match_type AS ENUM ('friendly', 'tournament_group', 'tournament_playoff')");
-        DB::statement("CREATE TYPE tournament_entry_status AS ENUM ('participating', 'disqualified')");
+        DB::statement("DO $$ BEGIN CREATE TYPE match_type AS ENUM ('friendly', 'tournament_group', 'tournament_playoff'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
+        DB::statement("DO $$ BEGIN CREATE TYPE tournament_entry_status AS ENUM ('participating', 'disqualified'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;");
 
         // ── Справочник видов турниров ──────────────────────────────────────────
 
