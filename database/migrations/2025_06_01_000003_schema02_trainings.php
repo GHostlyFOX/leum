@@ -101,7 +101,7 @@ return new class extends Migration
             $table->foreign('venue_id')->references('id')->on('venues');
             $table->unsignedInteger('training_type_id');
             $table->foreign('training_type_id')->references('id')->on('ref_training_types');
-            $table->string('status', 20)->default('scheduled');  // training_status ENUM
+            $table->string('status', 20);  // training_status ENUM — default задаётся ниже после смены типа
             $table->boolean('notify_parents')->default(true);
             $table->boolean('require_rsvp')->default(true);
             $table->text('comment')->nullable();
@@ -114,7 +114,9 @@ return new class extends Migration
             $table->index('training_date',  'idx_trainings_date');
             $table->index('recurring_id',   'idx_trainings_recurring');
         });
+        DB::statement("ALTER TABLE trainings ALTER COLUMN status DROP DEFAULT");
         DB::statement("ALTER TABLE trainings ALTER COLUMN status TYPE training_status USING status::training_status");
+        DB::statement("ALTER TABLE trainings ALTER COLUMN status SET DEFAULT 'scheduled'");
 
         DB::statement("COMMENT ON TABLE trainings IS 'Конкретные тренировочные занятия. Могут быть разовыми или порождёнными из шаблона recurring_trainings'");
         DB::statement("COMMENT ON COLUMN trainings.coach_id IS 'Тренер, проводящий занятие'");
@@ -141,7 +143,7 @@ return new class extends Migration
             $table->foreign('player_user_id')->references('id')->on('users');
             $table->unsignedBigInteger('marked_by_user_id');
             $table->foreign('marked_by_user_id')->references('id')->on('users');
-            $table->string('attendance_status', 20)->default('pending');  // attendance_status ENUM
+            $table->string('attendance_status', 20);  // attendance_status ENUM — default задаётся ниже
             $table->timestampTz('confirmed_at')->nullable();
             $table->text('absence_reason')->nullable();
             $table->timestampsTz();
@@ -149,7 +151,9 @@ return new class extends Migration
             $table->index('training_id',    'idx_attendance_training');
             $table->index('player_user_id', 'idx_attendance_player');
         });
+        DB::statement("ALTER TABLE training_attendance ALTER COLUMN attendance_status DROP DEFAULT");
         DB::statement("ALTER TABLE training_attendance ALTER COLUMN attendance_status TYPE attendance_status USING attendance_status::attendance_status");
+        DB::statement("ALTER TABLE training_attendance ALTER COLUMN attendance_status SET DEFAULT 'pending'");
 
         DB::statement("COMMENT ON TABLE training_attendance IS 'Посещаемость тренировок: статус присутствия каждого игрока с возможностью причины отсутствия'");
         DB::statement("COMMENT ON COLUMN training_attendance.training_id IS 'Тренировка, к которой относится запись'");

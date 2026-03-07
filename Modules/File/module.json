@@ -1,0 +1,11 @@
+{
+    "name": "File",
+    "alias": "file",
+    "description": "Модуль управления файлами: загрузка, хранение S3, реестр",
+    "keywords": ["file", "upload", "s3", "storage"],
+    "priority": 0,
+    "providers": [
+        "Modules\\File\\Providers\\FileServiceProvider"
+    ],
+    "files": []
+}

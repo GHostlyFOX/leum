@@ -1,9 +1,9 @@
 {
     "name": "User",
     "alias": "user",
-    "description": "",
-    "keywords": [],
-    "priority": 0,
+    "description": "Модуль пользователей: профили, роли, связи родитель-игрок",
+    "keywords": ["user", "profile", "player", "coach", "parent"],
+    "priority": 2,
     "providers": [
         "Modules\\User\\Providers\\UserServiceProvider"
     ],

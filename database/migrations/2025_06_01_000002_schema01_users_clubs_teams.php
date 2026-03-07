@@ -31,10 +31,11 @@ return new class extends Migration
             $table->foreign('photo_file_id')->references('id')->on('files')->nullOnDelete();
             $table->boolean('notifications_on')->default(true);
             $table->date('birth_date');
-            $table->string('gender', 10);  // user_gender ENUM
+            $table->string('gender', 10);  // user_gender ENUM — тип меняется ниже
             $table->timestampsTz();
         });
-        // Применяем ENUM-тип PostgreSQL
+        // Применяем ENUM-тип PostgreSQL (drop default → cast → restore)
+        DB::statement("ALTER TABLE users ALTER COLUMN gender DROP DEFAULT");
         DB::statement("ALTER TABLE users ALTER COLUMN gender TYPE user_gender USING gender::user_gender");
 
         DB::statement("COMMENT ON TABLE users IS 'Аккаунты всех пользователей системы: игроки, тренеры, родители, администраторы'");
@@ -110,7 +111,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->text('description')->nullable();
-            $table->string('gender', 10);  // team_gender ENUM
+            $table->string('gender', 10);  // team_gender ENUM — тип меняется ниже
             $table->unsignedBigInteger('logo_file_id')->nullable();
             $table->foreign('logo_file_id')->references('id')->on('files')->nullOnDelete();
             $table->unsignedSmallInteger('birth_year');
@@ -125,6 +126,7 @@ return new class extends Migration
             $table->timestampsTz();
             $table->index('club_id', 'idx_teams_club');
         });
+        DB::statement("ALTER TABLE teams ALTER COLUMN gender DROP DEFAULT");
         DB::statement("ALTER TABLE teams ALTER COLUMN gender TYPE team_gender USING gender::team_gender");
 
         DB::statement("COMMENT ON TABLE teams IS 'Команды внутри клуба, сгруппированные по году рождения и полу'");

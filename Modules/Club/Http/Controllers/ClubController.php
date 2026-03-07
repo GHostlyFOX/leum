@@ -2,13 +2,13 @@
 
 namespace Modules\Club\Http\Controllers;
 
-use App\Models\Club;
-use App\Models\Country;
-use App\Models\City;
-use App\Models\File;
-use App\Models\RefClubType;
-use App\Models\RefSportType;
-use App\Services\ClubService;
+use Modules\Club\Models\Club;
+use Modules\Reference\Models\Country;
+use Modules\Reference\Models\City;
+use Modules\File\Models\File;
+use Modules\Reference\Models\RefClubType;
+use Modules\Reference\Models\RefSportType;
+use Modules\Club\Services\ClubService;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

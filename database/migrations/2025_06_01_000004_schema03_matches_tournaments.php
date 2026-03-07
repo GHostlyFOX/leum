@@ -96,12 +96,14 @@ return new class extends Migration
             $table->foreign('club_id')->references('id')->on('clubs');
             $table->unsignedBigInteger('team_id');
             $table->foreign('team_id')->references('id')->on('teams');
-            $table->string('status', 20)->default('participating');  // tournament_entry_status ENUM
+            $table->string('status', 20);  // tournament_entry_status ENUM — default задаётся ниже
             $table->unique(['tournament_id', 'team_id']);
             $table->index('tournament_id', 'idx_tournament_teams_tour');
             $table->index('team_id',       'idx_tournament_teams_team');
         });
+        DB::statement("ALTER TABLE tournament_teams ALTER COLUMN status DROP DEFAULT");
         DB::statement("ALTER TABLE tournament_teams ALTER COLUMN status TYPE tournament_entry_status USING status::tournament_entry_status");
+        DB::statement("ALTER TABLE tournament_teams ALTER COLUMN status SET DEFAULT 'participating'");
 
         DB::statement("COMMENT ON TABLE tournament_teams IS 'Команды, заявленные для участия в конкретном турнире'");
         DB::statement("COMMENT ON COLUMN tournament_teams.tournament_id IS 'Турнир'");
@@ -113,7 +115,7 @@ return new class extends Migration
 
         Schema::create('matches', function (Blueprint $table) {
             $table->id();
-            $table->string('match_type', 30);  // match_type ENUM
+            $table->string('match_type', 30);  // match_type ENUM — тип меняется ниже
             $table->unsignedBigInteger('tournament_id')->nullable();
             $table->foreign('tournament_id')->references('id')->on('tournaments');
             $table->unsignedSmallInteger('sport_type_id');
@@ -142,6 +144,7 @@ return new class extends Migration
             $table->index('team_id',       'idx_matches_team');
             $table->index('scheduled_at',  'idx_matches_scheduled');
         });
+        DB::statement("ALTER TABLE matches ALTER COLUMN match_type DROP DEFAULT");
         DB::statement("ALTER TABLE matches ALTER COLUMN match_type TYPE match_type USING match_type::match_type");
         // CHECK: ровно один соперник
         DB::statement("

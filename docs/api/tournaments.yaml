@@ -1,0 +1,386 @@
+paths:
+  /tournaments:
+    get:
+      tags:
+        - Tournaments
+      summary: Список турниров
+      description: Получить список турниров с фильтрацией и пагинацией
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: sport_type_id
+          in: query
+          description: Фильтр по виду спорта
+          schema:
+            type: integer
+        - name: year
+          in: query
+          description: Фильтр по году проведения
+          schema:
+            type: integer
+        - name: status
+          in: query
+          description: Статус турнира
+          schema:
+            type: string
+            enum: ["planning", "registration", "in_progress", "completed"]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Список турниров
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tournament'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+    post:
+      tags:
+        - Tournaments
+      summary: Создать новый турнир
+      description: Создание нового турнира
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - sport_type_id
+                - start_date
+                - end_date
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  example: "Чемпионат Москвы U-12 2024"
+                description:
+                  type: string
+                  nullable: true
+                  example: "Региональный чемпионат по футболу"
+                sport_type_id:
+                  type: integer
+                  example: 1
+                start_date:
+                  type: string
+                  format: date
+                  example: "2024-03-01"
+                end_date:
+                  type: string
+                  format: date
+                  example: "2024-05-31"
+                host_city_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                status:
+                  type: string
+                  enum: ["planning", "registration", "in_progress", "completed"]
+                  default: "planning"
+                  example: "registration"
+                max_teams:
+                  type: integer
+                  nullable: true
+                  description: Максимальное количество команд
+                  example: 16
+      responses:
+        '201':
+          description: Турнир успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentDetail'
+        '422':
+          description: Ошибка валидации
+
+  /tournaments/{id}:
+    get:
+      tags:
+        - Tournaments
+      summary: Получить турнир по ID
+      description: Получить полную информацию о турнире
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация о турнире
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentDetail'
+        '404':
+          description: Турнир не найден
+
+    put:
+      tags:
+        - Tournaments
+      summary: Обновить турнир
+      description: Частичное обновление данных турнира
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                description:
+                  type: string
+                  nullable: true
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                status:
+                  type: string
+                  enum: ["planning", "registration", "in_progress", "completed"]
+                host_city_id:
+                  type: integer
+                  nullable: true
+                max_teams:
+                  type: integer
+                  nullable: true
+      responses:
+        '200':
+          description: Турнир успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentDetail'
+        '404':
+          description: Турнир не найден
+
+    delete:
+      tags:
+        - Tournaments
+      summary: Удалить турнир
+      description: Удаление турнира из системы
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Турнир успешно удален
+        '404':
+          description: Турнир не найден
+
+  /tournaments/{id}/teams:
+    post:
+      tags:
+        - Tournaments
+      summary: Зарегистрировать команду в турнире
+      description: Добавить команду в турнир
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - team_id
+              properties:
+                club_id:
+                  type: integer
+                  description: ID клуба (опционально, если можно определить из команды)
+                  example: 1
+                team_id:
+                  type: integer
+                  description: ID команды
+                  example: 3
+                registered_at:
+                  type: string
+                  format: date
+                  description: Дата регистрации (опционально)
+                  nullable: true
+      responses:
+        '201':
+          description: Команда успешно зарегистрирована в турнире
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentTeam'
+        '404':
+          description: Турнир или команда не найдены
+        '422':
+          description: Ошибка валидации (команда уже зарегистрирована)
+
+components:
+  schemas:
+    Tournament:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sport_type_id:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: ["planning", "registration", "in_progress", "completed"]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TournamentDetail:
+      allOf:
+        - $ref: '#/components/schemas/Tournament'
+        - type: object
+          properties:
+            description:
+              type: string
+              nullable: true
+            host_city_id:
+              type: integer
+              nullable: true
+            max_teams:
+              type: integer
+              nullable: true
+            sport_type:
+              $ref: '#/components/schemas/SportType'
+            host_city:
+              $ref: '#/components/schemas/City'
+              nullable: true
+            teams:
+              type: array
+              items:
+                $ref: '#/components/schemas/TournamentTeam'
+            teams_count:
+              type: integer
+              description: Количество зарегистрированных команд
+
+    TournamentTeam:
+      type: object
+      properties:
+        id:
+          type: integer
+        tournament_id:
+          type: integer
+        team_id:
+          type: integer
+        club_id:
+          type: integer
+        registered_at:
+          type: string
+          format: date
+        team:
+          $ref: '#/components/schemas/Team'
+        club:
+          $ref: '#/components/schemas/Club'
+        created_at:
+          type: string
+          format: date-time
+
+    SportType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        country_id:
+          type: integer
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        gender:
+          type: string
+          enum: ["boys", "girls", "mixed"]
+        birth_year:
+          type: integer
+
+    Club:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+        per_page:
+          type: integer
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        from:
+          type: integer
+        to:
+          type: integer

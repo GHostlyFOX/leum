@@ -1,0 +1,11 @@
+{
+    "name": "Tournament",
+    "alias": "tournament",
+    "description": "Модуль турниров: регистрация команд, расписание",
+    "keywords": ["tournament", "championship", "cup"],
+    "priority": 7,
+    "providers": [
+        "Modules\\Tournament\\Providers\\TournamentServiceProvider"
+    ],
+    "files": []
+}

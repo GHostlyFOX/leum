@@ -1,9 +1,9 @@
 {
     "name": "Club",
     "alias": "club",
-    "description": "",
-    "keywords": [],
-    "priority": 0,
+    "description": "Модуль управления клубами",
+    "keywords": ["club", "organization"],
+    "priority": 3,
     "providers": [
         "Modules\\Club\\Providers\\ClubServiceProvider"
     ],

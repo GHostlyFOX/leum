@@ -1,0 +1,284 @@
+paths:
+  /refs/sport-types:
+    get:
+      tags:
+        - References
+      summary: Список видов спорта
+      description: Получить справочник видов спорта (публичный, без аутентификации)
+      responses:
+        '200':
+          description: Список видов спорта
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SportType'
+
+  /refs/club-types:
+    get:
+      tags:
+        - References
+      summary: Список типов клубов
+      description: Получить справочник типов клубов (публичный, без аутентификации)
+      responses:
+        '200':
+          description: Список типов клубов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClubType'
+
+  /refs/user-roles:
+    get:
+      tags:
+        - References
+      summary: Список ролей пользователей
+      description: Получить справочник ролей пользователей (публичный, без аутентификации)
+      responses:
+        '200':
+          description: Список ролей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRole'
+
+  /refs/positions:
+    get:
+      tags:
+        - References
+      summary: Список позиций игроков
+      description: Получить справочник позиций (с фильтром по виду спорта)
+      parameters:
+        - name: sport_type_id
+          in: query
+          description: Фильтр по виду спорта (опционально)
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Список позиций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Position'
+
+  /refs/dominant-feet:
+    get:
+      tags:
+        - References
+      summary: Список вариантов ведущей ноги
+      description: Получить справочник вариантов ведущей ноги (публичный, без аутентификации)
+      responses:
+        '200':
+          description: Список вариантов ведущей ноги
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DominantFoot'
+
+  /refs/kinship-types:
+    get:
+      tags:
+        - References
+      summary: Список типов родственных отношений
+      description: Получить справочник типов родства (опекун, родитель и т.д.)
+      responses:
+        '200':
+          description: Список типов родства
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KinshipType'
+
+  /refs/match-event-types:
+    get:
+      tags:
+        - References
+      summary: Список типов событий матча
+      description: Получить справочник типов событий в матче (гол, карточка, замена и т.д.)
+      responses:
+        '200':
+          description: Список типов событий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchEventType'
+
+  /refs/countries:
+    get:
+      tags:
+        - References
+      summary: Список стран
+      description: Получить справочник стран (публичный, без аутентификации)
+      parameters:
+        - name: search
+          in: query
+          description: Поиск по названию страны
+          schema:
+            type: string
+            example: "Россия"
+      responses:
+        '200':
+          description: Список стран
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Country'
+
+  /refs/cities:
+    get:
+      tags:
+        - References
+      summary: Список городов
+      description: Получить справочник городов (с фильтром по стране)
+      parameters:
+        - name: country_id
+          in: query
+          description: Фильтр по стране
+          schema:
+            type: integer
+            example: 1
+        - name: search
+          in: query
+          description: Поиск по названию города
+          schema:
+            type: string
+            example: "Москва"
+      responses:
+        '200':
+          description: Список городов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+
+components:
+  schemas:
+    SportType:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Футбол"
+
+    ClubType:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Профессиональный клуб"
+
+    UserRole:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Игрок"
+
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Вратарь"
+        sport_type_id:
+          type: integer
+          example: 1
+          description: ID вида спорта (если позиция специфична для спорта)
+
+    DominantFoot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Правша"
+
+    KinshipType:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Родитель"
+
+    MatchEventType:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Гол"
+        code:
+          type: string
+          nullable: true
+          example: "GOAL"
+          description: Короткий код события
+
+    Country:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Россия"
+        code:
+          type: string
+          example: "RU"
+          description: ISO 3166-1 alpha-2 код страны
+
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Москва"
+        country_id:
+          type: integer
+          example: 1
+        region:
+          type: string
+          nullable: true
+          example: "Московская область"
+          description: Название региона/области

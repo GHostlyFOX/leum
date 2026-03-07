@@ -1,0 +1,11 @@
+{
+    "name": "Training",
+    "alias": "training",
+    "description": "Модуль тренировок: расписание, посещаемость, медиа",
+    "keywords": ["training", "attendance", "venue", "schedule"],
+    "priority": 5,
+    "providers": [
+        "Modules\\Training\\Providers\\TrainingServiceProvider"
+    ],
+    "files": []
+}

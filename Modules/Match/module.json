@@ -1,0 +1,11 @@
+{
+    "name": "Match",
+    "alias": "match",
+    "description": "Модуль матчей: составы, события, результаты",
+    "keywords": ["match", "game", "lineup", "event", "opponent"],
+    "priority": 6,
+    "providers": [
+        "Modules\\Match\\Providers\\MatchServiceProvider"
+    ],
+    "files": []
+}

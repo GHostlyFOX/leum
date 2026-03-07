@@ -1,0 +1,433 @@
+paths:
+  /me:
+    get:
+      tags:
+        - Users
+      summary: Получить текущего пользователя
+      description: Возвращает профиль аутентифицированного пользователя с его профилями игрока/тренера
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Информация о текущем пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+        '401':
+          description: Не аутентифицирован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Список пользователей
+      description: Получить список всех пользователей с фильтрацией и пагинацией
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          description: Поиск по имени или email
+          schema:
+            type: string
+            example: "Иван"
+        - name: page
+          in: query
+          description: Номер страницы
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Элементов на странице
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Получить пользователя по ID
+      description: Получить полную информацию о пользователе с профилями и членством
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация о пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    put:
+      tags:
+        - Users
+      summary: Обновить профиль пользователя
+      description: Частичное обновление данных пользователя
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                last_name:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                birth_date:
+                  type: string
+                  format: date
+                gender:
+                  type: string
+                  enum: ["male", "female"]
+      responses:
+        '200':
+          description: Пользователь успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+        '404':
+          description: Пользователь не найден
+
+  /users/{id}/player-profile:
+    post:
+      tags:
+        - Users
+      summary: Создать или обновить профиль игрока
+      description: Добавляет или обновляет профиль спортсмена для пользователя
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - dominant_foot_id
+                - sport_type_id
+              properties:
+                dominant_foot_id:
+                  type: integer
+                  description: ID ведущей ноги (из справочника)
+                  example: 1
+                position_id:
+                  type: integer
+                  description: ID позиции (из справочника, опционально)
+                  example: 2
+                sport_type_id:
+                  type: integer
+                  description: ID вида спорта
+                  example: 1
+      responses:
+        '201':
+          description: Профиль игрока создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+        '200':
+          description: Профиль игрока обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+        '404':
+          description: Пользователь не найден
+
+  /users/{id}/coach-profile:
+    post:
+      tags:
+        - Users
+      summary: Создать или обновить профиль тренера
+      description: Добавляет или обновляет профиль тренера для пользователя
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sport_type_id
+              properties:
+                sport_type_id:
+                  type: integer
+                  description: ID вида спорта
+                  example: 1
+                specialty_id:
+                  type: integer
+                  description: ID специальности (опционально)
+                career_start:
+                  type: string
+                  format: date
+                  description: Дата начала карьеры (опционально)
+                license_number:
+                  type: string
+                  description: Номер лицензии тренера (опционально)
+                license_expires:
+                  type: string
+                  format: date
+                  description: Дата истечения лицензии (опционально)
+                achievements:
+                  type: string
+                  description: Описание достижений (опционально)
+      responses:
+        '201':
+          description: Профиль тренера создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachProfile'
+        '200':
+          description: Профиль тренера обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachProfile'
+        '404':
+          description: Пользователь не найден
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        birth_date:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: ["male", "female"]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserDetail:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            player_profile:
+              $ref: '#/components/schemas/PlayerProfile'
+            coach_profile:
+              $ref: '#/components/schemas/CoachProfile'
+            team_memberships:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamMembership'
+
+    PlayerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        sport_type:
+          $ref: '#/components/schemas/SportType'
+        dominant_foot_id:
+          type: integer
+        dominant_foot:
+          $ref: '#/components/schemas/DominantFoot'
+        position_id:
+          type: integer
+          nullable: true
+        position:
+          $ref: '#/components/schemas/Position'
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CoachProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        sport_type:
+          $ref: '#/components/schemas/SportType'
+        specialty_id:
+          type: integer
+          nullable: true
+        career_start:
+          type: string
+          format: date
+          nullable: true
+        license_number:
+          type: string
+          nullable: true
+        license_expires:
+          type: string
+          format: date
+          nullable: true
+        achievements:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TeamMembership:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        team_id:
+          type: integer
+        club_id:
+          type: integer
+        role_id:
+          type: integer
+        role:
+          $ref: '#/components/schemas/UserRole'
+        joined_at:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+
+    SportType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Футбол"
+
+    DominantFoot:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Правша"
+
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Вратарь"
+        sport_type_id:
+          type: integer
+
+    UserRole:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Игрок"
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+        per_page:
+          type: integer
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        from:
+          type: integer
+        to:
+          type: integer

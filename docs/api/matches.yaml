@@ -1,0 +1,565 @@
+paths:
+  /matches:
+    get:
+      tags:
+        - Matches
+      summary: Список матчей
+      description: Получить список матчей с фильтрацией и пагинацией
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: team_id
+          in: query
+          description: Фильтр по команде
+          schema:
+            type: integer
+        - name: club_id
+          in: query
+          description: Фильтр по клубу
+          schema:
+            type: integer
+        - name: tournament_id
+          in: query
+          description: Фильтр по турниру
+          schema:
+            type: integer
+        - name: date_from
+          in: query
+          description: Дата начала периода (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: Дата окончания периода (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          description: Статус матча
+          schema:
+            type: string
+            enum: ["scheduled", "in_progress", "completed", "cancelled"]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Список матчей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Match'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+    post:
+      tags:
+        - Matches
+      summary: Создать новый матч
+      description: Планирование нового матча между двумя командами
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - home_team_id
+                - away_team_id
+                - match_date
+                - start_time
+              properties:
+                home_team_id:
+                  type: integer
+                  example: 1
+                away_team_id:
+                  type: integer
+                  example: 2
+                tournament_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                match_date:
+                  type: string
+                  format: date
+                  example: "2024-03-20"
+                start_time:
+                  type: string
+                  format: time
+                  example: "15:00"
+                venue_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                referee_id:
+                  type: integer
+                  nullable: true
+                  description: ID судьи (пользователя)
+                  example: 5
+                notes:
+                  type: string
+                  nullable: true
+                  example: "Финальный матч группы"
+      responses:
+        '201':
+          description: Матч успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchDetail'
+        '422':
+          description: Ошибка валидации
+
+  /matches/{id}:
+    get:
+      tags:
+        - Matches
+      summary: Получить матч по ID
+      description: Получить полную информацию о матче
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация о матче
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchDetail'
+        '404':
+          description: Матч не найден
+
+    put:
+      tags:
+        - Matches
+      summary: Обновить матч
+      description: Частичное обновление данных матча
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                match_date:
+                  type: string
+                  format: date
+                start_time:
+                  type: string
+                  format: time
+                venue_id:
+                  type: integer
+                  nullable: true
+                referee_id:
+                  type: integer
+                  nullable: true
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Матч успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchDetail'
+        '404':
+          description: Матч не найден
+
+  /matches/{id}/start:
+    post:
+      tags:
+        - Matches
+      summary: Начать матч
+      description: Установить время начала матча и изменить статус на in_progress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Матч начат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchDetail'
+        '404':
+          description: Матч не найден
+
+  /matches/{id}/end:
+    post:
+      tags:
+        - Matches
+      summary: Завершить матч
+      description: Установить время окончания матча и финальный счет
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - home_team_goals
+                - away_team_goals
+              properties:
+                home_team_goals:
+                  type: integer
+                  example: 2
+                away_team_goals:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Матч завершен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchDetail'
+        '404':
+          description: Матч не найден
+
+  /matches/{id}/events:
+    post:
+      tags:
+        - Matches
+      summary: Добавить событие матча
+      description: Записать событие (гол, карточка, замена и т.д.) в матче
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - event_type_id
+                - match_minute
+                - player_user_id
+              properties:
+                event_type_id:
+                  type: integer
+                  description: ID типа события (гол, карточка и т.д.)
+                  example: 1
+                match_minute:
+                  type: integer
+                  description: Минута матча
+                  example: 45
+                player_user_id:
+                  type: integer
+                  description: ID игрока, совершившего событие
+                  example: 10
+                assistant_user_id:
+                  type: integer
+                  nullable: true
+                  description: ID ассистента (для голов)
+                  example: 11
+      responses:
+        '201':
+          description: Событие успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchEvent'
+        '404':
+          description: Матч не найден
+
+  /matches/{id}/lineup:
+    put:
+      tags:
+        - Matches
+      summary: Установить состав команды
+      description: Определить игроков и их позиции в составе матча
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - players
+              properties:
+                players:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                      - player_user_id
+                      - position_id
+                    properties:
+                      player_user_id:
+                        type: integer
+                        example: 10
+                      position_id:
+                        type: integer
+                        example: 1
+                      is_starter:
+                        type: boolean
+                        default: false
+                        example: true
+                      shirt_number:
+                        type: integer
+                        nullable: true
+                        example: 7
+      responses:
+        '200':
+          description: Состав успешно установлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MatchLineupPlayer'
+        '404':
+          description: Матч не найден
+
+components:
+  schemas:
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+        home_team_id:
+          type: integer
+        away_team_id:
+          type: integer
+        tournament_id:
+          type: integer
+          nullable: true
+        match_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        status:
+          type: string
+          enum: ["scheduled", "in_progress", "completed", "cancelled"]
+        home_team_goals:
+          type: integer
+          nullable: true
+        away_team_goals:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MatchDetail:
+      allOf:
+        - $ref: '#/components/schemas/Match'
+        - type: object
+          properties:
+            venue_id:
+              type: integer
+              nullable: true
+            referee_id:
+              type: integer
+              nullable: true
+            notes:
+              type: string
+              nullable: true
+            actual_start_at:
+              type: string
+              format: date-time
+              nullable: true
+            actual_end_at:
+              type: string
+              format: date-time
+              nullable: true
+            home_team:
+              $ref: '#/components/schemas/Team'
+            away_team:
+              $ref: '#/components/schemas/Team'
+            tournament:
+              $ref: '#/components/schemas/Tournament'
+              nullable: true
+            referee:
+              $ref: '#/components/schemas/User'
+              nullable: true
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/MatchEvent'
+            lineup:
+              type: array
+              items:
+                $ref: '#/components/schemas/MatchLineupPlayer'
+
+    MatchEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        match_id:
+          type: integer
+        event_type_id:
+          type: integer
+        match_minute:
+          type: integer
+        player_user_id:
+          type: integer
+        assistant_user_id:
+          type: integer
+          nullable: true
+        player:
+          $ref: '#/components/schemas/User'
+        assistant:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        event_type:
+          $ref: '#/components/schemas/MatchEventType'
+        created_at:
+          type: string
+          format: date-time
+
+    MatchLineupPlayer:
+      type: object
+      properties:
+        id:
+          type: integer
+        match_id:
+          type: integer
+        player_user_id:
+          type: integer
+        position_id:
+          type: integer
+        is_starter:
+          type: boolean
+        shirt_number:
+          type: integer
+          nullable: true
+        player:
+          $ref: '#/components/schemas/User'
+        position:
+          $ref: '#/components/schemas/Position'
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        club_id:
+          type: integer
+
+    Tournament:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        start_date:
+          type: string
+          format: date
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    MatchEventType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Гол"
+
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Форвард"
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+        per_page:
+          type: integer
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        from:
+          type: integer
+        to:
+          type: integer

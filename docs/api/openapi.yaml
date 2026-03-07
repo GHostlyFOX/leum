@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — API
+  description: |
+    REST API платформы управления детским спортом.
+    Аутентификация: Bearer Token (Laravel Sanctum).
+  version: 1.0.0
+  contact:
+    name: Детская лига
+servers:
+  - url: /api/v1
+    description: API v1
+
+tags:
+  - name: Auth
+    description: Регистрация, вход, выход
+  - name: Users
+    description: Управление пользователями и профилями
+  - name: Clubs
+    description: Управление клубами
+  - name: Teams
+    description: Управление командами и составами
+  - name: Trainings
+    description: Тренировки и посещаемость
+  - name: Matches
+    description: Матчи, составы, события
+  - name: Tournaments
+    description: Турниры
+  - name: References
+    description: Справочники (публичные)
+
+paths:
+  # Auth
+  /auth/register:
+    $ref: 'auth.yaml#/paths/~1auth~1register'
+  /auth/login:
+    $ref: 'auth.yaml#/paths/~1auth~1login'
+  /auth/logout:
+    $ref: 'auth.yaml#/paths/~1auth~1logout'
+
+  # Users
+  /me:
+    $ref: 'users.yaml#/paths/~1me'
+  /users:
+    $ref: 'users.yaml#/paths/~1users'
+  /users/{id}:
+    $ref: 'users.yaml#/paths/~1users~1{id}'
+  /users/{id}/player-profile:
+    $ref: 'users.yaml#/paths/~1users~1{id}~1player-profile'
+  /users/{id}/coach-profile:
+    $ref: 'users.yaml#/paths/~1users~1{id}~1coach-profile'
+
+  # Clubs
+  /clubs:
+    $ref: 'clubs.yaml#/paths/~1clubs'
+  /clubs/{id}:
+    $ref: 'clubs.yaml#/paths/~1clubs~1{id}'
+
+  # Teams
+  /clubs/{clubId}/teams:
+    $ref: 'teams.yaml#/paths/~1clubs~1{clubId}~1teams'
+  /teams/{id}:
+    $ref: 'teams.yaml#/paths/~1teams~1{id}'
+  /teams/{teamId}/members:
+    $ref: 'teams.yaml#/paths/~1teams~1{teamId}~1members'
+
+  # Trainings
+  /trainings:
+    $ref: 'trainings.yaml#/paths/~1trainings'
+  /trainings/{id}:
+    $ref: 'trainings.yaml#/paths/~1trainings~1{id}'
+  /trainings/{id}/cancel:
+    $ref: 'trainings.yaml#/paths/~1trainings~1{id}~1cancel'
+  /trainings/{trainingId}/attendance/{playerUserId}:
+    $ref: 'trainings.yaml#/paths/~1trainings~1{trainingId}~1attendance~1{playerUserId}'
+
+  # Matches
+  /matches:
+    $ref: 'matches.yaml#/paths/~1matches'
+  /matches/{id}:
+    $ref: 'matches.yaml#/paths/~1matches~1{id}'
+  /matches/{id}/start:
+    $ref: 'matches.yaml#/paths/~1matches~1{id}~1start'
+  /matches/{id}/end:
+    $ref: 'matches.yaml#/paths/~1matches~1{id}~1end'
+  /matches/{id}/events:
+    $ref: 'matches.yaml#/paths/~1matches~1{id}~1events'
+  /matches/{id}/lineup:
+    $ref: 'matches.yaml#/paths/~1matches~1{id}~1lineup'
+
+  # Tournaments
+  /tournaments:
+    $ref: 'tournaments.yaml#/paths/~1tournaments'
+  /tournaments/{id}:
+    $ref: 'tournaments.yaml#/paths/~1tournaments~1{id}'
+  /tournaments/{id}/teams:
+    $ref: 'tournaments.yaml#/paths/~1tournaments~1{id}~1teams'
+
+  # References
+  /refs/sport-types:
+    $ref: 'references.yaml#/paths/~1refs~1sport-types'
+  /refs/club-types:
+    $ref: 'references.yaml#/paths/~1refs~1club-types'
+  /refs/user-roles:
+    $ref: 'references.yaml#/paths/~1refs~1user-roles'
+  /refs/positions:
+    $ref: 'references.yaml#/paths/~1refs~1positions'
+  /refs/dominant-feet:
+    $ref: 'references.yaml#/paths/~1refs~1dominant-feet'
+  /refs/kinship-types:
+    $ref: 'references.yaml#/paths/~1refs~1kinship-types'
+  /refs/match-event-types:
+    $ref: 'references.yaml#/paths/~1refs~1match-event-types'
+  /refs/countries:
+    $ref: 'references.yaml#/paths/~1refs~1countries'
+  /refs/cities:
+    $ref: 'references.yaml#/paths/~1refs~1cities'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+
+security:
+  - BearerAuth: []

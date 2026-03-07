@@ -1,9 +1,9 @@
 {
     "name": "Team",
     "alias": "team",
-    "description": "",
-    "keywords": [],
-    "priority": 0,
+    "description": "Модуль управления командами и составами",
+    "keywords": ["team", "roster", "member"],
+    "priority": 4,
     "providers": [
         "Modules\\Team\\Providers\\TeamServiceProvider"
     ],

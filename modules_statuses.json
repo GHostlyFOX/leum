@@ -1,0 +1,11 @@
+{
+    "File": true,
+    "Reference": true,
+    "Auth": true,
+    "User": true,
+    "Club": true,
+    "Team": true,
+    "Training": true,
+    "Match": true,
+    "Tournament": true
+}

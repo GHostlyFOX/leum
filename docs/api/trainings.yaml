@@ -1,0 +1,419 @@
+paths:
+  /trainings:
+    get:
+      tags:
+        - Trainings
+      summary: Список тренировок
+      description: Получить список тренировок с фильтрацией и пагинацией
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          description: Фильтр по клубу
+          schema:
+            type: integer
+        - name: team_id
+          in: query
+          description: Фильтр по команде
+          schema:
+            type: integer
+        - name: coach_id
+          in: query
+          description: Фильтр по тренеру
+          schema:
+            type: integer
+        - name: date_from
+          in: query
+          description: Дата начала периода (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: Дата окончания периода (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          description: Статус тренировки
+          schema:
+            type: string
+            enum: ["scheduled", "in_progress", "completed", "cancelled"]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: Список тренировок
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Training'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+
+    post:
+      tags:
+        - Trainings
+      summary: Создать новую тренировку
+      description: Планирование новой тренировки
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - coach_id
+                - club_id
+                - team_id
+                - training_date
+                - start_time
+                - duration_minutes
+              properties:
+                coach_id:
+                  type: integer
+                  example: 2
+                club_id:
+                  type: integer
+                  example: 1
+                team_id:
+                  type: integer
+                  example: 3
+                training_date:
+                  type: string
+                  format: date
+                  example: "2024-03-15"
+                start_time:
+                  type: string
+                  format: time
+                  example: "15:30"
+                duration_minutes:
+                  type: integer
+                  example: 90
+                venue_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                training_type_id:
+                  type: integer
+                  nullable: true
+                  example: 1
+                notes:
+                  type: string
+                  nullable: true
+                  example: "Техническая подготовка"
+      responses:
+        '201':
+          description: Тренировка успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetail'
+        '422':
+          description: Ошибка валидации
+
+  /trainings/{id}:
+    get:
+      tags:
+        - Trainings
+      summary: Получить тренировку по ID
+      description: Получить полную информацию о тренировке
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация о тренировке
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetail'
+        '404':
+          description: Тренировка не найдена
+
+    put:
+      tags:
+        - Trainings
+      summary: Обновить тренировку
+      description: Частичное обновление данных тренировки
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                training_date:
+                  type: string
+                  format: date
+                start_time:
+                  type: string
+                  format: time
+                duration_minutes:
+                  type: integer
+                venue_id:
+                  type: integer
+                  nullable: true
+                training_type_id:
+                  type: integer
+                  nullable: true
+                notes:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Тренировка успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetail'
+        '404':
+          description: Тренировка не найдена
+
+  /trainings/{id}/cancel:
+    post:
+      tags:
+        - Trainings
+      summary: Отменить тренировку
+      description: Отмена запланированной тренировки
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cancellation_reason:
+                  type: string
+                  nullable: true
+                  example: "Болезнь основного тренера"
+      responses:
+        '200':
+          description: Тренировка успешно отменена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetail'
+        '404':
+          description: Тренировка не найдена
+
+  /trainings/{trainingId}/attendance/{playerUserId}:
+    patch:
+      tags:
+        - Trainings
+      summary: Отметить посещаемость
+      description: Установить статус посещаемости игроком тренировки
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: trainingId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: playerUserId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attendance_status
+              properties:
+                attendance_status:
+                  type: string
+                  enum: ["present", "absent", "excused_absence", "late"]
+                  example: "present"
+                absence_reason:
+                  type: string
+                  nullable: true
+                  description: Причина отсутствия (если absent или excused_absence)
+                  example: "Болезнь"
+      responses:
+        '200':
+          description: Посещаемость успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingAttendance'
+        '404':
+          description: Тренировка или игрок не найдены
+
+components:
+  schemas:
+    Training:
+      type: object
+      properties:
+        id:
+          type: integer
+        coach_id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        training_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        duration_minutes:
+          type: integer
+        status:
+          type: string
+          enum: ["scheduled", "in_progress", "completed", "cancelled"]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TrainingDetail:
+      allOf:
+        - $ref: '#/components/schemas/Training'
+        - type: object
+          properties:
+            venue_id:
+              type: integer
+              nullable: true
+            training_type_id:
+              type: integer
+              nullable: true
+            notes:
+              type: string
+              nullable: true
+            cancellation_reason:
+              type: string
+              nullable: true
+            actual_start_at:
+              type: string
+              format: date-time
+              nullable: true
+            actual_end_at:
+              type: string
+              format: date-time
+              nullable: true
+            coach:
+              $ref: '#/components/schemas/User'
+            team:
+              $ref: '#/components/schemas/Team'
+            club:
+              $ref: '#/components/schemas/Club'
+            attendance:
+              type: array
+              items:
+                $ref: '#/components/schemas/TrainingAttendance'
+
+    TrainingAttendance:
+      type: object
+      properties:
+        id:
+          type: integer
+        training_id:
+          type: integer
+        player_user_id:
+          type: integer
+        attendance_status:
+          type: string
+          enum: ["present", "absent", "excused_absence", "late"]
+        absence_reason:
+          type: string
+          nullable: true
+        player:
+          $ref: '#/components/schemas/User'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sport_type_id:
+          type: integer
+
+    Club:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    PaginationMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+        per_page:
+          type: integer
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        from:
+          type: integer
+        to:
+          type: integer
