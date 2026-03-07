@@ -52,6 +52,8 @@ System_Ext(excel,        "Excel / CSV",            "Импорт/экспорт 
 Rel(admin,      web_app,    "Использует",             "HTTPS")
 Rel(admin,      mobile_app, "Использует",             "HTTPS / Mobile")
 Rel(parent,     mobile_app, "Использует",             "HTTPS / Mobile")
+Rel(parent,     web_app,    "Использует",             "HTTPS")
+Rel(player,     web_app,    "Использует",             "HTTPS")
 
 Rel(web_app,    api,        "REST API запросы",       "HTTPS / JSON")
 Rel(mobile_app, api,        "REST API запросы",       "HTTPS / JSON")

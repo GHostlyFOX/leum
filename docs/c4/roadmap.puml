@@ -186,13 +186,13 @@ Project starts 2025-09-01
 [Чат: тренер ↔ родители ↔ администратор]                lasts 14 days   and is colored in #D5DBDB
 [Чат: тренер ↔ родители ↔ администратор] starts at [Галерея: фото/видео тренировок и матчей]'s end
 
-[Авто-расчёт состава PlaxOff по результатам]            lasts 10 days   and is colored in #D5DBDB
-[Авто-расчёт состава PlaxOff по результатам] starts at [м] 'placeholder
+[Авто-расчёт состава PlayOff по результатам]            lasts 10 days   and is colored in #D5DBDB
+[Авто-расчёт состава PlayOff по результатам] starts at [Чат: тренер ↔ родители ↔ администратор]'s end
 
 [Несколько клубов / мультитенантность]                  lasts 15 days   and is colored in #D5DBDB
 [Несколько клубов / мультитенантность] starts at [Чат: тренер ↔ родители ↔ администратор]'s end
 
-[Авто-расчёт состава PlaxOff по результатам] starts at [Чат: тренер ↔ родители ↔ администратор]'s end
+[Авто-расчёт состава PlayOff по результатам] starts at [Чат: тренер ↔ родители ↔ администратор]'s end
 
 [v2.0 Milestone: Полная платформа] as [m6] lasts 0 days
 [m6] starts at [Несколько клубов / мультитенантность]'s end
