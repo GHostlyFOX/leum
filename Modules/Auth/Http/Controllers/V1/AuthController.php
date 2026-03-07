@@ -24,6 +24,7 @@ class AuthController extends Controller
             'password'    => 'required|string|min:8|confirmed',
             'birth_date'  => 'required|date',
             'gender'      => 'required|in:male,female',
+            'role'        => 'sometimes|in:player,parent,coach',
         ]);
 
         $result = $this->authService->register($validated);

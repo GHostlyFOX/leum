@@ -10,6 +10,16 @@ use Modules\Tournament\Http\Controllers\V1\TournamentController;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('tournaments', TournamentController::class)->except(['destroy']);
-    Route::post('tournaments/{id}/teams', [TournamentController::class, 'registerTeam']);
+
+    // Просмотр
+    Route::get('tournaments',      [TournamentController::class, 'index'])->middleware('permission:tournaments.view');
+    Route::get('tournaments/{id}', [TournamentController::class, 'show'])->middleware('permission:tournaments.view');
+
+    // Создание / редактирование — admin
+    Route::post('tournaments',     [TournamentController::class, 'store'])->middleware('permission:tournaments.create');
+    Route::put('tournaments/{id}', [TournamentController::class, 'update'])->middleware('permission:tournaments.update');
+
+    // Регистрация команды на турнир — coach+
+    Route::post('tournaments/{id}/teams', [TournamentController::class, 'registerTeam'])
+        ->middleware('permission:tournaments.register');
 });

@@ -10,10 +10,20 @@ use Modules\User\Http\Controllers\V1\UserController;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('me',                         [UserController::class, 'me']);
-    Route::get('users',                      [UserController::class, 'index']);
-    Route::get('users/{id}',                 [UserController::class, 'show']);
-    Route::put('users/{id}',                 [UserController::class, 'update']);
-    Route::post('users/{id}/player-profile', [UserController::class, 'createPlayerProfile']);
-    Route::post('users/{id}/coach-profile',  [UserController::class, 'createCoachProfile']);
+
+    // Текущий пользователь — доступен всем аутентифицированным
+    Route::get('me', [UserController::class, 'me']);
+
+    // Просмотр списка / профиля пользователей
+    Route::get('users',      [UserController::class, 'index'])->middleware('permission:users.view');
+    Route::get('users/{id}', [UserController::class, 'show'])->middleware('permission:users.view');
+
+    // Редактирование
+    Route::put('users/{id}', [UserController::class, 'update'])->middleware('permission:users.update');
+
+    // Создание профилей — управление пользователями
+    Route::post('users/{id}/player-profile', [UserController::class, 'createPlayerProfile'])
+        ->middleware('permission:users.manage');
+    Route::post('users/{id}/coach-profile', [UserController::class, 'createCoachProfile'])
+        ->middleware('permission:users.manage');
 });

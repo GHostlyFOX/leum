@@ -32,7 +32,12 @@ class UserController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = $this->userService->find($request->user()->id);
-        return response()->json($user);
+
+        return response()->json([
+            'user'        => $user,
+            'role'        => $user->global_role,
+            'permissions' => $user->getAllPermissions()->values(),
+        ]);
     }
 
     public function update(Request $request, int $id): JsonResponse

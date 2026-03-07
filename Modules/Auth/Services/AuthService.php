@@ -19,12 +19,17 @@ class AuthService
             'password_hash'    => Hash::make($data['password']),
             'birth_date'       => $data['birth_date'],
             'gender'           => $data['gender'],
+            'global_role'      => $data['role'] ?? 'player',
             'notifications_on' => true,
         ]);
 
         $token = $user->createToken('api')->plainTextToken;
 
-        return ['user' => $user, 'token' => $token];
+        return [
+            'user'        => $user,
+            'token'       => $token,
+            'permissions' => $user->getAllPermissions()->values(),
+        ];
     }
 
     public function login(string $login, string $password): array
@@ -40,6 +45,10 @@ class AuthService
 
         $token = $user->createToken('api')->plainTextToken;
 
-        return ['user' => $user, 'token' => $token];
+        return [
+            'user'        => $user,
+            'token'       => $token,
+            'permissions' => $user->getAllPermissions()->values(),
+        ];
     }
 }
