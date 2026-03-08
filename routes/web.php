@@ -7,6 +7,7 @@ use App\Http\Livewire\Login;
 use App\Http\Livewire\Profile;
 use App\Http\Livewire\Register;
 use App\Http\Livewire\ClubOnboarding;
+use App\Http\Livewire\Onboarding;
 use App\Http\Livewire\Settings;
 
 use Illuminate\Support\Facades\Route;
@@ -32,10 +33,15 @@ Route::middleware('guest')->group(function () {
     Route::get('forgot-password', ForgotPassword::class);
 });
 
-// ── Защищённые страницы (требуется авторизация) ──────────────────
+// ── Онбординг (auth, но без проверки onboarded) ─────────────────
 Route::middleware('auth')->group(function () {
+    Route::get('onboarding', Onboarding::class)->name('onboarding');
+    Route::get('onboarding/club', ClubOnboarding::class)->name('club.onboarding');
+});
+
+// ── Защищённые страницы (требуется авторизация + онбординг) ──────
+Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('dashboard', Index::class)->name('home');
-    Route::get('onboarding', ClubOnboarding::class)->name('club.onboarding');
     Route::get('profile', Profile::class);
     Route::get('settings', Settings::class);
 });

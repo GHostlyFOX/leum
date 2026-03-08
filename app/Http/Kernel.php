@@ -64,6 +64,9 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
+        // ── Onboarding ─────────────────────────────────────────
+        'onboarded'  => \App\Http\Middleware\EnsureOnboarded::class,
+
         // ── RBAC ────────────────────────────────────────────────
         'role'       => \App\Http\Middleware\CheckGlobalRole::class,
         'team.role'  => \App\Http\Middleware\CheckTeamRole::class,

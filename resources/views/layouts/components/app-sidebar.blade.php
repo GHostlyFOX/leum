@@ -56,10 +56,10 @@
                                 <h3>Клуб</h3>
                             </li>
                             <li class="slide">
-                                <a class="side-menu__item has-link" data-bs-toggle="slide" href="{{ route('club.onboarding') }}">
+                                <a class="side-menu__item has-link" data-bs-toggle="slide" href="{{ route('onboarding') }}">
                                     <i class="fe fe-plus-circle side-menu__icon"></i>
                                     <span class="side-menu__label">
-                                        Создать клуб
+                                        Онбординг
                                     </span>
                                 </a>
                             </li>

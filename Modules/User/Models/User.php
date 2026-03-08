@@ -34,6 +34,7 @@ class User extends Authenticatable
         'birth_date',
         'gender',
         'global_role',
+        'onboarded_at',
     ];
 
     protected $hidden = [
@@ -42,6 +43,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'notifications_on' => 'boolean',
+        'onboarded_at'     => 'datetime',
         'birth_date'       => 'date',
         'created_at'       => 'datetime',
         'updated_at'       => 'datetime',
