@@ -11,6 +11,7 @@
 		<meta name="keywords" content="laravel admin template, bootstrap admin template, admin dashboard template, admin dashboard, admin template, admin, bootstrap 5, laravel admin, laravel admin dashboard template, laravel ui template, laravel admin panel, admin panel, laravel admin dashboard, laravel template, admin ui dashboard">
 
         @include('layouts.components.styles')
+        @livewireStyles
 
     </head>
 
@@ -33,6 +34,7 @@
                 @yield('content')
 
         @include('layouts.components.custom-scripts')
+        @livewireScripts
 
     </body>
 

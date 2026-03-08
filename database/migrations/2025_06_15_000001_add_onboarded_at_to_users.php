@@ -18,10 +18,8 @@ return new class extends Migration
             $table->timestamp('onboarded_at')->nullable()->after('global_role');
         });
 
-        // Существующие пользователи считаются уже прошедшими онбординг
-        DB::table('users')->whereNull('onboarded_at')->update([
-            'onboarded_at' => now(),
-        ]);
+        // Все пользователи (включая существующих) должны пройти онбординг.
+        // onboarded_at остаётся NULL — middleware перенаправит на /onboarding.
     }
 
     public function down(): void
