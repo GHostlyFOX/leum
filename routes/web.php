@@ -6,6 +6,7 @@ use App\Http\Livewire\Landing;
 use App\Http\Livewire\Login;
 use App\Http\Livewire\Profile;
 use App\Http\Livewire\Register;
+use App\Http\Livewire\ClubOnboarding;
 use App\Http\Livewire\Settings;
 
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,7 @@ Route::middleware('guest')->group(function () {
 // ── Защищённые страницы (требуется авторизация) ──────────────────
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', Index::class)->name('home');
+    Route::get('onboarding', ClubOnboarding::class)->name('club.onboarding');
     Route::get('profile', Profile::class);
     Route::get('settings', Settings::class);
 });

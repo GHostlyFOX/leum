@@ -20,6 +20,24 @@
                             </div>
                             <!-- PAGE-HEADER END -->
 
+                            <!-- ONBOARDING BANNER -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-0" style="background: linear-gradient(135deg, #2d4a14 0%, #4a7a25 100%); border-radius: 16px;">
+                                        <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap">
+                                            <div class="text-white">
+                                                <h4 class="fw-bold mb-1">Создайте свой первый клуб</h4>
+                                                <p class="mb-0 opacity-75">Пошаговый мастер поможет настроить клуб, команды, тренеров и игроков за несколько минут.</p>
+                                            </div>
+                                            <a href="{{ route('club.onboarding') }}" class="btn btn-light btn-lg mt-2 mt-md-0">
+                                                <i class="fe fe-plus me-1"></i> Начать
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /ONBOARDING BANNER -->
+
                             <!-- ROW-1 -->
                             <div class="row">
                                 <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
