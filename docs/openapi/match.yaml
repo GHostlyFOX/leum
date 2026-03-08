@@ -1,0 +1,514 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Match API
+  description: Управление матчами, составами, событиями
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Match
+    description: Матчи, составы и события
+
+paths:
+  /matches:
+    get:
+      tags: [Match]
+      summary: Список матчей
+      operationId: listMatches
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+        - name: team_id
+          in: query
+          schema:
+            type: integer
+        - name: tournament_id
+          in: query
+          schema:
+            type: integer
+        - name: match_type
+          in: query
+          schema:
+            type: string
+            enum: [friendly, tournament_group, tournament_playoff]
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список матчей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchPaginated'
+
+    post:
+      tags: [Match]
+      summary: Создать матч
+      operationId: createMatch
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMatchRequest'
+      responses:
+        '201':
+          description: Матч создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /matches/{id}:
+    get:
+      tags: [Match]
+      summary: Детали матча
+      operationId: showMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      responses:
+        '200':
+          description: Матч с составами, событиями, соперниками
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Match]
+      summary: Обновить матч
+      operationId: updateMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMatchRequest'
+      responses:
+        '200':
+          description: Матч обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+
+  /matches/{id}/start:
+    post:
+      tags: [Match]
+      summary: Начать матч
+      operationId: startMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      responses:
+        '200':
+          description: Матч начат (установлено actual_start_at)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+
+  /matches/{id}/end:
+    post:
+      tags: [Match]
+      summary: Завершить матч
+      operationId: endMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      responses:
+        '200':
+          description: Матч завершён (установлено actual_end_at)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+
+  /matches/{id}/events:
+    post:
+      tags: [Match]
+      summary: Добавить событие матча
+      operationId: addMatchEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMatchEventRequest'
+      responses:
+        '201':
+          description: Событие добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchEvent'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /matches/{id}/lineup:
+    put:
+      tags: [Match]
+      summary: Установить состав матча
+      operationId: setMatchLineup
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetLineupRequest'
+      responses:
+        '200':
+          description: Состав обновлён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lineup updated
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    MatchId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+        match_type:
+          type: string
+          enum: [friendly, tournament_group, tournament_playoff]
+        tournament_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+        venue_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        opponent_team_id:
+          type: integer
+          nullable: true
+          description: ID команды-соперника (внутренняя команда)
+        opponent_id:
+          type: integer
+          nullable: true
+          description: ID соперника (внешний)
+        scheduled_at:
+          type: string
+          format: date-time
+        half_duration_minutes:
+          type: integer
+        halves_count:
+          type: integer
+        is_away:
+          type: boolean
+        actual_start_at:
+          type: string
+          format: date-time
+          nullable: true
+        actual_end_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MatchFull:
+      allOf:
+        - $ref: '#/components/schemas/Match'
+        - type: object
+          properties:
+            players:
+              type: array
+              items:
+                $ref: '#/components/schemas/MatchPlayer'
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/MatchEvent'
+            venue:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+                address:
+                  type: string
+            opponent:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+
+    MatchPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Match'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    MatchPlayer:
+      type: object
+      properties:
+        id:
+          type: integer
+        match_id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        player_user_id:
+          type: integer
+        position_id:
+          type: integer
+        is_starter:
+          type: boolean
+        absence_reason:
+          type: string
+          nullable: true
+        parent_user_id:
+          type: integer
+          nullable: true
+
+    MatchEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        match_id:
+          type: integer
+        event_type_id:
+          type: integer
+        match_minute:
+          type: integer
+        player_user_id:
+          type: integer
+        assistant_user_id:
+          type: integer
+          nullable: true
+        event_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    CreateMatchRequest:
+      type: object
+      required: [match_type, sport_type_id, venue_id, name, club_id, team_id, scheduled_at, half_duration_minutes, halves_count]
+      properties:
+        match_type:
+          type: string
+          enum: [friendly, tournament_group, tournament_playoff]
+        tournament_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+        venue_id:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        opponent_team_id:
+          type: integer
+          nullable: true
+          description: Указать либо opponent_team_id, либо opponent_id
+        opponent_id:
+          type: integer
+          nullable: true
+        scheduled_at:
+          type: string
+          format: date-time
+        half_duration_minutes:
+          type: integer
+          minimum: 5
+          maximum: 60
+        halves_count:
+          type: integer
+          minimum: 1
+          maximum: 4
+        is_away:
+          type: boolean
+          default: false
+
+    UpdateMatchRequest:
+      type: object
+      properties:
+        venue_id:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        scheduled_at:
+          type: string
+          format: date-time
+        half_duration_minutes:
+          type: integer
+          minimum: 5
+          maximum: 60
+        halves_count:
+          type: integer
+          minimum: 1
+          maximum: 4
+        is_away:
+          type: boolean
+
+    CreateMatchEventRequest:
+      type: object
+      required: [event_type_id, match_minute, player_user_id]
+      properties:
+        event_type_id:
+          type: integer
+        match_minute:
+          type: integer
+          minimum: 0
+        player_user_id:
+          type: integer
+        assistant_user_id:
+          type: integer
+          nullable: true
+
+    SetLineupRequest:
+      type: object
+      required: [players]
+      properties:
+        players:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [player_user_id, position_id]
+            properties:
+              player_user_id:
+                type: integer
+              position_id:
+                type: integer
+              is_starter:
+                type: boolean
+                default: true
+              absence_reason:
+                type: string
+                nullable: true
+              parent_user_id:
+                type: integer
+                nullable: true

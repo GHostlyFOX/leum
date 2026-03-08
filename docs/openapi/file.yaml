@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — File API
+  description: Внутренний сервис загрузки файлов (используется другими модулями)
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: File
+    description: Файловый сервис (внутренний, без публичных эндпоинтов)
+
+components:
+  schemas:
+    File:
+      type: object
+      description: Файл, загруженный через FileService
+      properties:
+        id:
+          type: integer
+        path:
+          type: string
+          description: Путь к файлу в хранилище
+        mime_type:
+          type: string
+          example: image/png
+        size_bytes:
+          type: integer
+          format: int64
+          example: 204800
+        created_at:
+          type: string
+          format: date-time
+
+    FileUploadNote:
+      type: object
+      description: |
+        Файлы загружаются через связанные модули (например, логотип клуба — через POST /clubs).
+        FileService предоставляет внутренние методы:
+        - upload(UploadedFile, directory) → сохраняет на S3 и создаёт запись File
+        - uploadPublic(UploadedFile, directory) → сохраняет на публичный диск (локальная разработка)
+        - url(File, disk) → возвращает URL файла
+        - delete(File, disk) → удаляет файл и запись
+      properties:
+        note:
+          type: string
+          example: Загрузка файлов происходит через связанные модули (Club, Team, Tournament и т.д.)

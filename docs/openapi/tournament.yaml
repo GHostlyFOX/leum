@@ -1,0 +1,332 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Tournament API
+  description: Управление турнирами и регистрация команд
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Tournament
+    description: Турниры
+
+paths:
+  /tournaments:
+    get:
+      tags: [Tournament]
+      summary: Список турниров
+      operationId: listTournaments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+        - name: year
+          in: query
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список турниров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentPaginated'
+
+    post:
+      tags: [Tournament]
+      summary: Создать турнир
+      operationId: createTournament
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTournamentRequest'
+      responses:
+        '201':
+          description: Турнир создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /tournaments/{id}:
+    get:
+      tags: [Tournament]
+      summary: Детали турнира
+      operationId: showTournament
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      responses:
+        '200':
+          description: Турнир с командами и матчами
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Tournament]
+      summary: Обновить турнир
+      operationId: updateTournament
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTournamentRequest'
+      responses:
+        '200':
+          description: Турнир обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+
+  /tournaments/{id}/teams:
+    post:
+      tags: [Tournament]
+      summary: Зарегистрировать команду на турнир
+      operationId: registerTeamForTournament
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterTeamRequest'
+      responses:
+        '201':
+          description: Команда зарегистрирована
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentTeam'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    TournamentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Tournament:
+      type: object
+      properties:
+        id:
+          type: integer
+        tournament_type_id:
+          type: integer
+        name:
+          type: string
+        logo_file_id:
+          type: integer
+          nullable: true
+        starts_at:
+          type: string
+          format: date
+        ends_at:
+          type: string
+          format: date
+        half_duration_minutes:
+          type: integer
+        halves_count:
+          type: integer
+        organizer:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TournamentFull:
+      allOf:
+        - $ref: '#/components/schemas/Tournament'
+        - type: object
+          properties:
+            tournament_type:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+            teams:
+              type: array
+              items:
+                $ref: '#/components/schemas/TournamentTeam'
+            matches:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  scheduled_at:
+                    type: string
+                    format: date-time
+                  match_type:
+                    type: string
+
+    TournamentPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tournament'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    TournamentTeam:
+      type: object
+      properties:
+        id:
+          type: integer
+        tournament_id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        status:
+          type: string
+          enum: [participating, disqualified]
+
+    CreateTournamentRequest:
+      type: object
+      required: [tournament_type_id, name, starts_at, ends_at, half_duration_minutes, halves_count]
+      properties:
+        tournament_type_id:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        starts_at:
+          type: string
+          format: date
+        ends_at:
+          type: string
+          format: date
+          description: Должна быть >= starts_at
+        half_duration_minutes:
+          type: integer
+          minimum: 5
+          maximum: 60
+        halves_count:
+          type: integer
+          minimum: 1
+          maximum: 4
+        organizer:
+          type: string
+          maxLength: 255
+          nullable: true
+
+    UpdateTournamentRequest:
+      type: object
+      properties:
+        tournament_type_id:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        starts_at:
+          type: string
+          format: date
+        ends_at:
+          type: string
+          format: date
+        half_duration_minutes:
+          type: integer
+          minimum: 5
+          maximum: 60
+        halves_count:
+          type: integer
+          minimum: 1
+          maximum: 4
+        organizer:
+          type: string
+          maxLength: 255
+          nullable: true
+
+    RegisterTeamRequest:
+      type: object
+      required: [club_id, team_id]
+      properties:
+        club_id:
+          type: integer
+        team_id:
+          type: integer

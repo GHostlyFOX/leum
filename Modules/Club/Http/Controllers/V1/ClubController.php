@@ -5,6 +5,9 @@ namespace Modules\Club\Http\Controllers\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Club\Http\Requests\StoreClubRequest;
+use Modules\Club\Http\Requests\UpdateClubRequest;
+use Modules\Club\Http\Resources\ClubResource;
 use Modules\Club\Services\ClubService;
 
 class ClubController extends Controller
@@ -13,6 +16,9 @@ class ClubController extends Controller
         private readonly ClubService $clubService
     ) {}
 
+    /**
+     * GET /api/v1/clubs
+     */
     public function index(Request $request): JsonResponse
     {
         $clubs = $this->clubService->list(
@@ -20,64 +26,51 @@ class ClubController extends Controller
             perPage: $request->integer('per_page', 15),
         );
 
-        return response()->json($clubs);
+        return ClubResource::collection($clubs)->response();
     }
 
+    /**
+     * GET /api/v1/clubs/{id}
+     */
     public function show(int $id): JsonResponse
     {
         $club = $this->clubService->find($id);
-        return response()->json($club);
+
+        return (new ClubResource($club))->response();
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * POST /api/v1/clubs
+     */
+    public function store(StoreClubRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'club_type_id'  => 'required|exists:ref_club_types,id',
-            'sport_type_id' => 'required|exists:ref_sport_types,id',
-            'country_id'    => 'required|exists:countries,id',
-            'city_id'       => 'required|exists:cities,id',
-            'address'       => 'required|string|max:255',
-            'email'         => 'nullable|email|max:255',
-            'phones'        => 'nullable|array',
-            'logo'          => 'nullable|image|max:2048',
-        ]);
-
         $club = $this->clubService->create(
-            data: collect($validated)->except('logo')->toArray(),
+            data: collect($request->validated())->except('logo')->toArray(),
             logo: $request->file('logo'),
         );
 
-        return response()->json($club, 201);
+        return (new ClubResource($club))->response()->setStatusCode(201);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    /**
+     * PUT /api/v1/clubs/{id}
+     */
+    public function update(UpdateClubRequest $request, int $id): JsonResponse
     {
         $club = $this->clubService->find($id);
 
-        $validated = $request->validate([
-            'name'          => 'sometimes|string|max:255',
-            'description'   => 'nullable|string',
-            'club_type_id'  => 'sometimes|exists:ref_club_types,id',
-            'sport_type_id' => 'sometimes|exists:ref_sport_types,id',
-            'country_id'    => 'sometimes|exists:countries,id',
-            'city_id'       => 'sometimes|exists:cities,id',
-            'address'       => 'sometimes|string|max:255',
-            'email'         => 'nullable|email|max:255',
-            'phones'        => 'nullable|array',
-            'logo'          => 'nullable|image|max:2048',
-        ]);
-
         $updated = $this->clubService->update(
             club: $club,
-            data: collect($validated)->except('logo')->toArray(),
+            data: collect($request->validated())->except('logo')->toArray(),
             logo: $request->file('logo'),
         );
 
-        return response()->json($updated);
+        return (new ClubResource($updated))->response();
     }
 
+    /**
+     * DELETE /api/v1/clubs/{id}
+     */
     public function destroy(int $id): JsonResponse
     {
         $club = $this->clubService->find($id);

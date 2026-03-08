@@ -1,0 +1,423 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Training API
+  description: Управление тренировками, посещаемостью и площадками
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Training
+    description: Тренировки и посещаемость
+
+paths:
+  /trainings:
+    get:
+      tags: [Training]
+      summary: Список тренировок
+      operationId: listTrainings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+        - name: team_id
+          in: query
+          schema:
+            type: integer
+        - name: coach_id
+          in: query
+          schema:
+            type: integer
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, completed, cancelled]
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список тренировок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingPaginated'
+
+    post:
+      tags: [Training]
+      summary: Создать тренировку
+      operationId: createTraining
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrainingRequest'
+      responses:
+        '201':
+          description: Тренировка создана (с записями посещаемости)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingFull'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /trainings/{id}:
+    get:
+      tags: [Training]
+      summary: Детали тренировки
+      operationId: showTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TrainingId'
+      responses:
+        '200':
+          description: Тренировка с посещаемостью и медиа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Training]
+      summary: Обновить тренировку
+      operationId: updateTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TrainingId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTrainingRequest'
+      responses:
+        '200':
+          description: Тренировка обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingFull'
+
+  /trainings/{id}/cancel:
+    post:
+      tags: [Training]
+      summary: Отменить тренировку
+      operationId: cancelTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TrainingId'
+      responses:
+        '200':
+          description: Тренировка отменена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingFull'
+
+  /trainings/{trainingId}/attendance/{playerUserId}:
+    patch:
+      tags: [Training]
+      summary: Отметить посещаемость
+      operationId: markAttendance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: trainingId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: playerUserId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkAttendanceRequest'
+      responses:
+        '200':
+          description: Посещаемость обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingAttendance'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    TrainingId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Training:
+      type: object
+      properties:
+        id:
+          type: integer
+        coach_id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        training_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          example: '10:00'
+        duration_minutes:
+          type: integer
+        venue_id:
+          type: integer
+        training_type_id:
+          type: integer
+        status:
+          type: string
+          enum: [scheduled, completed, cancelled]
+        notify_parents:
+          type: boolean
+        require_rsvp:
+          type: boolean
+        comment:
+          type: string
+          nullable: true
+        recurring_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TrainingFull:
+      allOf:
+        - $ref: '#/components/schemas/Training'
+        - type: object
+          properties:
+            attendance:
+              type: array
+              items:
+                $ref: '#/components/schemas/TrainingAttendance'
+            coach:
+              type: object
+              properties:
+                id:
+                  type: integer
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+            venue:
+              $ref: '#/components/schemas/Venue'
+            training_type:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+
+    TrainingPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Training'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    TrainingAttendance:
+      type: object
+      properties:
+        id:
+          type: integer
+        training_id:
+          type: integer
+        player_user_id:
+          type: integer
+        marked_by_user_id:
+          type: integer
+        attendance_status:
+          type: string
+          enum: [pending, present, absent]
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        absence_reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Venue:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+        club_id:
+          type: integer
+          nullable: true
+
+    CreateTrainingRequest:
+      type: object
+      required: [coach_id, club_id, team_id, training_date, start_time, duration_minutes, venue_id, training_type_id]
+      properties:
+        coach_id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        training_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: '10:00'
+        duration_minutes:
+          type: integer
+          minimum: 15
+          maximum: 300
+        venue_id:
+          type: integer
+        training_type_id:
+          type: integer
+        notify_parents:
+          type: boolean
+          default: true
+        require_rsvp:
+          type: boolean
+          default: true
+        comment:
+          type: string
+          nullable: true
+
+    UpdateTrainingRequest:
+      type: object
+      properties:
+        coach_id:
+          type: integer
+        training_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+        duration_minutes:
+          type: integer
+          minimum: 15
+          maximum: 300
+        venue_id:
+          type: integer
+        training_type_id:
+          type: integer
+        notify_parents:
+          type: boolean
+        require_rsvp:
+          type: boolean
+        comment:
+          type: string
+          nullable: true
+
+    MarkAttendanceRequest:
+      type: object
+      required: [attendance_status]
+      properties:
+        attendance_status:
+          type: string
+          enum: [pending, present, absent]
+        absence_reason:
+          type: string
+          nullable: true

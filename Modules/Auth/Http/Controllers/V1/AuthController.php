@@ -5,7 +5,10 @@ namespace Modules\Auth\Http\Controllers\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Auth\Http\Requests\LoginRequest;
+use Modules\Auth\Http\Requests\RegisterRequest;
 use Modules\Auth\Services\AuthService;
+use Modules\User\Http\Resources\UserShortResource;
 
 class AuthController extends Controller
 {
@@ -13,40 +16,40 @@ class AuthController extends Controller
         private readonly AuthService $authService
     ) {}
 
-    public function register(Request $request): JsonResponse
+    /**
+     * POST /api/v1/auth/register
+     */
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'first_name'  => 'required|string|max:100',
-            'last_name'   => 'required|string|max:100',
-            'middle_name' => 'nullable|string|max:100',
-            'email'       => 'required|email|max:255|unique:users,email',
-            'phone'       => 'nullable|string|max:30',
-            'password'    => 'required|string|min:8|confirmed',
-            'birth_date'  => 'required|date',
-            'gender'      => 'required|in:male,female',
-            'role'        => 'sometimes|in:player,parent,coach',
-        ]);
+        $result = $this->authService->register($request->validated());
 
-        $result = $this->authService->register($validated);
-
-        return response()->json($result, 201);
+        return response()->json([
+            'user'        => new UserShortResource($result['user']),
+            'token'       => $result['token'],
+            'permissions' => $result['permissions'],
+        ], 201);
     }
 
-    public function login(Request $request): JsonResponse
+    /**
+     * POST /api/v1/auth/login
+     */
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'login'    => 'required|string',
-            'password' => 'required|string',
-        ]);
-
         $result = $this->authService->login(
             $request->input('login'),
             $request->input('password')
         );
 
-        return response()->json($result);
+        return response()->json([
+            'user'        => new UserShortResource($result['user']),
+            'token'       => $result['token'],
+            'permissions' => $result['permissions'],
+        ]);
     }
 
+    /**
+     * POST /api/v1/auth/logout
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

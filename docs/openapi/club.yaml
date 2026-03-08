@@ -1,0 +1,334 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Club API
+  description: Управление спортивными клубами
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Club
+    description: CRUD клубов
+
+paths:
+  /clubs:
+    get:
+      tags: [Club]
+      summary: Список клубов
+      operationId: listClubs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+        - name: country_id
+          in: query
+          schema:
+            type: integer
+        - name: city_id
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Поиск по названию
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список клубов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubPaginated'
+
+    post:
+      tags: [Club]
+      summary: Создать клуб
+      operationId: createClub
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateClubRequest'
+      responses:
+        '201':
+          description: Клуб создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /clubs/{id}:
+    get:
+      tags: [Club]
+      summary: Детали клуба
+      operationId: showClub
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      responses:
+        '200':
+          description: Клуб с командами и связями
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClubFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Club]
+      summary: Обновить клуб
+      operationId: updateClub
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateClubRequest'
+      responses:
+        '200':
+          description: Клуб обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [Club]
+      summary: Удалить клуб
+      operationId: deleteClub
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClubId'
+      responses:
+        '204':
+          description: Клуб удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    ClubId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Club:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        club_type_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+        email:
+          type: string
+          nullable: true
+        phones:
+          type: array
+          items:
+            type: string
+          nullable: true
+        logo_file_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ClubFull:
+      allOf:
+        - $ref: '#/components/schemas/Club'
+        - type: object
+          properties:
+            teams:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamShort'
+            sport_type:
+              $ref: '#/components/schemas/RefItem'
+            club_type:
+              $ref: '#/components/schemas/RefItem'
+            country:
+              $ref: '#/components/schemas/RefItem'
+            city:
+              $ref: '#/components/schemas/RefItem'
+
+    TeamShort:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        gender:
+          type: string
+          enum: [boys, girls, mixed]
+        birth_year:
+          type: integer
+
+    RefItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    ClubPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Club'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    CreateClubRequest:
+      type: object
+      required: [name, club_type_id, sport_type_id, country_id, city_id, address]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        club_type_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+        phones:
+          type: array
+          items:
+            type: string
+          nullable: true
+        logo:
+          type: string
+          format: binary
+          description: Логотип клуба (макс. 2 МБ)
+
+    UpdateClubRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        club_type_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          nullable: true
+        phones:
+          type: array
+          items:
+            type: string
+          nullable: true
+        logo:
+          type: string
+          format: binary

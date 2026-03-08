@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Reference API
+  description: Справочники (виды спорта, типы клубов, роли, позиции, страны, города и т.д.)
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Reference
+    description: Справочные данные (публичный доступ)
+
+paths:
+  /refs/sport-types:
+    get:
+      tags: [Reference]
+      summary: Виды спорта
+      operationId: getSportTypes
+      responses:
+        '200':
+          description: Список видов спорта
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/club-types:
+    get:
+      tags: [Reference]
+      summary: Типы клубов
+      operationId: getClubTypes
+      responses:
+        '200':
+          description: Список типов клубов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/user-roles:
+    get:
+      tags: [Reference]
+      summary: Роли пользователей в команде
+      operationId: getUserRoles
+      responses:
+        '200':
+          description: Список ролей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/positions:
+    get:
+      tags: [Reference]
+      summary: Позиции игроков
+      operationId: getPositions
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по виду спорта
+      responses:
+        '200':
+          description: Список позиций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PositionItem'
+
+  /refs/dominant-feet:
+    get:
+      tags: [Reference]
+      summary: Доминантная нога
+      operationId: getDominantFeet
+      responses:
+        '200':
+          description: Список вариантов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/kinship-types:
+    get:
+      tags: [Reference]
+      summary: Типы родства
+      operationId: getKinshipTypes
+      responses:
+        '200':
+          description: Список типов родства
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/match-event-types:
+    get:
+      tags: [Reference]
+      summary: Типы событий матча
+      operationId: getMatchEventTypes
+      responses:
+        '200':
+          description: Список типов событий (гол, жёлтая карточка и т.д.)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/countries:
+    get:
+      tags: [Reference]
+      summary: Страны
+      operationId: getCountries
+      responses:
+        '200':
+          description: Список стран
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefItem'
+
+  /refs/cities:
+    get:
+      tags: [Reference]
+      summary: Города
+      operationId: getCities
+      parameters:
+        - name: country_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по стране
+      responses:
+        '200':
+          description: Список городов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityItem'
+
+components:
+  schemas:
+    RefItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    PositionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sport_type_id:
+          type: integer
+
+    CityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        country_id:
+          type: integer

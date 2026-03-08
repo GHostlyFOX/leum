@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Auth API
+  description: Аутентификация и авторизация (регистрация, вход, выход)
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Auth
+    description: Регистрация, вход и выход из системы
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Регистрация нового пользователя
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Вход в систему
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Неверные учётные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Выход из системы
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Токен отозван
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  responses:
+    Unauthorized:
+      description: Не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: The given data was invalid.
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [first_name, last_name, email, password, password_confirmation, birth_date, gender]
+      properties:
+        first_name:
+          type: string
+          maxLength: 100
+          example: Иван
+        last_name:
+          type: string
+          maxLength: 100
+          example: Петров
+        middle_name:
+          type: string
+          maxLength: 100
+          nullable: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: ivan@example.com
+        phone:
+          type: string
+          maxLength: 30
+          nullable: true
+        password:
+          type: string
+          format: password
+          minLength: 8
+        password_confirmation:
+          type: string
+          format: password
+        birth_date:
+          type: string
+          format: date
+          example: '2010-05-15'
+        gender:
+          type: string
+          enum: [male, female]
+        role:
+          type: string
+          enum: [player, parent, coach]
+          description: Глобальная роль (по умолчанию player)
+
+    LoginRequest:
+      type: object
+      required: [login, password]
+      properties:
+        login:
+          type: string
+          description: E-mail или телефон
+          example: ivan@example.com
+        password:
+          type: string
+          format: password
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserShort'
+        token:
+          type: string
+          example: 1|abc123def456
+        permissions:
+          type: array
+          items:
+            type: string
+          example: [clubs.view, teams.view, trainings.view]
+
+    UserShort:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        birth_date:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female]
+        global_role:
+          type: string
+          enum: [super_admin, admin, coach, parent, player]
+        notifications_on:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Success
+
+    ErrorMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Unauthenticated.

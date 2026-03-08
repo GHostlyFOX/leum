@@ -5,6 +5,12 @@ namespace Modules\User\Http\Controllers\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\User\Http\Requests\CreateCoachProfileRequest;
+use Modules\User\Http\Requests\CreatePlayerProfileRequest;
+use Modules\User\Http\Requests\UpdateUserRequest;
+use Modules\User\Http\Resources\CoachProfileResource;
+use Modules\User\Http\Resources\PlayerProfileResource;
+use Modules\User\Http\Resources\UserResource;
 use Modules\User\Services\UserService;
 
 class UserController extends Controller
@@ -13,6 +19,9 @@ class UserController extends Controller
         private readonly UserService $userService
     ) {}
 
+    /**
+     * GET /api/v1/users
+     */
     public function index(Request $request): JsonResponse
     {
         $users = $this->userService->list(
@@ -20,71 +29,61 @@ class UserController extends Controller
             perPage: $request->integer('per_page', 15),
         );
 
-        return response()->json($users);
+        return UserResource::collection($users)->response();
     }
 
+    /**
+     * GET /api/v1/users/{id}
+     */
     public function show(int $id): JsonResponse
     {
         $user = $this->userService->find($id);
-        return response()->json($user);
+
+        return (new UserResource($user))->response();
     }
 
+    /**
+     * GET /api/v1/me
+     */
     public function me(Request $request): JsonResponse
     {
         $user = $this->userService->find($request->user()->id);
 
         return response()->json([
-            'user'        => $user,
+            'user'        => new UserResource($user),
             'role'        => $user->global_role,
             'permissions' => $user->getAllPermissions()->values(),
         ]);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    /**
+     * PUT /api/v1/users/{id}
+     */
+    public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        $user = $this->userService->find($id);
+        $user    = $this->userService->find($id);
+        $updated = $this->userService->update($user, $request->validated());
 
-        $validated = $request->validate([
-            'first_name'       => 'sometimes|string|max:100',
-            'last_name'        => 'sometimes|string|max:100',
-            'middle_name'      => 'nullable|string|max:100',
-            'phone'            => 'nullable|string|max:30',
-            'birth_date'       => 'sometimes|date',
-            'gender'           => 'sometimes|in:male,female',
-            'notifications_on' => 'sometimes|boolean',
-        ]);
-
-        $updated = $this->userService->update($user, $validated);
-
-        return response()->json($updated);
+        return (new UserResource($updated))->response();
     }
 
-    public function createPlayerProfile(Request $request, int $id): JsonResponse
+    /**
+     * POST /api/v1/users/{id}/player-profile
+     */
+    public function createPlayerProfile(CreatePlayerProfileRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validate([
-            'dominant_foot_id' => 'required|exists:ref_dominant_feet,id',
-            'position_id'      => 'nullable|exists:ref_positions,id',
-            'sport_type_id'    => 'required|exists:ref_sport_types,id',
-        ]);
+        $profile = $this->userService->createPlayerProfile($id, $request->validated());
 
-        $profile = $this->userService->createPlayerProfile($id, $validated);
-
-        return response()->json($profile, 201);
+        return (new PlayerProfileResource($profile))->response()->setStatusCode(201);
     }
 
-    public function createCoachProfile(Request $request, int $id): JsonResponse
+    /**
+     * POST /api/v1/users/{id}/coach-profile
+     */
+    public function createCoachProfile(CreateCoachProfileRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validate([
-            'sport_type_id'  => 'required|exists:ref_sport_types,id',
-            'specialty_id'   => 'nullable|exists:ref_positions,id',
-            'career_start'   => 'nullable|date',
-            'license_number' => 'nullable|string|max:100',
-            'license_expires'=> 'nullable|date',
-            'achievements'   => 'nullable|array',
-        ]);
+        $profile = $this->userService->createCoachProfile($id, $request->validated());
 
-        $profile = $this->userService->createCoachProfile($id, $validated);
-
-        return response()->json($profile, 201);
+        return (new CoachProfileResource($profile))->response()->setStatusCode(201);
     }
 }

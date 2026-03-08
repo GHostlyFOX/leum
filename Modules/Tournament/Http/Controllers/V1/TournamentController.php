@@ -5,6 +5,11 @@ namespace Modules\Tournament\Http\Controllers\V1;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Tournament\Http\Requests\RegisterTeamRequest;
+use Modules\Tournament\Http\Requests\StoreTournamentRequest;
+use Modules\Tournament\Http\Requests\UpdateTournamentRequest;
+use Modules\Tournament\Http\Resources\TournamentResource;
+use Modules\Tournament\Http\Resources\TournamentTeamResource;
 use Modules\Tournament\Services\TournamentService;
 
 class TournamentController extends Controller
@@ -13,6 +18,9 @@ class TournamentController extends Controller
         private readonly TournamentService $tournamentService
     ) {}
 
+    /**
+     * GET /api/v1/tournaments
+     */
     public function index(Request $request): JsonResponse
     {
         $tournaments = $this->tournamentService->list(
@@ -20,59 +28,47 @@ class TournamentController extends Controller
             perPage: $request->integer('per_page', 15),
         );
 
-        return response()->json($tournaments);
+        return TournamentResource::collection($tournaments)->response();
     }
 
+    /**
+     * GET /api/v1/tournaments/{id}
+     */
     public function show(int $id): JsonResponse
     {
         $tournament = $this->tournamentService->find($id);
-        return response()->json($tournament);
+
+        return (new TournamentResource($tournament))->response();
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * POST /api/v1/tournaments
+     */
+    public function store(StoreTournamentRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'tournament_type_id'    => 'required|exists:ref_tournament_types,id',
-            'name'                  => 'required|string|max:255',
-            'starts_at'             => 'required|date',
-            'ends_at'               => 'required|date|after_or_equal:starts_at',
-            'half_duration_minutes' => 'required|integer|min:5|max:60',
-            'halves_count'          => 'required|integer|min:1|max:4',
-            'organizer'             => 'nullable|string|max:255',
-        ]);
+        $tournament = $this->tournamentService->create($request->validated());
 
-        $tournament = $this->tournamentService->create($validated);
-
-        return response()->json($tournament, 201);
+        return (new TournamentResource($tournament))->response()->setStatusCode(201);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    /**
+     * PUT /api/v1/tournaments/{id}
+     */
+    public function update(UpdateTournamentRequest $request, int $id): JsonResponse
     {
         $tournament = $this->tournamentService->find($id);
+        $updated    = $this->tournamentService->update($tournament, $request->validated());
 
-        $validated = $request->validate([
-            'name'                  => 'sometimes|string|max:255',
-            'starts_at'             => 'sometimes|date',
-            'ends_at'               => 'sometimes|date',
-            'half_duration_minutes' => 'sometimes|integer|min:5|max:60',
-            'halves_count'          => 'sometimes|integer|min:1|max:4',
-            'organizer'             => 'nullable|string|max:255',
-        ]);
-
-        $updated = $this->tournamentService->update($tournament, $validated);
-
-        return response()->json($updated);
+        return (new TournamentResource($updated))->response();
     }
 
-    public function registerTeam(Request $request, int $id): JsonResponse
+    /**
+     * POST /api/v1/tournaments/{id}/teams
+     */
+    public function registerTeam(RegisterTeamRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validate([
-            'club_id' => 'required|exists:clubs,id',
-            'team_id' => 'required|exists:teams,id',
-        ]);
+        $entry = $this->tournamentService->registerTeam($id, $request->validated());
 
-        $entry = $this->tournamentService->registerTeam($id, $validated);
-
-        return response()->json($entry, 201);
+        return (new TournamentTeamResource($entry))->response()->setStatusCode(201);
     }
 }

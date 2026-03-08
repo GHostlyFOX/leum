@@ -1,0 +1,411 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — User API
+  description: Управление пользователями, профилями игроков и тренеров
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: User
+    description: Пользователи и профили
+
+paths:
+  /me:
+    get:
+      tags: [User]
+      summary: Текущий пользователь
+      operationId: me
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Данные текущего пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/UserFull'
+                  role:
+                    type: string
+                    enum: [super_admin, admin, coach, parent, player]
+                  permissions:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users:
+    get:
+      tags: [User]
+      summary: Список пользователей
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Поиск по имени, email или телефону
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список пользователей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPaginated'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{id}:
+    get:
+      tags: [User]
+      summary: Профиль пользователя
+      operationId: showUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: Данные пользователя с профилями
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [User]
+      summary: Обновить пользователя
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Пользователь обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFull'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/{id}/player-profile:
+    post:
+      tags: [User]
+      summary: Создать профиль игрока
+      operationId: createPlayerProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlayerProfileRequest'
+      responses:
+        '201':
+          description: Профиль игрока создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfile'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/{id}/coach-profile:
+    post:
+      tags: [User]
+      summary: Создать профиль тренера
+      operationId: createCoachProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCoachProfileRequest'
+      responses:
+        '201':
+          description: Профиль тренера создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachProfile'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    Unauthorized:
+      description: Не авторизован
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    Forbidden:
+      description: Нет прав доступа
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    UserFull:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        birth_date:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female]
+        global_role:
+          type: string
+          enum: [super_admin, admin, coach, parent, player]
+        notifications_on:
+          type: boolean
+        photo_file_id:
+          type: integer
+          nullable: true
+        player_profile:
+          $ref: '#/components/schemas/PlayerProfile'
+        coach_profile:
+          $ref: '#/components/schemas/CoachProfile'
+        team_memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMembershipShort'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserFull'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        middle_name:
+          type: string
+          maxLength: 100
+          nullable: true
+        phone:
+          type: string
+          maxLength: 30
+          nullable: true
+        birth_date:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female]
+        notifications_on:
+          type: boolean
+
+    CreatePlayerProfileRequest:
+      type: object
+      required: [dominant_foot_id, sport_type_id]
+      properties:
+        dominant_foot_id:
+          type: integer
+        position_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+
+    CreateCoachProfileRequest:
+      type: object
+      required: [sport_type_id]
+      properties:
+        sport_type_id:
+          type: integer
+        specialty_id:
+          type: integer
+          nullable: true
+        career_start:
+          type: string
+          format: date
+          nullable: true
+        license_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        license_expires:
+          type: string
+          format: date
+          nullable: true
+        achievements:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+    PlayerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        dominant_foot_id:
+          type: integer
+        position_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+
+    CoachProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        specialty_id:
+          type: integer
+          nullable: true
+        career_start:
+          type: string
+          format: date
+          nullable: true
+        license_number:
+          type: string
+          nullable: true
+        license_expires:
+          type: string
+          format: date
+          nullable: true
+        achievements:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+    TeamMembershipShort:
+      type: object
+      properties:
+        team_id:
+          type: integer
+        club_id:
+          type: integer
+        role_id:
+          type: integer
+        joined_at:
+          type: string
+          format: date
+          nullable: true
+        is_active:
+          type: boolean

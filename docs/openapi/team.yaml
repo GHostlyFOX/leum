@@ -1,0 +1,347 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Team API
+  description: Управление командами и участниками
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Team
+    description: CRUD команд и управление составом
+
+paths:
+  /clubs/{clubId}/teams:
+    get:
+      tags: [Team]
+      summary: Команды клуба
+      operationId: listTeamsByClub
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список команд клуба
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPaginated'
+
+    post:
+      tags: [Team]
+      summary: Создать команду в клубе
+      operationId: createTeam
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+      responses:
+        '201':
+          description: Команда создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /teams/{id}:
+    get:
+      tags: [Team]
+      summary: Детали команды
+      operationId: showTeam
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '200':
+          description: Команда с участниками
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Team]
+      summary: Обновить команду
+      operationId: updateTeam
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamRequest'
+      responses:
+        '200':
+          description: Команда обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+
+    delete:
+      tags: [Team]
+      summary: Удалить команду
+      operationId: deleteTeam
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '204':
+          description: Команда удалена
+
+  /teams/{teamId}/members:
+    post:
+      tags: [Team]
+      summary: Добавить участника в команду
+      operationId: addTeamMember
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddMemberRequest'
+      responses:
+        '201':
+          description: Участник добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMember'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    TeamId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          enum: [boys, girls, mixed]
+        birth_year:
+          type: integer
+        club_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        country_id:
+          type: integer
+          nullable: true
+        city_id:
+          type: integer
+          nullable: true
+        logo_file_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TeamFull:
+      allOf:
+        - $ref: '#/components/schemas/Team'
+        - type: object
+          properties:
+            members:
+              type: array
+              items:
+                $ref: '#/components/schemas/TeamMember'
+            club:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+
+    TeamPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    TeamMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        role_id:
+          type: integer
+        joined_at:
+          type: string
+          format: date
+          nullable: true
+        is_active:
+          type: boolean
+
+    CreateTeamRequest:
+      type: object
+      required: [name, gender, birth_year, sport_type_id]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          enum: [boys, girls, mixed]
+        birth_year:
+          type: integer
+          minimum: 2000
+          maximum: 2030
+        sport_type_id:
+          type: integer
+        country_id:
+          type: integer
+          nullable: true
+        city_id:
+          type: integer
+          nullable: true
+
+    UpdateTeamRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          enum: [boys, girls, mixed]
+        birth_year:
+          type: integer
+          minimum: 2000
+          maximum: 2030
+        sport_type_id:
+          type: integer
+        country_id:
+          type: integer
+          nullable: true
+        city_id:
+          type: integer
+          nullable: true
+
+    AddMemberRequest:
+      type: object
+      required: [user_id, club_id, role_id]
+      properties:
+        user_id:
+          type: integer
+        club_id:
+          type: integer
+        role_id:
+          type: integer
+          description: ID роли из ref_user_roles
+        joined_at:
+          type: string
+          format: date
+          nullable: true
