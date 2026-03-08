@@ -2,7 +2,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/images/brand/favicon.ico')}}" />
 
         <!-- TITLE -->
-        <title>Детская Лига — платформа для детского спорта</title>
+        <title>Сбор — единое пространство для детского спорта | SquadUp.ru</title>
 
         <!-- BOOTSTRAP CSS -->
         <link id="style" href="{{asset('assets/plugins/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" />
@@ -16,3 +16,5 @@
         <!-- INTERNAL Switcher css -->
 		<!-- <link href="{{asset('assets/switcher/css/switcher.css')}}" rel="stylesheet" />
 		<link href="{{asset('assets/switcher/demo.css')}}" rel="stylesheet" /> -->
+
+        @yield('styles')

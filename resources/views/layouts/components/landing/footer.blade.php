@@ -8,9 +8,9 @@
                         <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
                             <h6 class="text-uppercase mb-3 fw-semibold">О платформе</h6>
                             <p class="text-muted">
-                                «Детская Лига» — платформа для управления детскими спортивными клубами и командами.
-                                Объединяет администраторов, тренеров, родителей и юных спортсменов в единое пространство
-                                для планирования тренировок, организации турниров и отслеживания прогресса.
+                                Сбор (SquadUp.ru) — сервис для детского спорта, где важна не только игра, но и вся жизнь команды вокруг неё.
+                                Объединяет клуб, тренера, родителей и юных спортсменов в единое цифровое пространство —
+                                от расписания тренировок до итогов турнира и личной статистики каждого игрока.
                             </p>
                         </div>
                         <div class="col-lg-2 col-sm-6 col-md-4 mb-4 mb-lg-0">
@@ -33,9 +33,9 @@
                         </div>
                         <div class="col-lg-4 col-md-12">
                             <h6 class="text-uppercase mb-3 fw-semibold">Контакты</h6>
-                            <p class="text-muted mb-2"><i class="fa fa-map-marker me-2"></i> Казахстан</p>
-                            <p class="text-muted mb-2"><i class="fa fa-envelope me-2"></i> info@liga.itex.kz</p>
-                            <p class="text-muted mb-2"><i class="fa fa-globe me-2"></i> liga.itex.kz</p>
+                            <p class="text-muted mb-2"><i class="fa fa-map-marker me-2"></i> Россия</p>
+                            <p class="text-muted mb-2"><i class="fa fa-envelope me-2"></i> info@squadup.ru</p>
+                            <p class="text-muted mb-2"><i class="fa fa-globe me-2"></i> squadup.ru</p>
                         </div>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                 <footer class="main-footer px-0 pb-0 border-0">
                     <div class="row align-items-center">
                         <div class="col-md-8 footer1">
-                            &copy; {{ date('Y') }} <a href="{{ url('/') }}">Детская Лига</a>. Все права защищены.
+                            &copy; {{ date('Y') }} <a href="{{ url('/') }}">Сбор (SquadUp.ru)</a>. Все права защищены.
                         </div>
                         <div class="col-md-4 text-end">
                             <a href="{{ route('personal.data.agreement') }}" class="text-muted small">Политика конфиденциальности</a>

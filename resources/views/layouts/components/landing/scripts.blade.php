@@ -14,3 +14,36 @@
 
         <!-- landing JS -->
         <script src="{{asset('assets/js/landing.js')}}"></script>
+
+        <!-- Rotating slogans -->
+        <script>
+        (function() {
+            var slogans = [
+                'Сбор — команда начинается с единства.',
+                'Сбор — вся команда в одном ритме.',
+                'Сбор — когда команда действительно вместе.'
+            ];
+            var el = document.getElementById('hero-slogan');
+            if (!el) return;
+
+            // Shuffle array (Fisher-Yates)
+            for (var i = slogans.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var t = slogans[i]; slogans[i] = slogans[j]; slogans[j] = t;
+            }
+
+            var idx = 0;
+            el.textContent = slogans[idx];
+
+            setInterval(function() {
+                el.style.opacity = '0';
+                setTimeout(function() {
+                    idx = (idx + 1) % slogans.length;
+                    el.textContent = slogans[idx];
+                    el.style.opacity = '1';
+                }, 500);
+            }, 4000);
+        })();
+        </script>
+
+        @yield('scripts')

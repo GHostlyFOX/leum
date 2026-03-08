@@ -192,12 +192,14 @@
                     <span style="color: var(--bs-primary);">&#9679;</span>&ensp;Платформа для детского спорта
                 </div>
                 <h1 class="display-4 text-white fw-bold mb-4" style="line-height: 1.15;">
-                    Управляйте клубами,<br>
-                    командами и турнирами<br>
-                    <span style="color: var(--bs-primary);">в одном месте</span>
+                    <span style="color: var(--bs-primary);">Сбор</span> — вся команда<br>
+                    в одном месте
                 </h1>
+                <p class="lead text-white mb-4" id="hero-slogan" style="max-width: 520px; font-size: 1.4rem; font-weight: 500; opacity: 1; transition: opacity 0.5s ease;">
+                    Сбор — команда начинается с единства.
+                </p>
                 <p class="lead text-white opacity-75 mb-5" style="max-width: 520px;">
-                    «Детская лига» объединяет тренеров, родителей и юных спортсменов. Планируйте тренировки, ведите статистику матчей и отслеживайте прогресс каждого ребёнка.
+                    Клуб управляет составом и расписанием, тренер ведёт тренировки и матчи, родители подтверждают участие ребёнка, а игроки видят свою команду, календарь и результаты.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="{{ route('auth.register') }}" class="btn btn-primary btn-lg px-4">
