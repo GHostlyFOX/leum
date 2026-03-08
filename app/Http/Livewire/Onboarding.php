@@ -113,7 +113,7 @@ class Onboarding extends Component
                 : collect(),
             'positions'     => RefPosition::orderBy('name')->get(),
             'dominantFeet'  => RefDominantFoot::orderBy('name')->get(),
-        ]);
+        ])->layout('layouts.app');
     }
 
     public function updatedCountryId()

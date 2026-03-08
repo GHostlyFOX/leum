@@ -1,6 +1,5 @@
-@extends('layouts.app')
-
 @section('content')
+<div>
 <style>
     .wizard-stepper { display: flex; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 4px; }
     .wizard-step { display: flex; align-items: center; }
@@ -677,5 +676,6 @@
         @endif
 
     </div>
+</div>
 </div>
 @endsection
