@@ -1,15 +1,15 @@
 openapi: 3.0.3
 info:
   title: Детская лига — Auth API
-  description: Аутентификация и авторизация (регистрация, вход, выход)
-  version: 1.0.0
+  description: Аутентификация и авторизация (регистрация, вход, выход, обновление токенов, сброс пароля)
+  version: 2.0.0
 
 servers:
   - url: /api/v1
 
 tags:
   - name: Auth
-    description: Регистрация, вход и выход из системы
+    description: Регистрация, вход, выход, refresh-токены, сброс пароля
 
 paths:
   /auth/register:
@@ -29,7 +29,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
+                $ref: '#/components/schemas/AuthTokenResponse'
         '422':
           $ref: '#/components/responses/ValidationError'
 
@@ -50,9 +50,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
+                $ref: '#/components/schemas/AuthTokenResponse'
         '401':
           description: Неверные учётные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Обновление пары токенов (ротация refresh-токена)
+      operationId: refresh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Новая пара токенов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          description: Refresh-токен невалиден или истёк
           content:
             application/json:
               schema:
@@ -63,13 +90,13 @@ paths:
   /auth/logout:
     post:
       tags: [Auth]
-      summary: Выход из системы
+      summary: Выход из системы (отзыв всех токенов)
       operationId: logout
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Токен отозван
+          description: Все токены отозваны
           content:
             application/json:
               schema:
@@ -77,11 +104,67 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Запрос на сброс пароля (отправка токена)
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Токен сброса создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Ссылка для сброса пароля отправлена
+                  reset_token:
+                    type: string
+                    description: Токен сброса (64 символа)
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Сброс пароля по токену
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Пароль успешно изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          description: Невалидный или истёкший токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+      description: Sanctum Bearer-токен (access_token из AuthTokenResponse)
 
   responses:
     Unauthorized:
@@ -164,14 +247,63 @@ components:
           type: string
           format: password
 
-    AuthResponse:
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+          minLength: 64
+          maxLength: 64
+          description: Refresh-токен (64 символа), полученный при login/register/refresh
+
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          example: ivan@example.com
+
+    ResetPasswordRequest:
+      type: object
+      required: [email, token, password, password_confirmation]
+      properties:
+        email:
+          type: string
+          format: email
+          example: ivan@example.com
+        token:
+          type: string
+          description: Токен сброса из forgot-password
+        password:
+          type: string
+          format: password
+          minLength: 8
+        password_confirmation:
+          type: string
+          format: password
+
+    AuthTokenResponse:
       type: object
       properties:
         user:
           $ref: '#/components/schemas/UserShort'
-        token:
+        access_token:
           type: string
+          description: Sanctum Bearer-токен для доступа к API
           example: 1|abc123def456
+        refresh_token:
+          type: string
+          description: Refresh-токен (64 символа) для обновления пары
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          description: Время жизни access_token в секундах
+          example: 3600
         permissions:
           type: array
           items:

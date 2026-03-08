@@ -130,6 +130,14 @@ class User extends Authenticatable
         return "{$this->last_name} {$initials}";
     }
 
+    /**
+     * Имя для отображения в шапке сайта.
+     */
+    public function headerName(): string
+    {
+        return $this->short_name;
+    }
+
     // ── RBAC ─────────────────────────────────────────────────────
 
     /**

@@ -10,8 +10,11 @@ use Modules\Auth\Http\Controllers\V1\AuthController;
 */
 
 // Публичные
-Route::post('auth/register', [AuthController::class, 'register']);
-Route::post('auth/login',    [AuthController::class, 'login']);
+Route::post('auth/register',       [AuthController::class, 'register']);
+Route::post('auth/login',          [AuthController::class, 'login']);
+Route::post('auth/refresh',        [AuthController::class, 'refresh']);
+Route::post('auth/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('auth/reset-password',  [AuthController::class, 'resetPassword']);
 
 // Защищённые
 Route::middleware('auth:sanctum')->group(function () {

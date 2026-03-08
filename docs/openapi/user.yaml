@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Детская лига — User API
   description: Управление пользователями, профилями игроков и тренеров
-  version: 1.0.0
+  version: 2.0.0
 
 servers:
   - url: /api/v1
@@ -10,8 +10,13 @@ servers:
 tags:
   - name: User
     description: Пользователи и профили
+  - name: Player
+    description: Игроки (профили игроков)
+  - name: Coach
+    description: Тренеры (профили тренеров)
 
 paths:
+  # ── Текущий пользователь ────────────────────────────────────────
   /me:
     get:
       tags: [User]
@@ -39,6 +44,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  # ── Пользователи ────────────────────────────────────────────────
   /users:
     get:
       tags: [User]
@@ -158,6 +164,215 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationError'
 
+  # ── Игроки (/players) ───────────────────────────────────────────
+  /players:
+    get:
+      tags: [Player]
+      summary: Список игроков
+      operationId: listPlayers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по виду спорта
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по клубу
+        - name: team_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по команде
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Поиск по имени/фамилии
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список игроков
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerPaginated'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /players/{id}:
+    get:
+      tags: [Player]
+      summary: Профиль игрока
+      operationId: showPlayer
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlayerId'
+      responses:
+        '200':
+          description: Профиль игрока с пользователем и справочниками
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfileFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Player]
+      summary: Обновить профиль игрока
+      operationId: updatePlayer
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlayerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePlayerProfileRequest'
+      responses:
+        '200':
+          description: Профиль обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerProfileFull'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [Player]
+      summary: Удалить профиль игрока
+      operationId: deletePlayer
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlayerId'
+      responses:
+        '200':
+          description: Профиль удалён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Профиль игрока удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ── Тренеры (/coaches) ──────────────────────────────────────────
+  /coaches:
+    get:
+      tags: [Coach]
+      summary: Список тренеров
+      operationId: listCoaches
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по виду спорта
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по клубу
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Поиск по имени/фамилии
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список тренеров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachPaginated'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /coaches/{id}:
+    get:
+      tags: [Coach]
+      summary: Профиль тренера
+      operationId: showCoach
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CoachId'
+      responses:
+        '200':
+          description: Профиль тренера с пользователем и справочниками
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachProfileFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Coach]
+      summary: Обновить профиль тренера
+      operationId: updateCoach
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CoachId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCoachProfileRequest'
+      responses:
+        '200':
+          description: Профиль обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachProfileFull'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [Coach]
+      summary: Удалить профиль тренера
+      operationId: deleteCoach
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CoachId'
+      responses:
+        '200':
+          description: Профиль удалён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Профиль тренера удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -171,6 +386,20 @@ components:
       required: true
       schema:
         type: integer
+    PlayerId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: ID профиля игрока (player_profiles.id)
+    CoachId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: ID профиля тренера (coach_profiles.id)
     PerPage:
       name: per_page
       in: query
@@ -223,6 +452,7 @@ components:
                     type: string
 
   schemas:
+    # ── User schemas ──────────────────────────────────────────────
     UserFull:
       type: object
       properties:
@@ -311,6 +541,7 @@ components:
         notifications_on:
           type: boolean
 
+    # ── Player schemas ────────────────────────────────────────────
     CreatePlayerProfileRequest:
       type: object
       required: [dominant_foot_id, sport_type_id]
@@ -323,6 +554,86 @@ components:
         sport_type_id:
           type: integer
 
+    UpdatePlayerProfileRequest:
+      type: object
+      properties:
+        dominant_foot_id:
+          type: integer
+        position_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+
+    PlayerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        dominant_foot_id:
+          type: integer
+        position_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+
+    PlayerProfileFull:
+      type: object
+      description: Профиль игрока с загруженными связями
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        dominant_foot_id:
+          type: integer
+        position_id:
+          type: integer
+          nullable: true
+        sport_type_id:
+          type: integer
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            first_name:
+              type: string
+            last_name:
+              type: string
+            birth_date:
+              type: string
+              format: date
+            gender:
+              type: string
+              enum: [male, female]
+        dominant_foot:
+          $ref: '#/components/schemas/RefItem'
+        position:
+          $ref: '#/components/schemas/RefItem'
+        sport_type:
+          $ref: '#/components/schemas/RefItem'
+
+    PlayerPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerProfileFull'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    # ── Coach schemas ─────────────────────────────────────────────
     CreateCoachProfileRequest:
       type: object
       required: [sport_type_id]
@@ -350,20 +661,31 @@ components:
             type: string
           nullable: true
 
-    PlayerProfile:
+    UpdateCoachProfileRequest:
       type: object
       properties:
-        id:
-          type: integer
-        user_id:
-          type: integer
-        dominant_foot_id:
-          type: integer
-        position_id:
-          type: integer
-          nullable: true
         sport_type_id:
           type: integer
+        specialty_id:
+          type: integer
+          nullable: true
+        career_start:
+          type: string
+          format: date
+          nullable: true
+        license_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        license_expires:
+          type: string
+          format: date
+          nullable: true
+        achievements:
+          type: array
+          items:
+            type: string
+          nullable: true
 
     CoachProfile:
       type: object
@@ -393,6 +715,80 @@ components:
           items:
             type: string
           nullable: true
+
+    CoachProfileFull:
+      type: object
+      description: Профиль тренера с загруженными связями
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        specialty_id:
+          type: integer
+          nullable: true
+        career_start:
+          type: string
+          format: date
+          nullable: true
+        license_number:
+          type: string
+          nullable: true
+        license_expires:
+          type: string
+          format: date
+          nullable: true
+        achievements:
+          type: array
+          items:
+            type: string
+          nullable: true
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            first_name:
+              type: string
+            last_name:
+              type: string
+            birth_date:
+              type: string
+              format: date
+            gender:
+              type: string
+              enum: [male, female]
+        sport_type:
+          $ref: '#/components/schemas/RefItem'
+        specialty:
+          $ref: '#/components/schemas/RefItem'
+
+    CoachPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoachProfileFull'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    # ── Common schemas ────────────────────────────────────────────
+    RefItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
 
     TeamMembershipShort:
       type: object

@@ -43,6 +43,16 @@ class RbacSeeder extends Seeder
             ['slug' => 'teams.delete',   'name' => 'Удаление команд',                  'group' => 'teams'],
             ['slug' => 'teams.members',  'name' => 'Управление составом команды',      'group' => 'teams'],
 
+            // Игроки (профили)
+            ['slug' => 'players.view',   'name' => 'Просмотр профилей игроков',        'group' => 'players'],
+            ['slug' => 'players.update', 'name' => 'Редактирование профилей игроков',  'group' => 'players'],
+            ['slug' => 'players.delete', 'name' => 'Удаление профилей игроков',        'group' => 'players'],
+
+            // Тренеры (профили)
+            ['slug' => 'coaches.view',   'name' => 'Просмотр профилей тренеров',       'group' => 'coaches'],
+            ['slug' => 'coaches.update', 'name' => 'Редактирование профилей тренеров', 'group' => 'coaches'],
+            ['slug' => 'coaches.delete', 'name' => 'Удаление профилей тренеров',       'group' => 'coaches'],
+
             // Тренировки
             ['slug' => 'trainings.view',       'name' => 'Просмотр тренировок',        'group' => 'trainings'],
             ['slug' => 'trainings.create',     'name' => 'Создание тренировок',        'group' => 'trainings'],
@@ -86,12 +96,15 @@ class RbacSeeder extends Seeder
 
         $matrix = [
             'admin' => [
-                'clubs.*', 'teams.*', 'trainings.*', 'matches.*',
-                'tournaments.*', 'users.*', 'files.*',
+                'clubs.*', 'teams.*', 'players.*', 'coaches.*',
+                'trainings.*', 'matches.*', 'tournaments.*',
+                'users.*', 'files.*',
             ],
             'coach' => [
                 'clubs.view',
                 'teams.view', 'teams.members',
+                'players.view',
+                'coaches.view', 'coaches.update',
                 'trainings.view', 'trainings.create', 'trainings.update', 'trainings.cancel', 'trainings.attendance',
                 'matches.view', 'matches.create', 'matches.update', 'matches.manage',
                 'tournaments.view', 'tournaments.register',
@@ -101,6 +114,8 @@ class RbacSeeder extends Seeder
             'parent' => [
                 'clubs.view',
                 'teams.view',
+                'players.view',
+                'coaches.view',
                 'trainings.view',
                 'matches.view',
                 'tournaments.view',
@@ -109,6 +124,8 @@ class RbacSeeder extends Seeder
             'player' => [
                 'clubs.view',
                 'teams.view',
+                'players.view',
+                'coaches.view',
                 'trainings.view',
                 'matches.view',
                 'tournaments.view',
@@ -126,7 +143,6 @@ class RbacSeeder extends Seeder
 
             foreach ($slugPatterns as $pattern) {
                 if (str_ends_with($pattern, '.*')) {
-                    // Подстановка: clubs.* → все slug, начинающиеся с "clubs."
                     $prefix = str_replace('.*', '.', $pattern);
                     $matched = $allPerms->filter(fn ($id, $slug) => str_starts_with($slug, $prefix));
                     $permIds = $permIds->merge($matched->values());

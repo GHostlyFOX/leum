@@ -34,8 +34,8 @@
 **Срок:** ~42 дня
 
 **API и Авторизация:**
-- Подготовка OpenAPI контрактов
-- Реализация авторизации (Email, OAuth Google/Apple) через Laravel Sanctum.
+- Подготовка OpenAPI контрактов - готово
+- Реализация авторизации (Email, OAuth Google/Apple) через Laravel Sanctum. - частично
 - JWT-токены, refresh-токены, сброс пароля.
 - RBAC-middleware для разграничения доступа по ролям.
 - REST API: /auth/*, /clubs/*, /teams/*, /players/*, /coaches/*.
