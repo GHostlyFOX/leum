@@ -4,6 +4,9 @@ Route::prefix('auth')->group(function() {
     Route::get('/', 'AuthController@index')->name('auth.index');
     Route::post('/login', 'AuthController@login')->name('auth.login');
     Route::post('/logout', 'AuthController@logout')->middleware('auth')->name('auth.logout');
+    Route::get('/logout', function () {
+        return redirect()->route('auth.index');
+    });
     Route::get('/forgot-password', 'AuthController@showForm')->name('password.request');
     Route::post('/forgot-password', 'AuthController@handleRequest')->name('password.forgot');
     Route::get('/reset-by-token/{token}', 'AuthController@verifyToken')->name('password.token');

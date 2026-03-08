@@ -36,9 +36,9 @@
 **API и Авторизация:**
 - Подготовка OpenAPI контрактов - готово
 - Реализация авторизации (Email, OAuth Google/Apple) через Laravel Sanctum. - частично
-- JWT-токены, refresh-токены, сброс пароля.
-- RBAC-middleware для разграничения доступа по ролям.
-- REST API: /auth/*, /clubs/*, /teams/*, /players/*, /coaches/*.
+- JWT-токены, refresh-токены, сброс пароля. - готово
+- RBAC-middleware для разграничения доступа по ролям. - готово
+- REST API: /auth/*, /clubs/*, /teams/*, /players/*, /coaches/*. - готово
 
 **Веб-интерфейс (все роли):**
 - Регистрация, логин, OAuth, активация по ссылке-приглашению.
