@@ -15,10 +15,13 @@
 											<a class="side-menu__item" data-bs-toggle="slide" href="#features"><span class="side-menu__label">Возможности</span></a>
 										</li>
 										<li class="slide">
+											<a class="side-menu__item" data-bs-toggle="slide" href="#stats"><span class="side-menu__label">Аналитика</span></a>
+										</li>
+										<li class="slide">
 											<a class="side-menu__item" data-bs-toggle="slide" href="#audience"><span class="side-menu__label">Для кого</span></a>
 										</li>
 										<li class="slide">
-											<a class="side-menu__item" data-bs-toggle="slide" href="#advantages"><span class="side-menu__label">Преимущества</span></a>
+											<a class="side-menu__item" data-bs-toggle="slide" href="#advantages"><span class="side-menu__label">Как начать</span></a>
 										</li>
 										<li class="slide">
 											<a class="side-menu__item" data-bs-toggle="slide" href="#testimonials"><span class="side-menu__label">Отзывы</span></a>
