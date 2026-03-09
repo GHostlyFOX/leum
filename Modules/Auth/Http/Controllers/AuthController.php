@@ -109,7 +109,7 @@ class AuthController extends Controller
         if ($field === 'email') {
             Mail::send('auth::emails.password_reset', ['token' => $token], function ($message) use ($user) {
                 $message->to($user->email)
-                    ->subject('Восстановление пароля — Детская лига');
+                    ->subject('Восстановление пароля — Сбор');
             });
             return back()->with('status', 'Ссылка отправлена на email');
         }
