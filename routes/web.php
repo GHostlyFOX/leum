@@ -29,7 +29,7 @@ Route::get('/', Landing::class)->name('landing');
 // ── Авторизация (только для гостей) ──────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)->name('auth.loginForm');
-    Route::get('register', Register::class);
+    Route::get('register', Register::class)->name('auth.register');
     Route::get('forgot-password', ForgotPassword::class);
 });
 

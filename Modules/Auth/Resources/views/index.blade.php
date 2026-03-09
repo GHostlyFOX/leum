@@ -74,7 +74,7 @@
 
                                 <!-- Ссылка на регистрацию -->
                                 <div class="text-center pt-3">
-                                    <p class="text-dark mb-0">Нет аккаунта? <a href="{{ route('register') }}" class="text-primary ms-1">Зарегистрироваться</a></p>
+                                    <p class="text-dark mb-0">Нет аккаунта? <a href="{{ route('auth.register') }}" class="text-primary ms-1">Зарегистрироваться</a></p>
                                 </div>
                             </form>
                         </div>

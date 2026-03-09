@@ -15,8 +15,7 @@ Route::prefix('auth')->group(function() {
     Route::get('/reset-password/{token}', 'AuthController@showResetForm')->name('password.reset');
     Route::post('/reset-password', 'AuthController@resetPassword')->name('password.update');
 });
-Route::prefix('register2')->group(function() {
-    Route::get('/', 'RegisterController@index')->name('auth.register');
-    Route::get('/agreement', 'RegisterController@agreement')->name('personal.data.agreement');
-    Route::post('/register', 'RegisterController@register')->name('register');
-});
+// Старые маршруты register2 удалены.
+// Регистрация теперь через Livewire-визард: GET /register (routes/web.php)
+// Согласие на обработку ПД пока доступно по прямому маршруту:
+Route::get('agreement', 'RegisterController@agreement')->name('personal.data.agreement');

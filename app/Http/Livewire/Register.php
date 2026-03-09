@@ -135,7 +135,7 @@ class Register extends Component
             $this->step = 3;
         } else {
             // Для coach / parent — регистрируем и отправляем на онбординг
-            $this->registerAndRedirect();
+            return $this->registerAndRedirect();
         }
     }
 

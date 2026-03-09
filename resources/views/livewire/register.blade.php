@@ -301,7 +301,7 @@
             </button>
 
             <div class="register-footer">
-                Уже есть аккаунт? <a href="{{ url('login') }}">Войти</a>
+                Уже есть аккаунт? <a href="{{ route('auth.loginForm') }}">Войти</a>
             </div>
         @endif
 
@@ -363,7 +363,7 @@
             </div>
 
             <div class="register-footer">
-                Уже есть аккаунт? <a href="{{ url('login') }}">Войти</a>
+                Уже есть аккаунт? <a href="{{ route('auth.loginForm') }}">Войти</a>
             </div>
         @endif
 
