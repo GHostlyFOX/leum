@@ -156,6 +156,45 @@ entity "training_media" as media {
 }
 
 ' ════════════════════════════════════════════════════════════════════════
+' ОБЪЯВЛЕНИЯ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "announcements" as announce {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * title         : VARCHAR(255)
+    * message       : TEXT
+    * priority      : ENUM(normal, important, urgent)
+    * team_id       : BIGINT <<FK>>
+    * club_id       : BIGINT <<FK>>
+    * author_id     : BIGINT <<FK>>
+      published_at  : TIMESTAMPTZ
+      expires_at    : TIMESTAMPTZ
+    * is_draft      : BOOLEAN
+    * created_at    : TIMESTAMPTZ
+    * updated_at    : TIMESTAMPTZ
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' ПОЛИМОРФНЫЕ RSVP-ОТВЕТЫ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "event_responses" as rsvp {
+    * id              : BIGSERIAL <<PK>>
+    --
+    * event_type      : VARCHAR(50)
+    ' training, match, tournament, etc.
+    * event_id        : BIGINT
+    * user_id         : BIGINT <<FK>>
+    * status          : ENUM(yes, no, maybe, pending)
+      comment         : TEXT
+    * responded_at    : TIMESTAMPTZ
+    * created_at      : TIMESTAMPTZ
+    * updated_at      : TIMESTAMPTZ
+    ' UNIQUE(event_type, event_id, user_id)
+}
+
+' ════════════════════════════════════════════════════════════════════════
 ' СВЯЗИ — справочники
 ' ════════════════════════════════════════════════════════════════════════
 
@@ -192,5 +231,20 @@ usr      ||--o{ attendance : "отметил"
 
 training ||--o{ media : "медиафайлы"
 file     ||--o{ media : ""
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ — объявления
+' ════════════════════════════════════════════════════════════════════════
+
+club ||--o{ announce   : "объявления клуба"
+team ||--o{ announce   : "объявления команды"
+usr  ||--o{ announce   : "автор"
+
+' ════════════════════════════════════════════════════════════════════════
+' СВЯЗИ — event_responses (полиморфные)
+' ════════════════════════════════════════════════════════════════════════
+
+usr      ||--o{ rsvp    : "ответы пользователя"
+training |o--o{ rsvp    : "RSVP на тренировку\n(event_type='training')"
 
 @enduml

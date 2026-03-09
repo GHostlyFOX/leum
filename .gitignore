@@ -15,3 +15,7 @@ yarn-error.log
 /.vscode
 
 .ai
+/docs/interface/
+/docs/c4.zip
+/docs/interface-analysis.docx
+/docs/interface-analysis.js

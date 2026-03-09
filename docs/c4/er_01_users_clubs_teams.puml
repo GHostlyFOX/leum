@@ -108,6 +108,8 @@ entity "users" as usr {
     * notifications_on : BOOLEAN
     * birth_date       : DATE
     * gender           : ENUM(male, female)
+      onboarded_at     : TIMESTAMPTZ
+      timezone         : VARCHAR(50)
     * created_at       : TIMESTAMPTZ
     * updated_at       : TIMESTAMPTZ
 }
@@ -169,6 +171,7 @@ entity "teams" as team {
       description   : TEXT
     * gender        : ENUM(boys, girls, mixed)
       logo_file_id  : BIGINT <<FK>>
+      team_color    : VARCHAR(7)
     * birth_year    : SMALLINT
     * club_id       : BIGINT <<FK>>
     * sport_type_id : SMALLINT <<FK>>
@@ -187,6 +190,48 @@ entity "team_members" as member {
     * role_id   : SMALLINT <<FK>>
       joined_at : DATE
     * is_active : BOOLEAN
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' СЕЗОНЫ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "seasons" as season {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * name          : VARCHAR(255)
+    * club_id       : BIGINT <<FK>>
+    * sport_type_id : SMALLINT <<FK>>
+    * status        : ENUM(planned, active, archived)
+    * start_date    : DATE
+    * end_date      : DATE
+    * created_at    : TIMESTAMPTZ
+    * updated_at    : TIMESTAMPTZ
+}
+
+entity "season_teams" as season_team {
+    * id         : BIGSERIAL <<PK>>
+    --
+    * season_id  : BIGINT <<FK>>
+    * team_id    : BIGINT <<FK>>
+    ' UNIQUE(season_id, team_id)
+}
+
+' ════════════════════════════════════════════════════════════════════════
+' INVITE-ССЫЛКИ
+' ════════════════════════════════════════════════════════════════════════
+
+entity "invite_links" as invite {
+    * id            : BIGSERIAL <<PK>>
+    --
+    * token         : VARCHAR(64) <<UNIQUE>>
+    * team_id       : BIGINT <<FK>>
+    * role          : ENUM(player, coach, parent)
+    * created_by_id : BIGINT <<FK>>
+      max_uses      : INT
+      used_count    : INT
+    * expires_at    : TIMESTAMPTZ
+    * created_at    : TIMESTAMPTZ
 }
 
 ' ════════════════════════════════════════════════════════════════════════
@@ -232,5 +277,15 @@ usr ||--o{ parent_link  : "как ребёнок"
 club ||--o{ team        : "команды клуба"
 club ||--o{ member      : ""
 team ||--o{ member      : "состав"
+
+' --- сезоны ---
+club   ||--o{ season       : "сезоны клуба"
+sport  ||--o{ season       : ""
+season ||--o{ season_team  : "команды сезона"
+team   ||--o{ season_team  : ""
+
+' --- invite-ссылки ---
+team ||--o{ invite         : "инвайты команды"
+usr  ||--o{ invite         : "создал инвайт"
 
 @enduml

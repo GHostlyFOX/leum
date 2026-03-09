@@ -15,7 +15,7 @@ skinparam backgroundColor #FFFFFF
 skinparam noteBorderColor #D4AC0D
 skinparam noteBackgroundColor #FEF9E7
 
-title Sequence: Онбординг клуба\n(Регистрация → Клуб → Команда → Тренеры → Игроки)
+title Sequence: Онбординг клуба — «Сбор» (SquadUp.ru)\n(Регистрация → Роль → Клуб → Команда → Сезон → Тренеры → Игроки)
 
 actor "Администратор" as admin
 participant "Веб-приложение" as web
@@ -29,19 +29,35 @@ participant "Email / Push" as notify
 ' ШАГ 1: РЕГИСТРАЦИЯ
 ' ═══════════════════════════════════════════════════════════
 
-== Шаг 1: Регистрация администратора ==
+== Шаг 1: Регистрация ==
 
 admin -> web : Открывает сайт\nНажимает «Зарегистрироваться»
 web -> api : POST /auth/register\n{email, password}
-api -> db : INSERT users\n{email, password_hash, role=admin}
+api -> db : INSERT users\n{email, password_hash}
 db --> api : user_id
-api --> web : JWT access_token + refresh_token
-web --> admin : Перенаправление на онбординг
+api --> web : Токен сессии
+web --> admin : Перенаправление на выбор роли
 
 note over admin, db
     Альтернатива: OAuth (Google/Apple)
     POST /auth/oauth { provider, code }
     → обмен code → profile → upsert users
+end note
+
+== Шаг 1б: Выбор роли ==
+
+admin -> web : Выбирает роль:\n«Администратор клуба»\n(или Тренер / Родитель / Игрок)
+web -> api : POST /onboarding/role\n{role: 'admin'}
+api -> db : UPDATE users\nSET global_role = 'admin'
+api --> web : OK
+web --> admin : Перенаправление на создание клуба
+
+note over admin, db
+    Роль определяет дальнейший сценарий:
+    admin → создание клуба (шаги 2–6)
+    coach → присоединение к команде
+    parent → привязка ребёнка
+    player → присоединение к команде
 end note
 
 ' ═══════════════════════════════════════════════════════════
@@ -79,7 +95,25 @@ web -> api : POST /teams\n{club_id, birth_year, gender,\nname, sport_type_id}
 api -> db : INSERT teams
 db --> api : team_id
 api --> web : {team_id}
-web --> admin : «Команда создана» → Шаг 4
+web --> admin : «Команда создана» → Шаг 3б
+
+' ═══════════════════════════════════════════════════════════
+' ШАГ 3Б: СОЗДАНИЕ СЕЗОНА (необязательный)
+' ═══════════════════════════════════════════════════════════
+
+== Шаг 3б: Создание сезона (необязательно) ==
+
+opt Администратор хочет создать сезон
+    admin -> web : Заполняет форму сезона:\nНазвание, даты начала/окончания
+    web -> api : POST /seasons\n{club_id, name, start_date,\nend_date, sport_type_id}
+    api -> db : INSERT seasons
+    db --> api : season_id
+    api -> db : INSERT season_teams\n{season_id, team_id}
+    api --> web : {season_id}
+    web --> admin : «Сезон создан»
+end
+
+web --> admin : → Шаг 4
 
 ' ═══════════════════════════════════════════════════════════
 ' ШАГ 4: ДОБАВЛЕНИЕ ТРЕНЕРА
@@ -156,7 +190,11 @@ web --> admin : «Импортировано 18 игроков,\n2 строки 
 
 == Онбординг завершён ==
 
+web -> api : POST /onboarding/complete
+api -> db : UPDATE users\nSET onboarded_at = now()
+api --> web : OK
+
 web --> admin : Перенаправление на Дашборд клуба
-note over admin : Дашборд: состав команды, 0 тренировок,\n0 матчей. Готово к работе.
+note over admin : Дашборд: состав команды,\nвиджеты (Upcoming Games, Practices,\nAnnouncements), онбординг-чеклист.\nГотово к работе.
 
 @enduml

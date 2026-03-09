@@ -44,7 +44,7 @@ skinparam node {
     BorderColor #AEB6BF
 }
 
-title Карта движения данных — Детская лига\n(System Data Flow)
+title Карта движения данных — Сбор (SquadUp.ru)\n(System Data Flow)
 
 ' ═══════════════════════════════════════════════════════════
 ' АКТОРЫ
@@ -59,7 +59,7 @@ actor "Игрок" as player
 ' ФРОНТЕНД
 ' ═══════════════════════════════════════════════════════════
 
-rectangle "Веб-приложение\n(Laravel + Vue.js)" as web #EBF5FB {
+rectangle "Веб-приложение\n(Laravel + Livewire)" as web #EBF5FB {
     component "[auth] Логин / OAuth" as web_auth
     component "[club] Клуб и команды" as web_club
     component "[people] Игроки и тренеры" as web_people
@@ -68,8 +68,12 @@ rectangle "Веб-приложение\n(Laravel + Vue.js)" as web #EBF5FB {
     component "[stats] Статистика" as web_stats
     component "[import] Excel-импорт" as web_import
     component "[rsvp] RSVP (Родитель)" as web_rsvp
-    component "[calendar] Календарь (Родитель/Игрок)" as web_cal
+    component "[calendar] Единый календарь\n(FullCalendar.js)" as web_cal
     component "[notify] Уведомления" as web_notify
+    component "[announce] Объявления" as web_announce
+    component "[season] Сезоны" as web_season
+    component "[invite] Invite-ссылки\n/ Join Team" as web_invite
+    component "[dashboard] Дашборд-виджеты" as web_dashboard
 }
 
 rectangle "Мобильное приложение\n(React Native / Flutter)" as mobile #EBF5FB {
@@ -87,7 +91,7 @@ rectangle "Мобильное приложение\n(React Native / Flutter)" as
 ' ═══════════════════════════════════════════════════════════
 
 rectangle "Backend API (Laravel REST)" as api #D6EAF8 {
-    component "AuthModule\nJWT / Sanctum / OAuth2" as api_auth
+    component "AuthModule\nSanctum / OAuth2" as api_auth
     component "ClubTeamModule\nCRUD клубов, команд" as api_club
     component "PeopleModule\nИгроки, тренеры, родители" as api_people
     component "TrainingModule\nРасписание, посещаемость" as api_train
@@ -97,6 +101,10 @@ rectangle "Backend API (Laravel REST)" as api #D6EAF8 {
     component "CalendarModule\niCal-экспорт" as api_cal
     component "ImportExportModule\nExcel / CSV" as api_import
     component "FileModule\nS3 upload/download" as api_file
+    component "AnnouncementModule\nОбъявления CRUD" as api_announce
+    component "SeasonModule\nСезоны, привязка команд" as api_season
+    component "InviteModule\nInvite-ссылки, Join Team" as api_invite
+    component "EventResponseModule\nПолиморфный RSVP" as api_rsvp
 }
 
 ' ═══════════════════════════════════════════════════════════
@@ -104,8 +112,8 @@ rectangle "Backend API (Laravel REST)" as api #D6EAF8 {
 ' ═══════════════════════════════════════════════════════════
 
 rectangle "PostgreSQL 15" as pg #E9F7EF {
-    database "Схема 1\nusers · clubs · teams\nteam_members · profiles" as pg1
-    database "Схема 2\ntrainings · venues\nattendance · media" as pg2
+    database "Схема 1\nusers · clubs · teams\nteam_members · profiles\nseasons · invite_links" as pg1
+    database "Схема 2\ntrainings · venues\nattendance · media\nannouncements · event_responses" as pg2
     database "Схема 3\nmatches · tournaments\nmatch_events" as pg3
 }
 
@@ -151,6 +159,12 @@ web_rsvp --> api_match : "PATCH match_players (веб)"
 web_cal --> api_train : "GET trainings (веб)"
 web_cal --> api_match : "GET matches (веб)"
 web_notify --> api_notify : "GET/PATCH notifications (веб)"
+web_announce --> api_announce : "announcements CRUD"
+web_season --> api_season : "seasons CRUD"
+web_invite --> api_invite : "invite links CRUD,\njoin team"
+web_dashboard --> api_train : "upcoming trainings"
+web_dashboard --> api_match : "upcoming matches"
+web_dashboard --> api_announce : "recent announcements"
 
 mob_auth --> api_auth : "credentials / OAuth token"
 mob_cal --> api_train : "GET trainings"
@@ -181,6 +195,10 @@ api_file --> pg1 : "files (R/W)"
 api_people --> s3 : "фото профиля"
 api_club --> s3 : "логотип клуба/команды"
 api_train --> s3 : "медиа тренировок"
+api_announce --> pg2 : "announcements (R/W)"
+api_season --> pg1 : "seasons,\nseason_teams (R/W)"
+api_invite --> pg1 : "invite_links (R/W)"
+api_rsvp --> pg2 : "event_responses (R/W)"
 
 ' ═══════════════════════════════════════════════════════════
 ' СВЯЗИ: API → ОЧЕРЕДИ
@@ -190,6 +208,7 @@ api_train --> redis : "dispatch: SendTrainingNotify\nSendAttendanceReminder"
 api_match --> redis : "dispatch: SendMatchNotify\nSendLiveEventNotify"
 api_people --> redis : "dispatch: SendInviteEmail"
 api_notify --> redis : "dispatch: PushBatch"
+api_announce --> redis : "dispatch: SendAnnouncementNotify"
 cron --> api_train : "GenerateRecurringTrainings\n(ежедневно)"
 redis --> api_notify : "consume job"
 

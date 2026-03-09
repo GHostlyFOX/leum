@@ -146,7 +146,11 @@ entity "matches" as match {
     * scheduled_at          : TIMESTAMPTZ
     * half_duration_minutes : SMALLINT
     * halves_count          : SMALLINT
-    * is_away               : BOOLEAN
+    * game_location         : ENUM(home, away)
+      score_home            : SMALLINT
+      score_away            : SMALLINT
+    * score_mode            : ENUM(auto, manual)
+    ' auto = сумма из match_events, manual = ручной ввод
       actual_start_at       : TIMESTAMPTZ
       actual_end_at         : TIMESTAMPTZ
     * created_at            : TIMESTAMPTZ
@@ -238,5 +242,9 @@ match    ||--o{ mevent      : "события матча"
 etype    ||--o{ mevent      : "тип события"
 usr      ||--o{ mevent      : "игрок"
 usr      |o--o{ mevent      : "ассистент"
+
+' --- event_responses (полиморфные, из Schema 2) ---
+note "event_responses (Schema 2)\nevent_type='match' → match.id\nРодительский RSVP на матч" as n_rsvp
+match .. n_rsvp
 
 @enduml
