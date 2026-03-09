@@ -100,6 +100,13 @@ class Onboarding extends Component
     public function mount()
     {
         $this->teamBirthYear = (string) (date('Y') - 10);
+
+        // Если роль уже была выбрана при регистрации — пропускаем шаг выбора роли
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user && in_array($user->global_role, ['admin', 'coach', 'player', 'parent'])) {
+            $this->selectedRole = $user->global_role;
+            $this->step = 2; // Сразу переходим к шагу профиля
+        }
     }
 
     public function render()

@@ -22,7 +22,7 @@ class Team extends Model
     protected $fillable = [
         'name', 'description', 'gender', 'logo_file_id',
         'birth_year', 'club_id', 'sport_type_id',
-        'country_id', 'city_id',
+        'country_id', 'city_id', 'team_color',
     ];
 
     protected $casts = [

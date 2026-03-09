@@ -35,6 +35,7 @@ class User extends Authenticatable
         'gender',
         'global_role',
         'onboarded_at',
+        'timezone',
     ];
 
     protected $hidden = [
