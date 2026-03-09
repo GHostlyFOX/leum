@@ -2,7 +2,6 @@
 <body class="ltr login-img">
 @endsection
 
-@section('content')
 <div>
 <style>
     body.ltr { background: #f5f7fb; }
@@ -474,4 +473,3 @@
     </div>
 </div>
 </div>
-@endsection

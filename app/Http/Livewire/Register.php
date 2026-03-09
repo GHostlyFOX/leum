@@ -93,7 +93,7 @@ class Register extends Component
     {
         return view('livewire.register', [
             'sportTypes' => RefSportType::orderBy('name')->get(),
-        ])->layout('layouts.custom-app');
+        ])->extends('layouts.custom-app')->section('content');
     }
 
     // ── Step 1 → Step 2: Validate account data ─────────────────────
