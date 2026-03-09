@@ -112,19 +112,25 @@
                 <div class="col-lg-4">
                     <div class="chart-card">
                         <h5>Посещаемость тренировок</h5>
-                        <canvas id="chartAttendance" height="220"></canvas>
+                        <div style="position: relative; height: 220px;">
+                            <canvas id="chartAttendance"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="chart-card">
                         <h5>Результаты матчей</h5>
-                        <canvas id="chartResults" height="220"></canvas>
+                        <div style="position: relative; height: 220px;">
+                            <canvas id="chartResults"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="chart-card">
                         <h5>Распределение по видам спорта</h5>
-                        <canvas id="chartSports" height="220"></canvas>
+                        <div style="position: relative; height: 220px;">
+                            <canvas id="chartSports"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
