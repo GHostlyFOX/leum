@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Modules\Club\Services\ClubService;
@@ -20,6 +22,7 @@ use Modules\User\Models\CoachProfile;
 use Modules\User\Models\PlayerProfile;
 use Modules\User\Models\User;
 
+#[Layout('layouts.app')]
 class Onboarding extends Component
 {
     use WithFileUploads;
@@ -127,7 +130,7 @@ class Onboarding extends Component
             'positions'            => $positionsQuery->orderBy('name')->get(),
             'dominantFeet'         => RefDominantFoot::orderBy('name')->get(),
             'showDominantFoot'     => $this->showDominantFoot(),
-        ])->layout('layouts.app');
+        ]);
     }
 
     /**
@@ -159,7 +162,8 @@ class Onboarding extends Component
 
     // ── Step count per role ─────────────────────────────────────
 
-    public function getTotalStepsProperty(): int
+    #[Computed]
+    public function totalSteps(): int
     {
         return match ($this->selectedRole) {
             'admin'  => 5, // role → club → teams → coaches → players
@@ -170,7 +174,8 @@ class Onboarding extends Component
         };
     }
 
-    public function getStepLabelsProperty(): array
+    #[Computed]
+    public function stepLabels(): array
     {
         return match ($this->selectedRole) {
             'admin'  => [1 => 'Роль', 2 => 'Клуб', 3 => 'Команды', 4 => 'Тренеры', 5 => 'Игроки'],

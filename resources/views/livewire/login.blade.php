@@ -1,7 +1,3 @@
-@section('body')
-<body class="ltr login-img">
-@endsection
-
 @section('content')
 
 <!-- PAGE -->

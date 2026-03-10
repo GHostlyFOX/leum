@@ -38,6 +38,7 @@
                         <!-- CONTAINER -->
                         <div class="main-container container-fluid">
 
+                                {{ $slot ?? '' }}
                                 @yield('content')
 
                         </div>

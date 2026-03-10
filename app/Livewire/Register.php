@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Modules\Club\Services\ClubService;
@@ -26,6 +28,7 @@ use Modules\User\Models\User;
  * Если другая роль:
  *   → Регистрация + вход + redirect → onboarding (EnsureOnboarded middleware)
  */
+#[Layout('layouts.custom-app')]
 class Register extends Component
 {
     use WithFileUploads;
@@ -79,7 +82,8 @@ class Register extends Component
 
     // ── Computed properties ─────────────────────────────────────────
 
-    public function getTotalStepsProperty(): int
+    #[Computed]
+    public function totalSteps(): int
     {
         if ($this->selectedRole === 'admin') {
             return 4;
@@ -93,7 +97,7 @@ class Register extends Component
     {
         return view('livewire.register', [
             'sportTypes' => RefSportType::orderBy('name')->get(),
-        ])->extends('layouts.custom-app')->section('content');
+        ]);
     }
 
     // ── Step 1 → Step 2: Validate account data ─────────────────────

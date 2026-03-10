@@ -1,4 +1,3 @@
-@section('content')
 <div>
 <style>
     .wizard-stepper { display: flex; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 4px; }
@@ -218,14 +217,14 @@
             <div class="row g-3">
                 <div class="col-12">
                     <label class="form-label fw-semibold">Название клуба <span class="text-danger">*</span></label>
-                    <input type="text" wire:model.defer="clubName" class="form-control @error('clubName') is-invalid @enderror"
+                    <input type="text" wire:model="clubName" class="form-control @error('clubName') is-invalid @enderror"
                            placeholder="Например: ФК «Юные Чемпионы»">
                     @error('clubName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Вид спорта <span class="text-danger">*</span></label>
-                    <select wire:model.defer="sportTypeId" class="form-select @error('sportTypeId') is-invalid @enderror">
+                    <select wire:model="sportTypeId" class="form-select @error('sportTypeId') is-invalid @enderror">
                         <option value="">— Выберите —</option>
                         @foreach ($sportTypes as $st)
                             <option value="{{ $st->id }}">{{ $st->name }}</option>
@@ -236,7 +235,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Тип клуба</label>
-                    <select wire:model.defer="clubTypeId" class="form-select">
+                    <select wire:model="clubTypeId" class="form-select">
                         <option value="">— Не указан —</option>
                         @foreach ($clubTypes as $ct)
                             <option value="{{ $ct->id }}">{{ $ct->name }}</option>
@@ -246,7 +245,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Страна <span class="text-danger">*</span></label>
-                    <select wire:model="countryId" class="form-select @error('countryId') is-invalid @enderror">
+                    <select wire:model.live="countryId" class="form-select @error('countryId') is-invalid @enderror">
                         <option value="">— Выберите —</option>
                         @foreach ($countries as $c)
                             <option value="{{ $c->id }}">{{ $c->name }}</option>
@@ -257,7 +256,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Город <span class="text-danger">*</span></label>
-                    <select wire:model.defer="cityId" class="form-select @error('cityId') is-invalid @enderror"
+                    <select wire:model="cityId" class="form-select @error('cityId') is-invalid @enderror"
                             {{ $cities->isEmpty() ? 'disabled' : '' }}>
                         <option value="">— Выберите —</option>
                         @foreach ($cities as $c)
@@ -269,18 +268,18 @@
 
                 <div class="col-12">
                     <label class="form-label fw-semibold">Описание</label>
-                    <textarea wire:model.defer="clubDescription" class="form-control" rows="3"
+                    <textarea wire:model="clubDescription" class="form-control" rows="3"
                               placeholder="Краткое описание клуба (необязательно)"></textarea>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Email клуба</label>
-                    <input type="email" wire:model.defer="clubEmail" class="form-control" placeholder="club@example.com">
+                    <input type="email" wire:model="clubEmail" class="form-control" placeholder="club@example.com">
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Телефон</label>
-                    <input type="text" wire:model.defer="clubPhone" class="form-control" placeholder="+7 (___) ___-__-__">
+                    <input type="text" wire:model="clubPhone" class="form-control" placeholder="+7 (___) ___-__-__">
                 </div>
 
                 <div class="col-12">
@@ -327,20 +326,20 @@
                 <div class="row g-3">
                     <div class="col-md-5">
                         <label class="form-label fw-semibold">Название команды</label>
-                        <input type="text" wire:model.defer="teamName" class="form-control @error('teamName') is-invalid @enderror"
+                        <input type="text" wire:model="teamName" class="form-control @error('teamName') is-invalid @enderror"
                                placeholder="Например: U-12">
                         @error('teamName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">Пол</label>
-                        <select wire:model.defer="teamGender" class="form-select">
+                        <select wire:model="teamGender" class="form-select">
                             <option value="male">Мужской</option>
                             <option value="female">Женский</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fw-semibold">Год рожд.</label>
-                        <input type="number" wire:model.defer="teamBirthYear" class="form-control" min="2000" max="{{ date('Y') }}">
+                        <input type="number" wire:model="teamBirthYear" class="form-control" min="2000" max="{{ date('Y') }}">
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button wire:click="addTeam" class="btn btn-outline-primary w-100">
@@ -390,22 +389,22 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Фамилия <span class="text-danger">*</span></label>
-                        <input type="text" wire:model.defer="coachLastName" class="form-control @error('coachLastName') is-invalid @enderror" placeholder="Иванов">
+                        <input type="text" wire:model="coachLastName" class="form-control @error('coachLastName') is-invalid @enderror" placeholder="Иванов">
                         @error('coachLastName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Имя <span class="text-danger">*</span></label>
-                        <input type="text" wire:model.defer="coachFirstName" class="form-control @error('coachFirstName') is-invalid @enderror" placeholder="Пётр">
+                        <input type="text" wire:model="coachFirstName" class="form-control @error('coachFirstName') is-invalid @enderror" placeholder="Пётр">
                         @error('coachFirstName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
-                        <input type="email" wire:model.defer="coachEmail" class="form-control @error('coachEmail') is-invalid @enderror" placeholder="coach@example.com">
+                        <input type="email" wire:model="coachEmail" class="form-control @error('coachEmail') is-invalid @enderror" placeholder="coach@example.com">
                         @error('coachEmail') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Телефон</label>
-                        <input type="text" wire:model.defer="coachPhone" class="form-control" placeholder="+7...">
+                        <input type="text" wire:model="coachPhone" class="form-control" placeholder="+7...">
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button wire:click="addCoach" class="btn btn-outline-primary w-100">
@@ -455,26 +454,26 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Фамилия <span class="text-danger">*</span></label>
-                        <input type="text" wire:model.defer="playerLastName" class="form-control @error('playerLastName') is-invalid @enderror" placeholder="Петров">
+                        <input type="text" wire:model="playerLastName" class="form-control @error('playerLastName') is-invalid @enderror" placeholder="Петров">
                         @error('playerLastName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Имя <span class="text-danger">*</span></label>
-                        <input type="text" wire:model.defer="playerFirstName" class="form-control @error('playerFirstName') is-invalid @enderror" placeholder="Алексей">
+                        <input type="text" wire:model="playerFirstName" class="form-control @error('playerFirstName') is-invalid @enderror" placeholder="Алексей">
                         @error('playerFirstName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Email</label>
-                        <input type="email" wire:model.defer="playerEmail" class="form-control" placeholder="Необязательно">
+                        <input type="email" wire:model="playerEmail" class="form-control" placeholder="Необязательно">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Дата рождения <span class="text-danger">*</span></label>
-                        <input type="date" wire:model.defer="playerBirthDate" class="form-control @error('playerBirthDate') is-invalid @enderror">
+                        <input type="date" wire:model="playerBirthDate" class="form-control @error('playerBirthDate') is-invalid @enderror">
                         @error('playerBirthDate') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Пол <span class="text-danger">*</span></label>
-                        <select wire:model.defer="playerGender" class="form-select">
+                        <select wire:model="playerGender" class="form-select">
                             <option value="male">Мужской</option>
                             <option value="female">Женский</option>
                         </select>
@@ -505,7 +504,7 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Вид спорта <span class="text-danger">*</span></label>
-                    <select wire:model.defer="coachSportTypeId" class="form-select @error('coachSportTypeId') is-invalid @enderror">
+                    <select wire:model="coachSportTypeId" class="form-select @error('coachSportTypeId') is-invalid @enderror">
                         <option value="">— Выберите —</option>
                         @foreach ($sportTypes as $st)
                             <option value="{{ $st->id }}">{{ $st->name }}</option>
@@ -516,19 +515,19 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Специализация</label>
-                    <input type="text" wire:model.defer="coachSpecialty" class="form-control"
+                    <input type="text" wire:model="coachSpecialty" class="form-control"
                            placeholder="Например: вратарский тренер">
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Номер лицензии</label>
-                    <input type="text" wire:model.defer="coachLicense" class="form-control"
+                    <input type="text" wire:model="coachLicense" class="form-control"
                            placeholder="Если есть">
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Начало карьеры</label>
-                    <input type="date" wire:model.defer="coachCareerStart" class="form-control">
+                    <input type="date" wire:model="coachCareerStart" class="form-control">
                 </div>
             </div>
 
@@ -562,7 +561,7 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Позиция</label>
-                    <select wire:model.defer="playerPositionId" class="form-select" wire:loading.attr="disabled" @if(!$playerSportTypeId) disabled @endif>
+                    <select wire:model="playerPositionId" class="form-select" wire:loading.attr="disabled" @if(!$playerSportTypeId) disabled @endif>
                         <option value="">{{ $playerSportTypeId ? '— Не указана —' : '— Сначала выберите вид спорта —' }}</option>
                         @foreach ($positions as $pos)
                             <option value="{{ $pos->id }}">{{ $pos->name }}</option>
@@ -573,7 +572,7 @@
                 @if($showDominantFoot)
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Ведущая нога</label>
-                    <select wire:model.defer="playerDominantFootId" class="form-select">
+                    <select wire:model="playerDominantFootId" class="form-select">
                         <option value="">— Не указана —</option>
                         @foreach ($dominantFeet as $df)
                             <option value="{{ $df->id }}">{{ $df->name }}</option>
@@ -619,22 +618,22 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Фамилия <span class="text-danger">*</span></label>
-                        <input type="text" wire:model.defer="childLastName" class="form-control @error('childLastName') is-invalid @enderror" placeholder="Петров">
+                        <input type="text" wire:model="childLastName" class="form-control @error('childLastName') is-invalid @enderror" placeholder="Петров">
                         @error('childLastName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Имя <span class="text-danger">*</span></label>
-                        <input type="text" wire:model.defer="childFirstName" class="form-control @error('childFirstName') is-invalid @enderror" placeholder="Алексей">
+                        <input type="text" wire:model="childFirstName" class="form-control @error('childFirstName') is-invalid @enderror" placeholder="Алексей">
                         @error('childFirstName') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Дата рождения <span class="text-danger">*</span></label>
-                        <input type="date" wire:model.defer="childBirthDate" class="form-control @error('childBirthDate') is-invalid @enderror">
+                        <input type="date" wire:model="childBirthDate" class="form-control @error('childBirthDate') is-invalid @enderror">
                         @error('childBirthDate') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Пол <span class="text-danger">*</span></label>
-                        <select wire:model.defer="childGender" class="form-select">
+                        <select wire:model="childGender" class="form-select">
                             <option value="male">Мальчик</option>
                             <option value="female">Девочка</option>
                         </select>
@@ -680,4 +679,3 @@
     </div>
 </div>
 </div>
-@endsection

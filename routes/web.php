@@ -1,14 +1,14 @@
 <?php
 
-use App\Http\Livewire\ForgotPassword;
-use App\Http\Livewire\Index;
-use App\Http\Livewire\Landing;
-use App\Http\Livewire\Login;
-use App\Http\Livewire\Profile;
-use App\Http\Livewire\Register;
-use App\Http\Livewire\ClubOnboarding;
-use App\Http\Livewire\Onboarding;
-use App\Http\Livewire\Settings;
+use App\Livewire\ForgotPassword;
+use App\Livewire\Index;
+use App\Livewire\Landing;
+use App\Livewire\Login;
+use App\Livewire\Profile;
+use App\Livewire\Register;
+use App\Livewire\ClubOnboarding;
+use App\Livewire\Onboarding;
+use App\Livewire\Settings;
 
 use Illuminate\Support\Facades\Route;
 

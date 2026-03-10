@@ -21,6 +21,7 @@
                 <img src="{{asset('assets/images/loader.svg')}}" class="loader-img" alt="Loader">
             </div>
 
+                {{ $slot ?? '' }}
                 @yield('content')
 
         @include('layouts.components.custom-scripts')

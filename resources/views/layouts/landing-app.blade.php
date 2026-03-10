@@ -47,6 +47,7 @@
 						<!-- CONTAINER -->
 						<div class="main-container">
 
+							{{ $slot ?? '' }}
 							@yield('content')
 
 						</div>
@@ -60,6 +61,7 @@
 		</div>
 
         @include('layouts.components.landing.scripts')
+        @livewireScripts
 
 	</body>
 </html>

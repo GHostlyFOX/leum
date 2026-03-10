@@ -1,7 +1,3 @@
-@section('body')
-<body class="ltr login-img">
-@endsection
-
 <div>
 <style>
     body.ltr { background: #f5f7fb; }
@@ -268,7 +264,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Имя</label>
-                <input type="text" wire:model.defer="firstName"
+                <input type="text" wire:model="firstName"
                        class="form-control @error('firstName') is-invalid @enderror"
                        placeholder="Введите имя">
                 @error('firstName') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -276,7 +272,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Фамилия</label>
-                <input type="text" wire:model.defer="lastName"
+                <input type="text" wire:model="lastName"
                        class="form-control @error('lastName') is-invalid @enderror"
                        placeholder="Введите фамилию">
                 @error('lastName') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -284,7 +280,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="email" wire:model.defer="email"
+                <input type="email" wire:model="email"
                        class="form-control @error('email') is-invalid @enderror"
                        placeholder="you@example.com">
                 @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -292,7 +288,7 @@
 
             <div class="mb-4">
                 <label class="form-label">Пароль</label>
-                <input type="password" wire:model.defer="password"
+                <input type="password" wire:model="password"
                        class="form-control @error('password') is-invalid @enderror"
                        placeholder="Минимум 8 символов">
                 @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -380,7 +376,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Название клуба <span class="text-danger">*</span></label>
-                <input type="text" wire:model.defer="clubName"
+                <input type="text" wire:model="clubName"
                        class="form-control @error('clubName') is-invalid @enderror"
                        placeholder="Например: ФК «Юные Чемпионы»">
                 @error('clubName') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -388,7 +384,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Вид спорта <span class="text-danger">*</span></label>
-                <select wire:model.defer="sportTypeId"
+                <select wire:model="sportTypeId"
                         class="form-select @error('sportTypeId') is-invalid @enderror">
                     <option value="">— Выберите вид спорта —</option>
                     @foreach ($sportTypes as $st)
@@ -400,7 +396,7 @@
 
             <div class="mb-4">
                 <label class="form-label">Описание <span class="text-muted fw-normal">(необязательно)</span></label>
-                <textarea wire:model.defer="clubDescription"
+                <textarea wire:model="clubDescription"
                           class="form-control" rows="3"
                           placeholder="Расскажите о клубе в нескольких предложениях"></textarea>
             </div>
@@ -423,7 +419,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Название команды <span class="text-muted fw-normal">(необязательно)</span></label>
-                <input type="text" wire:model.defer="teamName"
+                <input type="text" wire:model="teamName"
                        class="form-control @error('teamName') is-invalid @enderror"
                        placeholder="Например: U-12 Основной состав">
                 @error('teamName') <div class="invalid-feedback">{{ $message }}</div> @enderror

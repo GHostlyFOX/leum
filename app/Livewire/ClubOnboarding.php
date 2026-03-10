@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Livewire;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Modules\Club\Models\Club;
@@ -21,6 +22,7 @@ use Modules\User\Models\CoachProfile;
 use Modules\User\Models\PlayerProfile;
 use Modules\User\Models\User;
 
+#[Layout('layouts.app')]
 class ClubOnboarding extends Component
 {
     use WithFileUploads;
