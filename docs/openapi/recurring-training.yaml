@@ -1,0 +1,413 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Recurring Training API
+  description: Управление шаблонами регулярных тренировок
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: RecurringTraining
+    description: Шаблоны регулярных тренировок
+
+paths:
+  /recurring-trainings:
+    get:
+      tags: [RecurringTraining]
+      summary: Список шаблонов регулярных тренировок
+      operationId: listRecurringTrainings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+        - name: team_id
+          in: query
+          schema:
+            type: integer
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список шаблонов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringTrainingPaginated'
+
+    post:
+      tags: [RecurringTraining]
+      summary: Создать шаблон регулярных тренировок
+      operationId: createRecurringTraining
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecurringTrainingRequest'
+      responses:
+        '201':
+          description: Шаблон создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringTraining'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /recurring-trainings/{id}:
+    get:
+      tags: [RecurringTraining]
+      summary: Получить шаблон
+      operationId: showRecurringTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RecurringTrainingId'
+      responses:
+        '200':
+          description: Шаблон с расписанием
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringTrainingFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [RecurringTraining]
+      summary: Обновить шаблон
+      operationId: updateRecurringTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RecurringTrainingId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRecurringTrainingRequest'
+      responses:
+        '200':
+          description: Шаблон обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringTraining'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [RecurringTraining]
+      summary: Удалить шаблон
+      operationId: deleteRecurringTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RecurringTrainingId'
+      responses:
+        '204':
+          description: Шаблон удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /recurring-trainings/{id}/generate:
+    post:
+      tags: [RecurringTraining]
+      summary: Сгенерировать тренировки из шаблона
+      description: Ручной запуск генерации тренировок на основе шаблона
+      operationId: generateTrainingsFromTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RecurringTrainingId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_date:
+                  type: string
+                  format: date
+                  description: Дата начала генерации (по умолчанию — сегодня)
+                to_date:
+                  type: string
+                  format: date
+                  description: Дата окончания генерации (по умолчанию — из auto_create)
+      responses:
+        '200':
+          description: Тренировки сгенерированы
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generated_count:
+                    type: integer
+                    description: Количество созданных тренировок
+                  trainings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        training_date:
+                          type: string
+                          format: date
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /recurring-trainings/{id}/toggle:
+    post:
+      tags: [RecurringTraining]
+      summary: Активировать/деактивировать шаблон
+      description: Переключение флага is_active (пауза/возобновление шаблона)
+      operationId: toggleRecurringTraining
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RecurringTrainingId'
+      responses:
+        '200':
+          description: Статус шаблона изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecurringTraining'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    RecurringTrainingId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    RecurringTraining:
+      type: object
+      properties:
+        id:
+          type: integer
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        schedule:
+          type: array
+          description: Недельное расписание сессий
+          items:
+            type: object
+            properties:
+              day_of_week:
+                type: integer
+                minimum: 1
+                maximum: 7
+                description: 1 = Понедельник, 7 = Воскресенье
+              start_time:
+                type: string
+                pattern: '^\d{2}:\d{2}$'
+                example: "10:00"
+              venue_id:
+                type: integer
+              coach_id:
+                type: integer
+              duration_minutes:
+                type: integer
+        auto_create:
+          type: object
+          description: Правила авто-генерации тренировок
+          properties:
+            advance_days:
+              type: integer
+              description: За сколько дней генерировать тренировки
+              example: 7
+            until_date:
+              type: string
+              format: date
+              description: Дата, до которой генерировать тренировки
+        notify_parents:
+          type: boolean
+          default: true
+        require_rsvp:
+          type: boolean
+          default: true
+        is_active:
+          type: boolean
+          default: true
+          description: FALSE = шаблон приостановлен
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RecurringTrainingFull:
+      allOf:
+        - $ref: '#/components/schemas/RecurringTraining'
+        - type: object
+          properties:
+            team:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+            club:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+
+    RecurringTrainingPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecurringTraining'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    CreateRecurringTrainingRequest:
+      type: object
+      required: [club_id, team_id, schedule, auto_create]
+      properties:
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+        schedule:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [day_of_week, start_time, venue_id, coach_id, duration_minutes]
+            properties:
+              day_of_week:
+                type: integer
+                minimum: 1
+                maximum: 7
+              start_time:
+                type: string
+                pattern: '^\d{2}:\d{2}$'
+              venue_id:
+                type: integer
+              coach_id:
+                type: integer
+              duration_minutes:
+                type: integer
+                minimum: 15
+                maximum: 300
+        auto_create:
+          type: object
+          required: [advance_days, until_date]
+          properties:
+            advance_days:
+              type: integer
+              minimum: 1
+              maximum: 30
+            until_date:
+              type: string
+              format: date
+        notify_parents:
+          type: boolean
+          default: true
+        require_rsvp:
+          type: boolean
+          default: true
+
+    UpdateRecurringTrainingRequest:
+      type: object
+      properties:
+        schedule:
+          type: array
+          items:
+            type: object
+            properties:
+              day_of_week:
+                type: integer
+                minimum: 1
+                maximum: 7
+              start_time:
+                type: string
+                pattern: '^\d{2}:\d{2}$'
+              venue_id:
+                type: integer
+              coach_id:
+                type: integer
+              duration_minutes:
+                type: integer
+        auto_create:
+          type: object
+          properties:
+            advance_days:
+              type: integer
+            until_date:
+              type: string
+              format: date
+        notify_parents:
+          type: boolean
+        require_rsvp:
+          type: boolean

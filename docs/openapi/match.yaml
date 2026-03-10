@@ -291,8 +291,27 @@ components:
           type: integer
         halves_count:
           type: integer
+        game_location:
+          type: string
+          enum: [home, away]
+          description: Место проведения — домашний или выездной матч
         is_away:
           type: boolean
+          description: 'Устаревшее поле. Используйте game_location: true = away, false = home'
+          deprecated: true
+        score_home:
+          type: integer
+          nullable: true
+          description: Голы хозяев (вычисляется из событий или задаётся вручную)
+        score_away:
+          type: integer
+          nullable: true
+          description: Голы гостей (вычисляется из событий или задаётся вручную)
+        score_mode:
+          type: string
+          enum: [auto, manual]
+          default: auto
+          description: 'Режим счёта: auto = сумма из match_events, manual = ручной ввод'
         actual_start_at:
           type: string
           format: date-time
@@ -444,9 +463,24 @@ components:
           type: integer
           minimum: 1
           maximum: 4
+        game_location:
+          type: string
+          enum: [home, away]
+          default: home
         is_away:
           type: boolean
           default: false
+          deprecated: true
+        score_home:
+          type: integer
+          nullable: true
+        score_away:
+          type: integer
+          nullable: true
+        score_mode:
+          type: string
+          enum: [auto, manual]
+          default: auto
 
     UpdateMatchRequest:
       type: object
@@ -470,8 +504,21 @@ components:
           type: integer
           minimum: 1
           maximum: 4
+        game_location:
+          type: string
+          enum: [home, away]
         is_away:
           type: boolean
+          deprecated: true
+        score_home:
+          type: integer
+          nullable: true
+        score_away:
+          type: integer
+          nullable: true
+        score_mode:
+          type: string
+          enum: [auto, manual]
 
     CreateMatchEventRequest:
       type: object

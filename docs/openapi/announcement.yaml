@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Announcement API
+  description: Управление объявлениями клуба и команды
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Announcement
+    description: Объявления и уведомления
+
+paths:
+  /announcements:
+    get:
+      tags: [Announcement]
+      summary: Список объявлений
+      operationId: listAnnouncements
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: team_id
+          in: query
+          schema:
+            type: integer
+          description: Если не указан — объявления для всего клуба
+        - name: is_draft
+          in: query
+          schema:
+            type: boolean
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [normal, important, urgent]
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список объявлений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementPaginated'
+
+    post:
+      tags: [Announcement]
+      summary: Создать объявление
+      operationId: createAnnouncement
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnnouncementRequest'
+      responses:
+        '201':
+          description: Объявление создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /announcements/{id}:
+    get:
+      tags: [Announcement]
+      summary: Получить объявление
+      operationId: showAnnouncement
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AnnouncementId'
+      responses:
+        '200':
+          description: Объявление
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Announcement]
+      summary: Обновить объявление
+      operationId: updateAnnouncement
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AnnouncementId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAnnouncementRequest'
+      responses:
+        '200':
+          description: Объявление обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Announcement]
+      summary: Удалить объявление
+      operationId: deleteAnnouncement
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AnnouncementId'
+      responses:
+        '204':
+          description: Объявление удалено
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /announcements/{id}/publish:
+    post:
+      tags: [Announcement]
+      summary: Опубликовать объявление
+      description: Переводит объявление из черновика в опубликованное состояние
+      operationId: publishAnnouncement
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AnnouncementId'
+      responses:
+        '200':
+          description: Объявление опубликовано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    AnnouncementId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        priority:
+          type: string
+          enum: [normal, important, urgent]
+          description: normal = обычный, important = важный, urgent = срочный
+        team_id:
+          type: integer
+          nullable: true
+          description: NULL = объявление для всего клуба
+        club_id:
+          type: integer
+        author_id:
+          type: integer
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_draft:
+          type: boolean
+          default: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AnnouncementFull:
+      allOf:
+        - $ref: '#/components/schemas/Announcement'
+        - type: object
+          properties:
+            team:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+            author:
+              type: object
+              properties:
+                id:
+                  type: integer
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+
+    AnnouncementPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Announcement'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    CreateAnnouncementRequest:
+      type: object
+      required: [title, message, club_id]
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        priority:
+          type: string
+          enum: [normal, important, urgent]
+          default: normal
+        club_id:
+          type: integer
+        team_id:
+          type: integer
+          nullable: true
+          description: Если NULL — объявление для всего клуба
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_draft:
+          type: boolean
+          default: true
+
+    UpdateAnnouncementRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        priority:
+          type: string
+          enum: [normal, important, urgent]
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true

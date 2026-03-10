@@ -1,0 +1,344 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Season API
+  description: Управление спортивными сезонами клуба
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Season
+    description: Спортивные сезоны (Осень 2025, Весна 2026 и т.д.)
+
+paths:
+  /seasons:
+    get:
+      tags: [Season]
+      summary: Список сезонов
+      operationId: listSeasons
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Обязательный фильтр по клубу
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [planned, active, archived]
+        - name: year
+          in: query
+          schema:
+            type: integer
+          description: Год начала сезона
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список сезонов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonPaginated'
+
+    post:
+      tags: [Season]
+      summary: Создать сезон
+      operationId: createSeason
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSeasonRequest'
+      responses:
+        '201':
+          description: Сезон создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /seasons/{id}:
+    get:
+      tags: [Season]
+      summary: Детали сезона
+      operationId: showSeason
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SeasonId'
+      responses:
+        '200':
+          description: Сезон с командами
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Season]
+      summary: Обновить сезон
+      operationId: updateSeason
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SeasonId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSeasonRequest'
+      responses:
+        '200':
+          description: Сезон обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Season'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Season]
+      summary: Удалить сезон
+      operationId: deleteSeason
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SeasonId'
+      responses:
+        '204':
+          description: Сезон удалён
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /seasons/{id}/teams:
+    post:
+      tags: [Season]
+      summary: Привязать команду к сезону
+      operationId: attachTeamToSeason
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SeasonId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [team_id]
+              properties:
+                team_id:
+                  type: integer
+      responses:
+        '201':
+          description: Команда привязана к сезону
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonTeam'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /seasons/{id}/teams/{teamId}:
+    delete:
+      tags: [Season]
+      summary: Отвязать команду от сезона
+      operationId: detachTeamFromSeason
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SeasonId'
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Команда отвязана от сезона
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    SeasonId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Season:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Осень 2025"
+        club_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        status:
+          type: string
+          enum: [planned, active, archived]
+          description: planned = запланирован, active = текущий, archived = завершён
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SeasonFull:
+      allOf:
+        - $ref: '#/components/schemas/Season'
+        - type: object
+          properties:
+            teams:
+              type: array
+              items:
+                $ref: '#/components/schemas/SeasonTeam'
+            sport_type:
+              $ref: '#/components/schemas/RefItem'
+
+    SeasonPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Season'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    SeasonTeam:
+      type: object
+      properties:
+        id:
+          type: integer
+        season_id:
+          type: integer
+        team_id:
+          type: integer
+        team:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+
+    CreateSeasonRequest:
+      type: object
+      required: [name, club_id, sport_type_id, start_date, end_date]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: "Осень 2025"
+        club_id:
+          type: integer
+        sport_type_id:
+          type: integer
+        status:
+          type: string
+          enum: [planned, active, archived]
+          default: planned
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    UpdateSeasonRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        sport_type_id:
+          type: integer
+        status:
+          type: string
+          enum: [planned, active, archived]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    RefItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

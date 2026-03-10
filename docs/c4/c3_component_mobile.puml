@@ -5,117 +5,124 @@ LAYOUT_WITH_LEGEND()
 
 title Component Diagram — Mobile Application (Level 3)
 
-' ─── Actors ───────────────────────────────────────────────────────────────────
-Person(admin,  "Администратор / Тренер", "")
-Person(parent, "Родитель",               "")
-Person(player, "Игрок",                  "")
+' ─── Backend API ──────────────────────────────────────────────────────────────
+Container(api, "Backend API", "Laravel REST", "")
 
 ' ─── Mobile App boundary ──────────────────────────────────────────────────────
-Container_Boundary(mobile, "Мобильное приложение (React Native / Flutter)") {
+Container_Boundary(mobile, "Мобильное приложение — React Native / Flutter") {
 
-    ' Navigation
-    Component(nav_comp, "Navigation & Auth Guard",
-        "React Navigation / go_router",
-        "Роутинг экранов, защита маршрутов\nпо роли пользователя (RBAC),\nGlobal state (Redux / Riverpod)")
+    ' Navigation & State
+    Component(nav, "Navigation & Auth Guard",
+        "React Navigation / Flutter Navigator",
+        "Роутинг, защита маршрутов по роли,\ndeep-link навигация, global state")
+
+    Component(state_mgmt, "Global State",
+        "Redux / Provider + Hive",
+        "Хранилище: user, club, team,\nnotifications, offline queue")
 
     ' Auth
     Component(auth_screen, "Auth Screen",
-        "UI Component",
-        "Вход по email/телефону + пароль.\nSign in with Google / Apple.\nСброс пароля.\nХранение токена (Secure Storage)")
+        "React Native / Flutter",
+        "Вход, OAuth2, Secure Storage\nдля токена, биометрия (опционально)")
 
-    ' Dashboard / Home
-    Component(home_screen, "Home / Dashboard",
-        "UI Component",
-        "Ближайшие тренировки и матчи,\nбыстрые действия по роли.\nСводка по команде")
+    ' Home
+    Component(home, "Home / Dashboard",
+        "React Native / Flutter",
+        "Сводка по ближайшим событиям,\nкарточка ребёнка (для родителей),\nбыстрые действия")
 
     ' Team
-    Component(team_comp, "Team Screen",
-        "UI Component",
-        "Состав команды: фото, позиция,\nконтакты. Карточка игрока.\nКарточка тренера с быстрым\nзвонком / сообщением")
+    Component(team_screen, "Team Screen",
+        "React Native / Flutter",
+        "Состав команды,\nкарточки игроков и тренеров,\nконтакты (позвонить/написать)")
 
-    ' Schedule / Calendar
-    Component(calendar_comp, "Calendar Screen",
-        "UI Component",
-        "Тренировки и матчи в виде\nкалендаря (месяц/неделя) или\nсписка. Прошедшие — серым,\nпредстоящие — выделены.\nПереключение вид/список")
+    ' Calendar
+    Component(calendar_screen, "Calendar Screen",
+        "React Native / Flutter",
+        "Расписание в режиме календаря\nи списка (тренировки + матчи)")
 
-    ' Attendance
-    Component(attendance_comp, "Attendance Screen",
-        "UI Component",
-        "Родитель: подтверждение /\nотмена присутствия на тренировке\nи матче. Выбор причины отсутствия.\nАвто-пометка при травме.\nТренер: ручные отметки, просмотр\nподтверждений родителей")
+    ' Attendance / RSVP
+    Component(attendance_screen, "Attendance / RSVP",
+        "React Native / Flutter",
+        "Подтверждение/отмена присутствия,\nпричины отсутствия (болезнь, травма),\nавто-продление при травме")
 
     ' Training Detail
-    Component(training_detail, "Training Detail Screen",
-        "UI Component",
-        "Дата, время, место, тренер.\nСписок игроков: подтвердили /\nотказались / нет ответа.\nВид тренировки (справочник)")
+    Component(training_detail, "Training Detail",
+        "React Native / Flutter",
+        "Детали тренировки,\nсписок участников со статусами,\nместо на карте (ссылка)")
 
-    ' Match / Tournament
-    Component(match_comp, "Match & Tournament Screen",
-        "UI Component",
-        "Карточка матча: состав, место,\nсоперник, счёт в реальном времени.\nТаймер, голы, ассисты, замены.\nТурниры: статус, сетка, результаты")
+    ' Match Live
+    Component(match_live, "Match Live",
+        "React Native / Flutter",
+        "Карточка матча,\nтаймер в реальном времени,\nтекущий счёт, лента событий")
 
-    ' Player Stats
-    Component(stats_comp, "Statistics Screen",
-        "UI Component",
-        "Посещаемость тренировок и\nматчей по игроку/команде.\nГолы, ассисты, игровое время.\nФильтр по периоду")
+    ' Statistics
+    Component(stats_screen, "Statistics Screen",
+        "React Native / Flutter",
+        "Посещаемость, голы, ассисты,\nминуты на поле,\nграфики по периодам")
 
     ' Notifications
-    Component(notif_comp, "Notifications Screen",
-        "UI Component",
-        "Список уведомлений: матчи,\nизменения, результаты.\nНастройки: включить/выключить\nуведомления по типу")
+    Component(notif_screen, "Notifications",
+        "React Native / Flutter",
+        "Уведомления,\nнастройки отключения по типам,\nTelegram-бот подключение")
 
-    ' Offline Sync
-    Component(sync_comp, "Offline Sync Layer",
-        "SQLite / Hive + Sync Service",
-        "Локальный кэш данных.\nОпределение состояния сети.\nОчередь отложенных запросов\n(посещаемость, отметки).\nАвто-синхронизация при сети")
+    ' Offline Layer
+    Component(offline_layer, "Offline Sync Layer",
+        "SQLite / Hive",
+        "Локальное кэширование,\nочередь отложенных запросов,\nсинхронизация при восстановлении сети")
 
     ' API Client
     Component(api_client, "API Client",
-        "Dio / Retrofit / http",
-        "REST-клиент: авторизация\n(Bearer token), interceptors,\nretry-логика, обработка ошибок.\nWebSocket-клиент для live-матча")
+        "Axios / Dio",
+        "REST клиент с interceptors,\nretry logic, offline queue,\nWebSocket для live-матча")
 
     ' Push Handler
-    Component(push_handler, "Push Notification Handler",
-        "FCM / APNs SDK",
-        "Получение и обработка\npush-уведомлений.\nDeep-link навигация\nна нужный экран")
+    Component(push_handler, "Push Handler",
+        "FCM SDK / APNs",
+        "Обработка push-уведомлений,\nотображение local notifications,\ndeep-link навигация")
 }
 
-' ─── External ─────────────────────────────────────────────────────────────────
-Container(backend_api, "Backend API",         "Laravel REST + WS", "")
-System_Ext(push_service, "FCM / APNs",        "Push-уведомления")
-System_Ext(os_calendar,  "OS Calendar",       "Системный календарь\nAndroid / iOS")
+' ─── External Services ────────────────────────────────────────────────────────
+System_Ext(fcm, "Firebase Cloud Messaging", "")
+System_Ext(apns, "Apple Push Notification", "")
+System_Ext(oauth, "Google / Apple OAuth2", "")
 
-' ─── Relationships — User → Screens ──────────────────────────────────────────
-Rel(admin,  auth_screen,      "Входит в систему",           "")
-Rel(admin,  training_detail,  "Создаёт / корректирует",     "")
-Rel(admin,  match_comp,       "Ведёт матч в реальном времени","")
-Rel(admin,  attendance_comp,  "Проставляет посещаемость",   "")
-Rel(parent, auth_screen,      "Входит в систему",           "")
-Rel(parent, attendance_comp,  "Подтверждает присутствие",   "")
-Rel(parent, stats_comp,       "Смотрит статистику ребёнка", "")
-Rel(player, team_comp,        "Просматривает состав",       "")
-Rel(player, calendar_comp,    "Смотрит расписание",         "")
+' ─── Relationships ────────────────────────────────────────────────────────────
+' Internal
+Rel(nav,           state_mgmt,   "Проверяет auth",       "")
+Rel(nav,           auth_screen,  "Неавторизованный",     "")
+Rel(nav,           home,         "Авторизованный",       "")
+Rel(state_mgmt,    api_client,   "Данные / Actions",     "")
+Rel(state_mgmt,    offline_layer,"Sync / Cache",         "")
 
-' ─── Relationships — Internal ─────────────────────────────────────────────────
-Rel(nav_comp,      auth_screen,      "Маршрутизация",         "")
-Rel(nav_comp,      home_screen,      "Маршрутизация",         "")
-Rel(home_screen,   calendar_comp,    "Открывает расписание",  "")
-Rel(home_screen,   match_comp,       "Открывает матч",        "")
-Rel(calendar_comp, training_detail,  "Открывает тренировку",  "")
-Rel(calendar_comp, match_comp,       "Открывает матч",        "")
-Rel(training_detail, attendance_comp,"Посещаемость",          "")
-Rel(attendance_comp, sync_comp,      "Кэширует отметки",      "")
-Rel(push_handler,  nav_comp,         "Deep-link на экран",    "")
+' Auth
+Rel(auth_screen,   api_client,   "POST /auth/*",         "HTTPS / JSON")
+Rel(auth_screen,   oauth,        "OAuth2 native flow",   "HTTPS")
 
-' ─── Relationships — to/from API ──────────────────────────────────────────────
-Rel(api_client,    backend_api,    "REST / WebSocket",        "HTTPS / WSS")
-Rel(sync_comp,     api_client,     "Синхронизация данных",    "Internal")
-Rel(auth_screen,   api_client,     "POST /auth/*",            "Internal")
-Rel(team_comp,     api_client,     "GET /teams, /players",    "Internal")
-Rel(training_detail, api_client,   "GET/POST /trainings",     "Internal")
-Rel(match_comp,    api_client,     "GET /matches, WS events", "Internal")
-Rel(stats_comp,    api_client,     "GET /statistics",         "Internal")
-Rel(notif_comp,    api_client,     "PATCH /notifications",    "Internal")
-Rel(push_handler,  push_service,   "Регистрация токена,\nполучение пушей", "FCM / APNs SDK")
-Rel(calendar_comp, os_calendar,    "Добавить событие в\nсистемный календарь", "OS API")
+' Screens
+Rel(home,          api_client,   "GET /dashboard",       "HTTPS / JSON")
+Rel(team_screen,   api_client,   "GET /teams/{id}/members", "HTTPS / JSON")
+Rel(calendar_screen, api_client, "GET /trainings, /matches", "HTTPS / JSON")
+
+' RSVP / Attendance
+Rel(attendance_screen, api_client, "PATCH /attendance, /match_players", "HTTPS / JSON")
+Rel(attendance_screen, offline_layer, "Queue if offline", "")
+
+' Training & Match
+Rel(training_detail, api_client, "GET /trainings/{id}", "HTTPS / JSON")
+Rel(match_live,    api_client,   "GET /matches/{id}/live", "HTTPS + WS")
+Rel(match_live,    api_client,   "POST /matches/{id}/events", "HTTPS / JSON")
+
+' Stats & Notifications
+Rel(stats_screen,  api_client,   "GET /players/{id}/stats", "HTTPS / JSON")
+Rel(notif_screen,  api_client,   "GET /notifications, PATCH /settings", "HTTPS / JSON")
+
+' Push
+Rel(push_handler,  fcm,          "FCM Token registration", "")
+Rel(push_handler,  apns,         "APNs Token registration", "")
+Rel(push_handler,  nav,          "Deep link",            "")
+
+' API
+Rel(api_client,    api,          "Все API запросы",      "HTTPS / JSON + Bearer")
+Rel(offline_layer, api_client,   "Retry queued requests", "")
 
 @enduml

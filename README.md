@@ -33,14 +33,40 @@
 │   │   ├── c1_context.puml     — Level 1: System Context
 │   │   ├── c2_container.puml   — Level 2: Container
 │   │   ├── c3_component_api.puml    — Level 3: Backend API
+│   │   ├── c3_component_web.puml    — Level 3: Web Application
 │   │   ├── c3_component_mobile.puml — Level 3: Mobile App
 │   │   ├── er_01_users_clubs_teams.puml  — ER: пользователи, клубы, команды
 │   │   ├── er_02_trainings.puml          — ER: тренировки
-│   │   └── er_03_matches_tournaments.puml — ER: матчи и турниры
+│   │   ├── er_03_matches_tournaments.puml — ER: матчи и турниры
+│   │   ├── data_flow.puml      — Карта движения данных
+│   │   ├── journey_*.puml      — User Journeys для всех ролей
+│   │   ├── sequence_*.puml     — Sequence диаграммы
+│   │   └── roadmap.puml        — Дорожная карта разработки
 │   ├── sql/                    — Оптимизированные SQL-схемы PostgreSQL
 │   │   ├── schema_01_users_clubs_teams.sql
 │   │   ├── schema_02_trainings.sql
 │   │   └── schema_03_matches_tournaments.sql
+│   ├── openapi/                — OpenAPI 3.0.3 спецификация
+│   │   ├── auth.yaml              — Аутентификация
+│   │   ├── user.yaml              — Пользователи и профили
+│   │   ├── club.yaml              — Клубы
+│   │   ├── team.yaml              — Команды
+│   │   ├── training.yaml          — Тренировки
+│   │   ├── match.yaml             — Матчи
+│   │   ├── tournament.yaml        — Турниры
+│   │   ├── venue.yaml             — Места проведения (площадки)
+│   │   ├── season.yaml            — Сезоны
+│   │   ├── invite.yaml            — Пригласительные ссылки
+│   │   ├── announcement.yaml      — Объявления
+│   │   ├── event-response.yaml    — RSVP/отклики на события
+│   │   ├── recurring-training.yaml — Шаблоны регулярных тренировок
+│   │   ├── reference.yaml         — Справочники
+│   │   └── file.yaml              — Файловый сервис
+│   ├── examples/               — Примеры использования API
+│   │   ├── curl/               — curl команды
+│   │   └── postman/            — Postman коллекция
+│   ├── CHANGELOG.md            — История изменений API
+│   ├── TZ.md                   — Техническое задание
 │   └── png/                    — PNG-рендеры архитектурных диаграмм
 ├── resources/                  — Шаблоны и фронтенд-ресурсы
 ├── routes/                     — Маршруты API и веб
@@ -76,6 +102,22 @@
 | Планировщик            | Laravel Scheduler / Cron | Напоминания, авто-создание тренировок          |
 
 #### Level 3 — Backend API [`docs/c4/c3_component_api.puml`](docs/c4/c3_component_api.puml)
+
+| Компонент            | Ответственность                                                   |
+|----------------------|-------------------------------------------------------------------|
+| Auth Module          | Регистрация, вход, OAuth2 (Google / Apple), RBAC                  |
+| Club & Team Module   | CRUD клубов и команд                                              |
+| People Module        | Игроки, тренеры, родители, фото, приглашения                      |
+| Training Module      | Расписание, шаблоны, посещаемость, причины отсутствия             |
+| Tournament & Match   | Турниры трёх типов, таймер матча, голы и ассисты в реальном времени |
+| Statistics Module    | Агрегация посещаемости и результатов                              |
+| Notification Module  | Push (FCM/APNs) и Telegram; настройки пользователя                |
+| Calendar Module      | Экспорт в Google/Apple Calendar (iCal)                            |
+| Import/Export Module | Импорт игроков из Excel, экспорт отчётов                          |
+| File Storage Module  | Загрузка и хранение файлов                                        |
+| Directory Module     | Справочники: виды спорта, позиции, типы тренировок                |
+
+#### Level 3 — Web Application [`docs/c4/c3_component_web.puml`](docs/c4/c3_component_web.puml)
 
 | Компонент            | Ответственность                                                   |
 |----------------------|-------------------------------------------------------------------|
@@ -355,6 +397,51 @@ java -jar plantuml.jar docs/c4/c1_context.puml
 
 - `sequence_invite.puml` — Sequence: приглашение тренера по email
 - `sequence_rsvp.puml` — Sequence: подтверждение посещения тренировки
+
+---
+
+---
+
+## API Documentation
+
+### OpenAPI 3.0.3
+
+Полная спецификация API находится в `docs/openapi/`:
+
+| Файл | Описание |
+|------|----------|
+| [`auth.yaml`](docs/openapi/auth.yaml) | Аутентификация: регистрация, вход, refresh, сброс пароля |
+| [`user.yaml`](docs/openapi/user.yaml) | Пользователи, профили игроков и тренеров |
+| [`club.yaml`](docs/openapi/club.yaml) | Управление клубами |
+| [`team.yaml`](docs/openapi/team.yaml) | Управление командами и составом |
+| [`training.yaml`](docs/openapi/training.yaml) | Тренировки и посещаемость |
+| [`match.yaml`](docs/openapi/match.yaml) | Матчи, события, составы |
+| [`tournament.yaml`](docs/openapi/tournament.yaml) | Турниры и регистрация команд |
+| [`venue.yaml`](docs/openapi/venue.yaml) | Места проведения (площадки) |
+| [`season.yaml`](docs/openapi/season.yaml) | Спортивные сезоны |
+| [`invite.yaml`](docs/openapi/invite.yaml) | Пригласительные ссылки |
+| [`announcement.yaml`](docs/openapi/announcement.yaml) | Объявления клуба/команды |
+| [`event-response.yaml`](docs/openapi/event-response.yaml) | RSVP/отклики на события |
+| [`recurring-training.yaml`](docs/openapi/recurring-training.yaml) | Шаблоны регулярных тренировок |
+| [`reference.yaml`](docs/openapi/reference.yaml) | Справочники (публичные endpoint) |
+| [`file.yaml`](docs/openapi/file.yaml) | Файловый сервис (внутренний) |
+
+### История изменений и аудит
+
+- [`CHANGELOG.md`](docs/CHANGELOG.md) — История изменений API (Keep a Changelog)
+- [`API_MIGRATION_AUDIT.md`](docs/API_MIGRATION_AUDIT.md) — Аудит соответствия OpenAPI и миграций БД (100% покрытие)
+
+### Примеры использования
+
+Примеры запросов доступны в `docs/examples/`:
+- [`curl/`](docs/examples/curl/) — команды curl для всех основных операций
+- [`postman/`](docs/examples/postman/) — Postman коллекция
+
+---
+
+## Техническое задание
+
+Исходное ТЗ в формате Markdown: [`docs/TZ.md`](docs/TZ.md)
 
 ---
 

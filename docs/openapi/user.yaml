@@ -481,6 +481,16 @@ components:
           enum: [super_admin, admin, coach, parent, player]
         notifications_on:
           type: boolean
+        onboarded_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Дата/время завершения онбординга. NULL = онбординг не завершён
+        timezone:
+          type: string
+          nullable: true
+          example: Europe/Moscow
+          description: Часовой пояс пользователя
         photo_file_id:
           type: integer
           nullable: true

@@ -159,6 +159,49 @@ paths:
                 items:
                   $ref: '#/components/schemas/CityItem'
 
+  /refs/training-types:
+    get:
+      tags: [Reference]
+      summary: Виды тренировок (для конкретного клуба)
+      operationId: getTrainingTypes
+      parameters:
+        - name: club_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID клуба (виды тренировок задаются per-club)
+      responses:
+        '200':
+          description: Список видов тренировок клуба
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrainingTypeItem'
+
+  /refs/tournament-types:
+    get:
+      tags: [Reference]
+      summary: Виды турниров
+      operationId: getTournamentTypes
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по виду спорта
+      responses:
+        '200':
+          description: Список видов турниров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TournamentTypeItem'
+
 components:
   schemas:
     RefItem:
@@ -187,4 +230,29 @@ components:
         name:
           type: string
         country_id:
+          type: integer
+
+    TrainingTypeItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        club_id:
+          type: integer
+        name:
+          type: string
+          example: "Техническая тренировка"
+        description:
+          type: string
+          nullable: true
+
+    TournamentTypeItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Чемпионат"
+        sport_type_id:
           type: integer

@@ -1,0 +1,297 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Invite API
+  description: Управление пригласительными ссылками для вступления в команды
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Invite
+    description: Пригласительные ссылки (invite links)
+  - name: Join
+    description: Вступление в команду по приглашению
+
+paths:
+  /invite-links:
+    get:
+      tags: [Invite]
+      summary: Список инвайт-ссылок
+      operationId: listInviteLinks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: team_id
+          in: query
+          schema:
+            type: integer
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список инвайт-ссылок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteLinkPaginated'
+
+    post:
+      tags: [Invite]
+      summary: Создать инвайт-ссылку
+      operationId: createInviteLink
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInviteLinkRequest'
+      responses:
+        '201':
+          description: Инвайт-ссылка создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteLink'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /invite-links/{id}:
+    get:
+      tags: [Invite]
+      summary: Получить инвайт-ссылку
+      operationId: showInviteLink
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InviteLinkId'
+      responses:
+        '200':
+          description: Инвайт-ссылка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteLink'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Invite]
+      summary: Отозвать инвайт-ссылку
+      operationId: deleteInviteLink
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/InviteLinkId'
+      responses:
+        '204':
+          description: Инвайт-ссылка отозвана
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invite-links/{token}/validate:
+    get:
+      tags: [Invite]
+      summary: Проверить валидность инвайт-ссылки
+      operationId: validateInviteLink
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Инвайт-ссылка валидна
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    example: true
+                  team:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                  role:
+                    type: string
+                    enum: [player, coach, parent]
+        '404':
+          description: Инвайт-ссылка не найдена или истекла
+
+  /join/{token}:
+    post:
+      tags: [Join]
+      summary: Вступить в команду по инвайт-ссылке
+      description: |
+        Для авторизованного пользователя — автоматическое вступление в команду.
+        Для неавторизованного — требуется регистрация/вход перед вступлением.
+      operationId: joinByInvite
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешное вступление в команду
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Вы успешно вступили в команду"
+                  team_membership:
+                    $ref: '#/components/schemas/TeamMembership'
+        '401':
+          description: Требуется авторизация
+        '404':
+          description: Инвайт-ссылка не найдена или истекла
+        '422':
+          description: Пользователь уже состоит в команде или лимит использований исчерпан
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    InviteLinkId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    InviteLink:
+      type: object
+      properties:
+        id:
+          type: integer
+        token:
+          type: string
+          example: "a1b2c3d4e5f6..."
+        team_id:
+          type: integer
+        role:
+          type: string
+          enum: [player, coach, parent]
+          description: Роль, с которой пользователь вступит в команду
+        created_by_id:
+          type: integer
+        max_uses:
+          type: integer
+          nullable: true
+          description: Максимальное число использований. NULL = неограниченно
+        used_count:
+          type: integer
+          default: 0
+          description: Текущее число использований
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    InviteLinkPaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InviteLink'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    CreateInviteLinkRequest:
+      type: object
+      required: [team_id, role, expires_at]
+      properties:
+        team_id:
+          type: integer
+        role:
+          type: string
+          enum: [player, coach, parent]
+        max_uses:
+          type: integer
+          nullable: true
+          description: Если не указано — неограниченное число использований
+        expires_at:
+          type: string
+          format: date-time
+          description: Дата и время истечения ссылки
+
+    TeamMembership:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        team_id:
+          type: integer
+        club_id:
+          type: integer
+        role_id:
+          type: integer
+        joined_at:
+          type: string
+          format: date
+        is_active:
+          type: boolean

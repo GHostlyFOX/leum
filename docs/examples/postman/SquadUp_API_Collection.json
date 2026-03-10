@@ -1,0 +1,773 @@
+{
+  "info": {
+    "_postman_id": "squadup-api-v1",
+    "name": "Детская лига (SquadUp) API",
+    "description": "API коллекция для платформы управления детским спортом",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Аутентификация и авторизация",
+      "item": [
+        {
+          "name": "Регистрация",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Иван\",\n  \"last_name\": \"Петров\",\n  \"email\": \"ivan@example.com\",\n  \"password\": \"securePassword123\",\n  \"password_confirmation\": \"securePassword123\",\n  \"birth_date\": \"2010-05-15\",\n  \"gender\": \"male\",\n  \"role\": \"player\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Вход",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"ivan@example.com\",\n  \"password\": \"securePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Текущий пользователь",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": ["{{base_url}}"],
+              "path": ["me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Обновление токена",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Выход",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Clubs",
+      "description": "Управление клубами",
+      "item": [
+        {
+          "name": "Список клубов",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clubs?search=&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["clubs"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Создать клуб",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "ЦСКА Москва",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Спортивный клуб по футболу",
+                  "type": "text"
+                },
+                {
+                  "key": "sport_type_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "club_type_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "country_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "city_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "ул. Ленина, 1",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "info@cska.ru",
+                  "type": "text"
+                },
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/clubs",
+              "host": ["{{base_url}}"],
+              "path": ["clubs"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Получить клуб",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clubs/:id",
+              "host": ["{{base_url}}"],
+              "path": ["clubs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Обновить клуб",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "ЦСКА Москва (обновлено)",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/clubs/:id",
+              "host": ["{{base_url}}"],
+              "path": ["clubs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Удалить клуб",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clubs/:id",
+              "host": ["{{base_url}}"],
+              "path": ["clubs", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "description": "Управление командами",
+      "item": [
+        {
+          "name": "Команды клуба",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clubs/:clubId/teams",
+              "host": ["{{base_url}}"],
+              "path": ["clubs", ":clubId", "teams"],
+              "variable": [
+                {
+                  "key": "clubId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Создать команду",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"U-12 Мальчики\",\n  \"description\": \"Основная команда U-12\",\n  \"gender\": \"boys\",\n  \"birth_year\": 2012,\n  \"sport_type_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/clubs/:clubId/teams",
+              "host": ["{{base_url}}"],
+              "path": ["clubs", ":clubId", "teams"],
+              "variable": [
+                {
+                  "key": "clubId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Добавить участника",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 5,\n  \"club_id\": 1,\n  \"role_id\": 1,\n  \"joined_at\": \"2024-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/teams/:teamId/members",
+              "host": ["{{base_url}}"],
+              "path": ["teams", ":teamId", "members"],
+              "variable": [
+                {
+                  "key": "teamId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trainings",
+      "description": "Тренировки и посещаемость",
+      "item": [
+        {
+          "name": "Список тренировок",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trainings?team_id=1&date_from=2024-03-01",
+              "host": ["{{base_url}}"],
+              "path": ["trainings"],
+              "query": [
+                {
+                  "key": "team_id",
+                  "value": "1"
+                },
+                {
+                  "key": "date_from",
+                  "value": "2024-03-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Создать тренировку",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coach_id\": 2,\n  \"club_id\": 1,\n  \"team_id\": 3,\n  \"training_date\": \"2024-03-15\",\n  \"start_time\": \"15:30\",\n  \"duration_minutes\": 90,\n  \"venue_id\": 1,\n  \"training_type_id\": 1,\n  \"notes\": \"Техническая подготовка\",\n  \"notify_parents\": true,\n  \"require_rsvp\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trainings",
+              "host": ["{{base_url}}"],
+              "path": ["trainings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Отметить посещаемость",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"attendance_status\": \"present\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trainings/:trainingId/attendance/:playerUserId",
+              "host": ["{{base_url}}"],
+              "path": ["trainings", ":trainingId", "attendance", ":playerUserId"],
+              "variable": [
+                {
+                  "key": "trainingId",
+                  "value": "1"
+                },
+                {
+                  "key": "playerUserId",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "description": "Матчи и события",
+      "item": [
+        {
+          "name": "Список матчей",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/matches?team_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["matches"],
+              "query": [
+                {
+                  "key": "team_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Создать матч",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"home_team_id\": 1,\n  \"away_team_id\": 2,\n  \"match_date\": \"2024-03-20\",\n  \"start_time\": \"15:00\",\n  \"venue_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/matches",
+              "host": ["{{base_url}}"],
+              "path": ["matches"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Начать матч",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/matches/:id/start",
+              "host": ["{{base_url}}"],
+              "path": ["matches", ":id", "start"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Добавить событие (гол)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_type_id\": 1,\n  \"match_minute\": 23,\n  \"player_user_id\": 10,\n  \"assistant_user_id\": 11\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/matches/:id/events",
+              "host": ["{{base_url}}"],
+              "path": ["matches", ":id", "events"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Завершить матч",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"home_team_goals\": 2,\n  \"away_team_goals\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/matches/:id/end",
+              "host": ["{{base_url}}"],
+              "path": ["matches", ":id", "end"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "References",
+      "description": "Справочники (публичные)",
+      "item": [
+        {
+          "name": "Виды спорта",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/refs/sport-types",
+              "host": ["{{base_url}}"],
+              "path": ["refs", "sport-types"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Типы клубов",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/refs/club-types",
+              "host": ["{{base_url}}"],
+              "path": ["refs", "club-types"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Роли пользователей",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/refs/user-roles",
+              "host": ["{{base_url}}"],
+              "path": ["refs", "user-roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Позиции игроков",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/refs/positions?sport_type_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["refs", "positions"],
+              "query": [
+                {
+                  "key": "sport_type_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Страны",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/refs/countries",
+              "host": ["{{base_url}}"],
+              "path": ["refs", "countries"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Города",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/refs/cities?country_id=1",
+              "host": ["{{base_url}}"],
+              "path": ["refs", "cities"],
+              "query": [
+                {
+                  "key": "country_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

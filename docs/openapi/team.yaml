@@ -216,6 +216,11 @@ components:
         city_id:
           type: integer
           nullable: true
+        team_color:
+          type: string
+          nullable: true
+          example: "#FF5733"
+          description: HEX цвет команды (для отображения в календаре и UI)
         logo_file_id:
           type: integer
           nullable: true
@@ -329,6 +334,10 @@ components:
         city_id:
           type: integer
           nullable: true
+        team_color:
+          type: string
+          nullable: true
+          example: "#FF5733"
 
     AddMemberRequest:
       type: object

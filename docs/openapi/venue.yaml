@@ -1,0 +1,275 @@
+openapi: 3.0.3
+info:
+  title: Детская лига — Venue API
+  description: Управление местами проведения тренировок и матчей
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Venue
+    description: Места проведения (площадки, стадионы, залы)
+
+paths:
+  /venues:
+    get:
+      tags: [Venue]
+      summary: Список мест проведения
+      operationId: listVenues
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: club_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по клубу (NULL = общедоступные)
+        - name: country_id
+          in: query
+          schema:
+            type: integer
+        - name: city_id
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Поиск по названию
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Пагинированный список мест
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenuePaginated'
+
+    post:
+      tags: [Venue]
+      summary: Создать место проведения
+      operationId: createVenue
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVenueRequest'
+      responses:
+        '201':
+          description: Место создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Venue'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /venues/{id}:
+    get:
+      tags: [Venue]
+      summary: Детали места проведения
+      operationId: showVenue
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VenueId'
+      responses:
+        '200':
+          description: Место проведения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueFull'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Venue]
+      summary: Обновить место проведения
+      operationId: updateVenue
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VenueId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVenueRequest'
+      responses:
+        '200':
+          description: Место обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Venue'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Venue]
+      summary: Удалить место проведения
+      operationId: deleteVenue
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VenueId'
+      responses:
+        '204':
+          description: Место удалено
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    VenueId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        default: 15
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  schemas:
+    Venue:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Стадион Лужники"
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+          example: "ул. Лужники, 24, Москва"
+        club_id:
+          type: integer
+          nullable: true
+          description: NULL = общедоступная площадка
+        created_at:
+          type: string
+          format: date-time
+
+    VenueFull:
+      allOf:
+        - $ref: '#/components/schemas/Venue'
+        - type: object
+          properties:
+            country:
+              $ref: '#/components/schemas/RefItem'
+            city:
+              $ref: '#/components/schemas/RefItem'
+            club:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+
+    VenuePaginated:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Venue'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    CreateVenueRequest:
+      type: object
+      required: [name, country_id, city_id, address]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: "Стадион Лужники"
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+          example: "ул. Лужники, 24, Москва"
+        club_id:
+          type: integer
+          nullable: true
+          description: Если NULL — площадка общедоступная
+
+    UpdateVenueRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        country_id:
+          type: integer
+        city_id:
+          type: integer
+        address:
+          type: string
+        club_id:
+          type: integer
+          nullable: true
+
+    RefItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

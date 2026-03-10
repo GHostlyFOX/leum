@@ -5,124 +5,120 @@ LAYOUT_WITH_LEGEND()
 
 title Component Diagram — Web Application (Level 3)
 
-' ─── Actors ───────────────────────────────────────────────────────────────────
-Person(admin,  "Администратор", "")
-Person(coach,  "Тренер",        "")
-Person(parent, "Родитель",      "")
-Person(player, "Игрок",         "")
+' ─── Backend API ──────────────────────────────────────────────────────────────
+Container(api, "Backend API", "Laravel REST", "")
 
-' ─── Web App boundary ───────────────────────────────────────────────────────
-Container_Boundary(web, "Веб-приложение (Laravel + Vue.js)") {
+' ─── Web App boundary ─────────────────────────────────────────────────────────
+Container_Boundary(web, "Веб-приложение — Vue.js / Laravel + Blade") {
+
+    ' Router & State
+    Component(router, "Router & Auth Guard",
+        "Vue Router / Laravel Middleware",
+        "Роутинг, защита маршрутов по роли\n(role-based access control),\nредиректы неавторизованных")
+
+    Component(store, "Global State",
+        "Pinia / Vuex",
+        "Хранилище: user, club, team,\nnotifications, settings")
 
     ' Auth
-    Component(auth_page, "Auth Pages",
-        "Vue.js / Blade",
-        "Логин по email/телефону + пароль.\nОAuth (Google / Apple).\nРегистрация, сброс пароля.\nАктивация по ссылке-приглашению")
+    Component(auth_pages, "Auth Pages",
+        "Vue Components / Blade",
+        "Логин, регистрация, OAuth2\n(Google, Apple), восстановление\nпароля, активация по приглашению")
 
     ' Dashboard
     Component(dashboard, "Dashboard",
-        "Vue.js Component",
-        "Главная страница по роли:\nАдмин/Тренер: сводка + быстрые действия.\nРодитель: ближайшие события + RSVP.\nИгрок: расписание + статистика")
+        "Vue Components",
+        "Главная страница с виджетами:\nUpcoming Games, Upcoming Practices,\nAnnouncements, онбординг-чеклист")
 
     ' Onboarding
     Component(onboarding, "Onboarding Wizard",
-        "Vue.js Component",
-        "Пошаговое создание клуба,\nкоманды, добавление тренера\nи игроков (только для админа)")
+        "Vue Stepper Component",
+        "Пошаговое создание клуба и команды\n(только для администраторов)\nШаги: Клуб → Команда → Сезон")
 
-    ' Club & Team Management
+    ' Club & Team
     Component(club_mgmt, "Club & Team Management",
-        "Vue.js Component",
-        "CRUD клубов и команд.\nУправление составом.\nЗагрузка логотипов.\n(Админ / Тренер)")
+        "Vue Components",
+        "CRUD клубов и команд,\nуправление составом,\ninvite-ссылки, настройки клуба")
 
-    ' Player & Coach Cards
+    ' People
     Component(people_mgmt, "People Management",
-        "Vue.js Component",
-        "Карточки игроков и тренеров.\nПрофили, документы, родители.\nExcel-импорт игроков.\n(Админ / Тренер)")
+        "Vue Components",
+        "Карточки игроков/тренеров/родителей,\nExcel-импорт игроков,\nприглашения по email")
 
-    ' Training Module
-    Component(training_page, "Training Pages",
-        "Vue.js Component",
-        "Создание разовых/регулярных\nтренировок. Отметка посещаемости.\n(Админ / Тренер)\nПросмотр расписания и RSVP.\n(Все роли)")
+    ' Training
+    Component(training_pages, "Training Pages",
+        "Vue Components",
+        "Расписание тренировок (разовые/регулярные),\nпосещаемость, отмена/изменение,\nRSVP (для тренеров)")
 
     ' Calendar
-    Component(calendar_page, "Calendar",
-        "Vue.js Component",
-        "Расписание в виде календаря\nили списка. Переключение вида.\nПрошедшие — серые,\nпредстоящие — выделены.\n(Все роли)")
+    Component(calendar, "Calendar",
+        "FullCalendar.js + Vue",
+        "Расписание в виде календаря и списка\n(тренировки + матчи + события)")
 
     ' Match & Tournament
-    Component(match_page, "Match & Tournament Pages",
-        "Vue.js Component",
-        "Создание матчей/турниров.\nТурнирная сетка.\nLive-таймер, события, голы.\n(Админ / Тренер)\nПросмотр матчей и результатов.\n(Все роли)")
+    Component(match_pages, "Match & Tournament",
+        "Vue Components",
+        "Матчи, турниры, турнирная сетка,\nсоставы, live-таймер (только просмотр),\nрезультаты")
 
-    ' RSVP
-    Component(rsvp_page, "RSVP / Attendance",
-        "Vue.js Component",
-        "Подтверждение присутствия\nна тренировках и матчах.\nВыбор причины отсутствия.\nАвто-пометка при травме.\n(Родитель через веб)")
+    ' RSVP / Attendance
+    Component(rsvp, "RSVP / Attendance",
+        "Vue Components",
+        "Подтверждение присутствия\n(для родителей через веб),\nпричины отсутствия")
 
     ' Statistics
     Component(stats_page, "Statistics Page",
-        "Vue.js Component",
-        "Посещаемость, голы, ассисты,\nигровое время по игроку/команде.\nФильтр по периоду.\nЭкспорт в Excel.\n(Все роли)")
+        "Vue Components + Chart.js",
+        "Статистика посещаемости,\nголы/ассисты по игрокам,\nэкспорт в Excel")
 
     ' Notifications
-    Component(notif_page, "Notifications & Settings",
-        "Vue.js Component",
-        "Список уведомлений.\nНастройки: push/Telegram\nвключить/отключить по типу.\n(Все роли)")
+    Component(notif_page, "Notifications",
+        "Vue Components",
+        "Список уведомлений,\nнастройки push/Telegram,\nистория событий")
 
     ' API Client
-    Component(api_client_web, "API Client (Axios)",
-        "JavaScript / Vue Plugin",
-        "REST-клиент: Bearer token,\ninterceptors, error handling.\nWebSocket для live-событий")
+    Component(api_client, "API Client",
+        "Axios + Interceptors",
+        "REST API клиент с retry logic,\nобработкой ошибок 401/403,\nавтоматическим refresh token")
 }
 
-' ─── External ─────────────────────────────────────────────────────────────────
-Container(backend_api, "Backend API",      "Laravel REST + WS", "")
+' ─── External Services (used by Web) ──────────────────────────────────────────
+System_Ext(oauth, "Google / Apple OAuth2", "")
+System_Ext(push_web, "Web Push (FCM)", "")
 
-' ─── Relationships — User → Pages ────────────────────────────────────────────
-Rel(admin,  auth_page,     "Входит в систему",           "")
-Rel(admin,  onboarding,    "Создаёт клуб и команду",     "")
-Rel(admin,  club_mgmt,     "Управляет клубом",           "")
-Rel(admin,  people_mgmt,   "Управляет составом",         "")
-Rel(admin,  training_page, "Создаёт тренировки",         "")
-Rel(admin,  match_page,    "Создаёт матчи / турниры",    "")
-Rel(admin,  stats_page,    "Смотрит статистику",         "")
+' ─── Relationships ────────────────────────────────────────────────────────────
+' Internal
+Rel(router,      store,        "Проверяет auth",       "")
+Rel(router,      auth_pages,   "Неавторизованный",     "")
+Rel(router,      dashboard,    "Авторизованный",       "")
+Rel(store,       api_client,   "Данные / Actions",     "")
 
-Rel(coach,  auth_page,     "Входит в систему",           "")
-Rel(coach,  training_page, "Создаёт тренировки",         "")
-Rel(coach,  match_page,    "Ведёт матчи",                "")
-Rel(coach,  stats_page,    "Смотрит статистику",         "")
+' Auth flow
+Rel(auth_pages,  api_client,   "POST /auth/*",         "HTTPS / JSON")
+Rel(auth_pages,  oauth,        "OAuth2 popup",         "HTTPS")
 
-Rel(parent, auth_page,     "Входит в систему",           "")
-Rel(parent, dashboard,     "Видит события ребёнка",      "")
-Rel(parent, rsvp_page,     "Подтверждает присутствие",   "")
-Rel(parent, calendar_page, "Просматривает расписание",   "")
-Rel(parent, stats_page,    "Смотрит статистику ребёнка", "")
-Rel(parent, notif_page,    "Управляет уведомлениями",    "")
+' Dashboard
+Rel(dashboard,   api_client,   "GET /dashboard",       "HTTPS / JSON")
+Rel(dashboard,   onboarding,   "Если нет клуба",       "")
 
-Rel(player, auth_page,     "Входит в систему",           "")
-Rel(player, dashboard,     "Видит расписание",           "")
-Rel(player, calendar_page, "Просматривает расписание",   "")
-Rel(player, match_page,    "Смотрит матчи и live",       "")
-Rel(player, stats_page,    "Смотрит свою статистику",    "")
+' Management
+Rel(club_mgmt,   api_client,   "CRUD /clubs, /teams",  "HTTPS / JSON")
+Rel(people_mgmt, api_client,   "CRUD /players, /coaches, /parents", "HTTPS / JSON")
+Rel(onboarding,  api_client,   "POST /clubs, /teams",  "HTTPS / JSON")
 
-' ─── Relationships — Internal ────────────────────────────────────────────────
-Rel(dashboard,     calendar_page,  "Открывает расписание",  "")
-Rel(dashboard,     match_page,     "Открывает матч",        "")
-Rel(calendar_page, training_page,  "Открывает тренировку",  "")
-Rel(calendar_page, match_page,     "Открывает матч",        "")
-Rel(training_page, rsvp_page,      "RSVP",                  "")
+' Training & Calendar
+Rel(training_pages, api_client, "CRUD /trainings",     "HTTPS / JSON")
+Rel(calendar,       api_client, "GET /trainings, /matches", "HTTPS / JSON")
+Rel(rsvp,           api_client, "PATCH /attendance",   "HTTPS / JSON")
 
-' ─── Relationships — to API ──────────────────────────────────────────────────
-Rel(api_client_web, backend_api, "REST / WebSocket",        "HTTPS / WSS")
-Rel(auth_page,      api_client_web, "POST /auth/*",         "Internal")
-Rel(onboarding,     api_client_web, "POST /clubs, /teams",  "Internal")
-Rel(club_mgmt,      api_client_web, "CRUD /clubs, /teams",  "Internal")
-Rel(people_mgmt,    api_client_web, "CRUD /players, /coaches","Internal")
-Rel(training_page,  api_client_web, "CRUD /trainings",      "Internal")
-Rel(match_page,     api_client_web, "CRUD /matches, WS events","Internal")
-Rel(rsvp_page,      api_client_web, "PATCH /attendance",    "Internal")
-Rel(calendar_page,  api_client_web, "GET /trainings, /matches","Internal")
-Rel(stats_page,     api_client_web, "GET /statistics",      "Internal")
-Rel(notif_page,     api_client_web, "PATCH /notifications", "Internal")
+' Match
+Rel(match_pages, api_client,   "CRUD /matches, /tournaments", "HTTPS / JSON")
+
+' Stats & Notifications
+Rel(stats_page,  api_client,   "GET /stats/*, GET /export", "HTTPS / JSON")
+Rel(notif_page,  api_client,   "GET /notifications, PATCH /settings", "HTTPS / JSON")
+Rel(notif_page,  push_web,     "Подписка на Web Push", "")
+
+' Main API connection
+Rel(api_client,  api,          "Все API запросы",      "HTTPS / JSON + Bearer")
 
 @enduml
