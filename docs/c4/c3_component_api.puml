@@ -1,5 +1,5 @@
 @startuml c3_component_api
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include lib/C4_Component.puml
 
 LAYOUT_WITH_LEGEND()
 
@@ -13,59 +13,37 @@ Container(mobile_app, "Мобильное приложение", "React Native",
 Container_Boundary(api, "Backend API — Laravel") {
 
     ' Auth
-    Component(auth_comp, "Auth Module",
-        "Laravel Sanctum / Passport",
-        "Регистрация, вход по email/телефону,\nOAuth2 (Google, Apple),\nсброс пароля, refresh-токены,\nразграничение прав (RBAC)")
+    Component(auth_comp, "Auth Module", "Laravel Sanctum / Passport", "Регистрация, вход по email/телефону,\nOAuth2 (Google, Apple),\nсброс пароля, refresh-токены,\nразграничение прав (RBAC)")
 
     ' Club & Team
-    Component(club_comp, "Club & Team Module",
-        "Laravel Controller + Service",
-        "CRUD клубов: название, логотип,\nвид, адрес, контакты.\nCRUD команд: вид спорта, год,\nпол, фото. Управление составом")
+    Component(club_comp, "Club & Team Module", "Laravel Controller + Service", "CRUD клубов: название, логотип,\nвид, адрес, контакты.\nCRUD команд: вид спорта, год,\nпол, фото. Управление составом")
 
     ' People
-    Component(people_comp, "People Module",
-        "Laravel Controller + Service",
-        "Управление игроками: основные\nданные, фото, родители.\nУправление тренерами: карьера,\nлицензия, достижения.\nПриглашения по email")
+    Component(people_comp, "People Module", "Laravel Controller + Service", "Управление игроками: основные\nданные, фото, родители.\nУправление тренерами: карьера,\nлицензия, достижения.\nПриглашения по email")
 
     ' Training
-    Component(training_comp, "Training Module",
-        "Laravel Controller + Service",
-        "Создание разовых/регулярных\nтренировок, расписание по дням\nнедели, места проведения.\nПосещаемость: подтверждения\nродителей, ручные отметки тренера,\nпричины отсутствия, травмы")
+    Component(training_comp, "Training Module", "Laravel Controller + Service", "Создание разовых/регулярных\nтренировок, расписание по дням\nнедели, места проведения.\nПосещаемость: подтверждения\nродителей, ручные отметки тренера,\nпричины отсутствия, травмы")
 
     ' Tournament & Match
-    Component(match_comp, "Tournament & Match Module",
-        "Laravel Controller + Service",
-        "Три типа турниров: товарищеский\nматч, однодневный, регулярный.\nТурнирная сетка, составы.\nЗапуск таймера матча, фиксация\nголов/ассистов/замен в реальном\nвремени. Результаты")
+    Component(match_comp, "Tournament & Match Module", "Laravel Controller + Service", "Три типа турниров: товарищеский\nматч, однодневный, регулярный.\nТурнирная сетка, составы.\nЗапуск таймера матча, фиксация\nголов/ассистов/замен в реальном\nвремени. Результаты")
 
     ' Statistics
-    Component(stats_comp, "Statistics Module",
-        "Laravel Service + Query Builder",
-        "Посещаемость тренировок и матчей\nпо игроку/команде/периоду.\nСтатистика голов, ассистов,\nигрового времени. Агрегация\nданных для дашборда")
+    Component(stats_comp, "Statistics Module", "Laravel Service + Query Builder", "Посещаемость тренировок и матчей\nпо игроку/команде/периоду.\nСтатистика голов, ассистов,\nигрового времени. Агрегация\nданных для дашборда")
 
     ' Notifications
-    Component(notif_comp, "Notification Module",
-        "Laravel Notifications + Jobs",
-        "Push (FCM/APNs), Telegram.\nСобытия: новый матч, изменение\nрасписания, отмена тренировки,\nрезультат матча в реальном времени.\nНастройки отключения уведомлений")
+    Component(notif_comp, "Notification Module", "Laravel Notifications + Jobs", "Push (FCM/APNs), Telegram.\nСобытия: новый матч, изменение\nрасписания, отмена тренировки,\nрезультат матча в реальном времени.\nНастройки отключения уведомлений")
 
     ' Calendar
-    Component(cal_comp, "Calendar Module",
-        "iCal / CalDAV Generator",
-        "Экспорт расписания тренировок\nи матчей в Google Calendar\nи Apple Calendar")
+    Component(cal_comp, "Calendar Module", "iCal / CalDAV Generator", "Экспорт расписания тренировок\nи матчей в Google Calendar\nи Apple Calendar")
 
     ' Import/Export
-    Component(import_comp, "Import / Export Module",
-        "Laravel + PhpSpreadsheet",
-        "Импорт игроков из Excel по шаблону.\nЭкспорт отчётов о посещаемости\nи статистике в XLSX / CSV")
+    Component(import_comp, "Import / Export Module", "Laravel + PhpSpreadsheet", "Импорт игроков из Excel по шаблону.\nЭкспорт отчётов о посещаемости\nи статистике в XLSX / CSV")
 
     ' File Storage
-    Component(file_comp, "File Storage Module",
-        "Laravel Filesystem / S3",
-        "Загрузка и хранение фотографий\nигроков, тренеров\nи логотипов команд")
+    Component(file_comp, "File Storage Module", "Laravel Filesystem / S3", "Загрузка и хранение фотографий\nигроков, тренеров\nи логотипов команд")
 
     ' Справочники
-    Component(dict_comp, "Directory Module",
-        "Laravel Controller",
-        "Справочники: виды спорта,\nпозиции игроков, типы тренировок,\nместа проведения, соперники")
+    Component(dict_comp, "Directory Module", "Laravel Controller", "Справочники: виды спорта,\nпозиции игроков, типы тренировок,\nместа проведения, соперники")
 }
 
 ' ─── Data & External ──────────────────────────────────────────────────────────

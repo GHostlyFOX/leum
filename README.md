@@ -30,6 +30,7 @@
 │   └── migrations/             — Миграции PostgreSQL (4 файла, порядок описан ниже)
 ├── docs/
 │   ├── c4/                     — Архитектурные диаграммы C4 Model (PlantUML)
+│   │   ├── lib/                — C4-PlantUML библиотека (локальная)
 │   │   ├── c1_context.puml     — Level 1: System Context
 │   │   ├── c2_container.puml   — Level 2: Container
 │   │   ├── c3_component_api.puml    — Level 3: Backend API

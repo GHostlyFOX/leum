@@ -1,5 +1,5 @@
 @startuml c3_component_mobile
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include lib/C4_Component.puml
 
 LAYOUT_WITH_LEGEND()
 
@@ -12,73 +12,45 @@ Container(api, "Backend API", "Laravel REST", "")
 Container_Boundary(mobile, "Мобильное приложение — React Native / Flutter") {
 
     ' Navigation & State
-    Component(nav, "Navigation & Auth Guard",
-        "React Navigation / Flutter Navigator",
-        "Роутинг, защита маршрутов по роли,\ndeep-link навигация, global state")
+    Component(nav, "Navigation & Auth Guard", "React Navigation / Flutter Navigator", "Роутинг, защита маршрутов по роли,\ndeep-link навигация, global state")
 
-    Component(state_mgmt, "Global State",
-        "Redux / Provider + Hive",
-        "Хранилище: user, club, team,\nnotifications, offline queue")
+    Component(state_mgmt, "Global State", "Redux / Provider + Hive", "Хранилище: user, club, team,\nnotifications, offline queue")
 
     ' Auth
-    Component(auth_screen, "Auth Screen",
-        "React Native / Flutter",
-        "Вход, OAuth2, Secure Storage\nдля токена, биометрия (опционально)")
+    Component(auth_screen, "Auth Screen", "React Native / Flutter", "Вход, OAuth2, Secure Storage\nдля токена, биометрия (опционально)")
 
     ' Home
-    Component(home, "Home / Dashboard",
-        "React Native / Flutter",
-        "Сводка по ближайшим событиям,\nкарточка ребёнка (для родителей),\nбыстрые действия")
+    Component(home, "Home / Dashboard", "React Native / Flutter", "Сводка по ближайшим событиям,\nкарточка ребёнка (для родителей),\nбыстрые действия")
 
     ' Team
-    Component(team_screen, "Team Screen",
-        "React Native / Flutter",
-        "Состав команды,\nкарточки игроков и тренеров,\nконтакты (позвонить/написать)")
+    Component(team_screen, "Team Screen", "React Native / Flutter", "Состав команды,\nкарточки игроков и тренеров,\nконтакты (позвонить/написать)")
 
     ' Calendar
-    Component(calendar_screen, "Calendar Screen",
-        "React Native / Flutter",
-        "Расписание в режиме календаря\nи списка (тренировки + матчи)")
+    Component(calendar_screen, "Calendar Screen", "React Native / Flutter", "Расписание в режиме календаря\nи списка (тренировки + матчи)")
 
     ' Attendance / RSVP
-    Component(attendance_screen, "Attendance / RSVP",
-        "React Native / Flutter",
-        "Подтверждение/отмена присутствия,\nпричины отсутствия (болезнь, травма),\nавто-продление при травме")
+    Component(attendance_screen, "Attendance / RSVP", "React Native / Flutter", "Подтверждение/отмена присутствия,\nпричины отсутствия (болезнь, травма),\nавто-продление при травме")
 
     ' Training Detail
-    Component(training_detail, "Training Detail",
-        "React Native / Flutter",
-        "Детали тренировки,\nсписок участников со статусами,\nместо на карте (ссылка)")
+    Component(training_detail, "Training Detail", "React Native / Flutter", "Детали тренировки,\nсписок участников со статусами,\nместо на карте (ссылка)")
 
     ' Match Live
-    Component(match_live, "Match Live",
-        "React Native / Flutter",
-        "Карточка матча,\nтаймер в реальном времени,\nтекущий счёт, лента событий")
+    Component(match_live, "Match Live", "React Native / Flutter", "Карточка матча,\nтаймер в реальном времени,\nтекущий счёт, лента событий")
 
     ' Statistics
-    Component(stats_screen, "Statistics Screen",
-        "React Native / Flutter",
-        "Посещаемость, голы, ассисты,\nминуты на поле,\nграфики по периодам")
+    Component(stats_screen, "Statistics Screen", "React Native / Flutter", "Посещаемость, голы, ассисты,\nминуты на поле,\nграфики по периодам")
 
     ' Notifications
-    Component(notif_screen, "Notifications",
-        "React Native / Flutter",
-        "Уведомления,\nнастройки отключения по типам,\nTelegram-бот подключение")
+    Component(notif_screen, "Notifications", "React Native / Flutter", "Уведомления,\nнастройки отключения по типам,\nTelegram-бот подключение")
 
     ' Offline Layer
-    Component(offline_layer, "Offline Sync Layer",
-        "SQLite / Hive",
-        "Локальное кэширование,\nочередь отложенных запросов,\nсинхронизация при восстановлении сети")
+    Component(offline_layer, "Offline Sync Layer", "SQLite / Hive", "Локальное кэширование,\nочередь отложенных запросов,\nсинхронизация при восстановлении сети")
 
     ' API Client
-    Component(api_client, "API Client",
-        "Axios / Dio",
-        "REST клиент с interceptors,\nretry logic, offline queue,\nWebSocket для live-матча")
+    Component(api_client, "API Client", "Axios / Dio", "REST клиент с interceptors,\nretry logic, offline queue,\nWebSocket для live-матча")
 
     ' Push Handler
-    Component(push_handler, "Push Handler",
-        "FCM SDK / APNs",
-        "Обработка push-уведомлений,\nотображение local notifications,\ndeep-link навигация")
+    Component(push_handler, "Push Handler", "FCM SDK / APNs", "Обработка push-уведомлений,\nотображение local notifications,\ndeep-link навигация")
 }
 
 ' ─── External Services ────────────────────────────────────────────────────────

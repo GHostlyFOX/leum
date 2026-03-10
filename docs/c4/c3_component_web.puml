@@ -1,5 +1,5 @@
 @startuml c3_component_web
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include lib/C4_Component.puml
 
 LAYOUT_WITH_LEGEND()
 
@@ -12,73 +12,45 @@ Container(api, "Backend API", "Laravel REST", "")
 Container_Boundary(web, "Веб-приложение — Vue.js / Laravel + Blade") {
 
     ' Router & State
-    Component(router, "Router & Auth Guard",
-        "Vue Router / Laravel Middleware",
-        "Роутинг, защита маршрутов по роли\n(role-based access control),\nредиректы неавторизованных")
+    Component(router, "Router & Auth Guard", "Vue Router / Laravel Middleware", "Роутинг, защита маршрутов по роли\n(role-based access control),\nредиректы неавторизованных")
 
-    Component(store, "Global State",
-        "Pinia / Vuex",
-        "Хранилище: user, club, team,\nnotifications, settings")
+    Component(store, "Global State", "Pinia / Vuex", "Хранилище: user, club, team,\nnotifications, settings")
 
     ' Auth
-    Component(auth_pages, "Auth Pages",
-        "Vue Components / Blade",
-        "Логин, регистрация, OAuth2\n(Google, Apple), восстановление\nпароля, активация по приглашению")
+    Component(auth_pages, "Auth Pages", "Vue Components / Blade", "Логин, регистрация, OAuth2\n(Google, Apple), восстановление\nпароля, активация по приглашению")
 
     ' Dashboard
-    Component(dashboard, "Dashboard",
-        "Vue Components",
-        "Главная страница с виджетами:\nUpcoming Games, Upcoming Practices,\nAnnouncements, онбординг-чеклист")
+    Component(dashboard, "Dashboard", "Vue Components", "Главная страница с виджетами:\nUpcoming Games, Upcoming Practices,\nAnnouncements, онбординг-чеклист")
 
     ' Onboarding
-    Component(onboarding, "Onboarding Wizard",
-        "Vue Stepper Component",
-        "Пошаговое создание клуба и команды\n(только для администраторов)\nШаги: Клуб → Команда → Сезон")
+    Component(onboarding, "Onboarding Wizard", "Vue Stepper Component", "Пошаговое создание клуба и команды\n(только для администраторов)\nШаги: Клуб → Команда → Сезон")
 
     ' Club & Team
-    Component(club_mgmt, "Club & Team Management",
-        "Vue Components",
-        "CRUD клубов и команд,\nуправление составом,\ninvite-ссылки, настройки клуба")
+    Component(club_mgmt, "Club & Team Management", "Vue Components", "CRUD клубов и команд,\nуправление составом,\ninvite-ссылки, настройки клуба")
 
     ' People
-    Component(people_mgmt, "People Management",
-        "Vue Components",
-        "Карточки игроков/тренеров/родителей,\nExcel-импорт игроков,\nприглашения по email")
+    Component(people_mgmt, "People Management", "Vue Components", "Карточки игроков/тренеров/родителей,\nExcel-импорт игроков,\nприглашения по email")
 
     ' Training
-    Component(training_pages, "Training Pages",
-        "Vue Components",
-        "Расписание тренировок (разовые/регулярные),\nпосещаемость, отмена/изменение,\nRSVP (для тренеров)")
+    Component(training_pages, "Training Pages", "Vue Components", "Расписание тренировок (разовые/регулярные),\nпосещаемость, отмена/изменение,\nRSVP (для тренеров)")
 
     ' Calendar
-    Component(calendar, "Calendar",
-        "FullCalendar.js + Vue",
-        "Расписание в виде календаря и списка\n(тренировки + матчи + события)")
+    Component(calendar, "Calendar", "FullCalendar.js + Vue", "Расписание в виде календаря и списка\n(тренировки + матчи + события)")
 
     ' Match & Tournament
-    Component(match_pages, "Match & Tournament",
-        "Vue Components",
-        "Матчи, турниры, турнирная сетка,\nсоставы, live-таймер (только просмотр),\nрезультаты")
+    Component(match_pages, "Match & Tournament", "Vue Components", "Матчи, турниры, турнирная сетка,\nсоставы, live-таймер (только просмотр),\nрезультаты")
 
     ' RSVP / Attendance
-    Component(rsvp, "RSVP / Attendance",
-        "Vue Components",
-        "Подтверждение присутствия\n(для родителей через веб),\nпричины отсутствия")
+    Component(rsvp, "RSVP / Attendance", "Vue Components", "Подтверждение присутствия\n(для родителей через веб),\nпричины отсутствия")
 
     ' Statistics
-    Component(stats_page, "Statistics Page",
-        "Vue Components + Chart.js",
-        "Статистика посещаемости,\nголы/ассисты по игрокам,\nэкспорт в Excel")
+    Component(stats_page, "Statistics Page", "Vue Components + Chart.js", "Статистика посещаемости,\nголы/ассисты по игрокам,\nэкспорт в Excel")
 
     ' Notifications
-    Component(notif_page, "Notifications",
-        "Vue Components",
-        "Список уведомлений,\nнастройки push/Telegram,\nистория событий")
+    Component(notif_page, "Notifications", "Vue Components", "Список уведомлений,\nнастройки push/Telegram,\nистория событий")
 
     ' API Client
-    Component(api_client, "API Client",
-        "Axios + Interceptors",
-        "REST API клиент с retry logic,\nобработкой ошибок 401/403,\nавтоматическим refresh token")
+    Component(api_client, "API Client", "Axios + Interceptors", "REST API клиент с retry logic,\nобработкой ошибок 401/403,\nавтоматическим refresh token")
 }
 
 ' ─── External Services (used by Web) ──────────────────────────────────────────

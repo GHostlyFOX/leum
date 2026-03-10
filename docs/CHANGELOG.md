@@ -22,6 +22,7 @@
 - Реструктуризация документации: удалена папка `docs/api/`, оставлена только `docs/openapi/`
 
 ### Fixed
+- **C4 Diagrams:** Исправлены includes для офлайн-работы — C4-PlantUML библиотека скачана локально в `docs/c4/lib/`, все диаграммы используют `!include lib/C4_*.puml`
 - **match.yaml:** Добавлены поля `game_location` (enum: home/away), `score_home`, `score_away`, `score_mode` (auto/manual). Поле `is_away` помечено как deprecated.
 - **user.yaml:** Добавлены поля `onboarded_at` и `timezone`.
 - **team.yaml:** Добавлено поле `team_color` (HEX цвет).
