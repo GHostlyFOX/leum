@@ -35,9 +35,15 @@ return new class extends Migration
         DB::statement("COMMENT ON COLUMN ref_match_event_groups.sport_type_id IS 'Привязка к виду спорта (NULL = общая группа)'");
 
         // ── Обновление таблицы типов событий ─────────────────────────────────
-        // Удаляем старую таблицу и создаём новую с дополнительными полями
+        // Сначала удаляем внешний ключ из match_events
+        Schema::table('match_events', function (Blueprint $table) {
+            $table->dropForeign(['event_type_id']);
+        });
+
+        // Теперь можно удалить старую таблицу
         Schema::dropIfExists('ref_match_event_types');
         
+        // Создаём новую таблицу с дополнительными полями
         Schema::create('ref_match_event_types', function (Blueprint $table) {
             $table->smallIncrements('id');
             $table->string('name', 100);
@@ -59,6 +65,11 @@ return new class extends Migration
         DB::statement("COMMENT ON COLUMN ref_match_event_types.affects_score IS 'Влияет на счёт матча'");
         DB::statement("COMMENT ON COLUMN ref_match_event_types.code IS 'Код события для API (goal, yellow_card и т.д.)'");
 
+        // Восстанавливаем внешний ключ в match_events
+        Schema::table('match_events', function (Blueprint $table) {
+            $table->foreign('event_type_id')->references('id')->on('ref_match_event_types');
+        });
+
         // ── Обновление таблицы match_events ──────────────────────────────────
         // Добавляем поле для хранения дополнительных данных события (JSON)
         Schema::table('match_events', function (Blueprint $table) {
@@ -73,6 +84,7 @@ return new class extends Migration
     {
         Schema::table('match_events', function (Blueprint $table) {
             $table->dropColumn(['metadata', 'description']);
+            $table->dropForeign(['event_type_id']);
         });
         
         Schema::dropIfExists('ref_match_event_types');
@@ -82,6 +94,11 @@ return new class extends Migration
         Schema::create('ref_match_event_types', function (Blueprint $table) {
             $table->smallIncrements('id');
             $table->string('name', 100)->unique();
+        });
+
+        // Восстанавливаем внешний ключ
+        Schema::table('match_events', function (Blueprint $table) {
+            $table->foreign('event_type_id')->references('id')->on('ref_match_event_types');
         });
     }
 };
