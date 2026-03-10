@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-        @section('styles')
+@section('styles')
+@endsection
 
-        @endsection
-
-                            @section('content')
+@section('content')
+<div>
 
 							<!-- PAGE-HEADER -->
 							<div class="page-header">
@@ -451,8 +451,9 @@
 							</div>
 							<!-- ROW-1 CLOSED -->
 
-                            @endsection
+</div>
+@endsection
 
-        @section('scripts')
+@section('scripts')
 
         @endsection

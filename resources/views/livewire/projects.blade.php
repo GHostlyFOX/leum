@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-        @section('styles')
+@section('styles')
+@endsection
 
-        @endsection
-
-                            @section('content')
+@section('content')
+<div>
 
                             <!-- PAGE-HEADER -->
 							<div class="page-header">
@@ -2135,9 +2135,10 @@
 							</div>
 							<!--ROW CLOSED-->
 
-                            @endsection
+</div>
+@endsection
 
-        @section('scripts')
+@section('scripts')
 
         <!-- PROJECT JS-->
         <script src="{{asset('assets/js/projects.js')}}"></script>

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-        @section('styles')
+@section('styles')
+@endsection
 
-        @endsection
-
-                            @section('content')
+@section('content')
+<div>
 
 							<!-- PAGE-HEADER -->
 							<div class="page-header">
@@ -457,9 +457,10 @@
 							</div>
 							<!-- ROW CLOSED -->
 
-                            @endsection
+</div>
+@endsection
 
-        @section('scripts')
+@section('scripts')
 
 		<!-- INTERNAL Data tables js-->
 		<script src="{{asset('assets/plugins/datatable/js/jquery.dataTables.min.js')}}"></script>
