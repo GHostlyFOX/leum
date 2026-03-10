@@ -35,13 +35,13 @@ return new class extends Migration
             ['id' => 12, 'name' => 'Удаления', 'code' => 'penalties', 'icon' => 'user-x', 'color' => '#dc3545', 'sort_order' => 21, 'sport_type_id' => 2],
             
             // Специфичные группы для баскетбола
-            ['id' => 13, 'name' => 'Броски', 'code' => 'shots', 'icon' => 'basketball', 'color' => '#fd7e14', 'sort_order' => 11, 'sport_type_id' => 3],
-            ['id' => 14, 'name' => 'Фолы', 'code' => 'fouls', 'icon' => 'hand-stop', 'color' => '#dc3545', 'sort_order' => 22, 'sport_type_id' => 3],
-            ['id' => 15, 'name' => 'Тайм-ауты', 'code' => 'timeouts', 'icon' => 'pause', 'color' => '#6c757d', 'sort_order' => 35, 'sport_type_id' => 3],
+            ['id' => 13, 'name' => 'Броски', 'code' => 'basketball_shots', 'icon' => 'basketball', 'color' => '#fd7e14', 'sort_order' => 11, 'sport_type_id' => 3],
+            ['id' => 14, 'name' => 'Фолы', 'code' => 'basketball_fouls', 'icon' => 'hand-stop', 'color' => '#dc3545', 'sort_order' => 22, 'sport_type_id' => 3],
+            ['id' => 15, 'name' => 'Тайм-ауты', 'code' => 'basketball_timeouts', 'icon' => 'pause', 'color' => '#6c757d', 'sort_order' => 35, 'sport_type_id' => 3],
             
             // Специфичные группы для волейбола
-            ['id' => 16, 'name' => 'Очки', 'code' => 'points', 'icon' => 'volleyball', 'color' => '#28a745', 'sort_order' => 12, 'sport_type_id' => 4],
-            ['id' => 17, 'name' => 'Сеты', 'code' => 'sets', 'icon' => 'layers', 'color' => '#17a2b8', 'sort_order' => 41, 'sport_type_id' => 4],
+            ['id' => 16, 'name' => 'Очки', 'code' => 'volleyball_points', 'icon' => 'volleyball', 'color' => '#28a745', 'sort_order' => 12, 'sport_type_id' => 4],
+            ['id' => 17, 'name' => 'Сеты', 'code' => 'volleyball_sets', 'icon' => 'layers', 'color' => '#17a2b8', 'sort_order' => 41, 'sport_type_id' => 4],
         ];
 
         foreach ($groups as $group) {
