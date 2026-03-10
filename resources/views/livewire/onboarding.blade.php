@@ -551,7 +551,7 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Вид спорта <span class="text-danger">*</span></label>
-                    <select wire:model.defer="playerSportTypeId" class="form-select @error('playerSportTypeId') is-invalid @enderror">
+                    <select wire:model="playerSportTypeId" class="form-select @error('playerSportTypeId') is-invalid @enderror">
                         <option value="">— Выберите —</option>
                         @foreach ($sportTypes as $st)
                             <option value="{{ $st->id }}">{{ $st->name }}</option>
@@ -562,14 +562,15 @@
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Позиция</label>
-                    <select wire:model.defer="playerPositionId" class="form-select">
-                        <option value="">— Не указана —</option>
+                    <select wire:model.defer="playerPositionId" class="form-select" {{ !$playerSportTypeId ? 'disabled' : '' }}>
+                        <option value="">{{ $playerSportTypeId ? '— Не указана —' : '— Сначала выберите вид спорта —' }}</option>
                         @foreach ($positions as $pos)
                             <option value="{{ $pos->id }}">{{ $pos->name }}</option>
                         @endforeach
                     </select>
                 </div>
 
+                @if($showDominantFoot)
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Ведущая нога</label>
                     <select wire:model.defer="playerDominantFootId" class="form-select">
@@ -579,6 +580,7 @@
                         @endforeach
                     </select>
                 </div>
+                @endif
             </div>
 
             <div class="d-flex justify-content-between mt-4">

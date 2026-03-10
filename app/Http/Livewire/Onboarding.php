@@ -111,21 +111,50 @@ class Onboarding extends Component
 
     public function render()
     {
+        // Фильтруем позиции по выбранному виду спорта (для игрока)
+        $positionsQuery = RefPosition::query();
+        if ($this->playerSportTypeId) {
+            $positionsQuery->where('sport_type_id', $this->playerSportTypeId);
+        }
+
         return view('livewire.onboarding', [
-            'sportTypes'    => RefSportType::orderBy('name')->get(),
-            'clubTypes'     => RefClubType::orderBy('name')->get(),
-            'countries'     => Country::orderBy('name')->get(),
-            'cities'        => $this->countryId
+            'sportTypes'           => RefSportType::orderBy('name')->get(),
+            'clubTypes'            => RefClubType::orderBy('name')->get(),
+            'countries'            => Country::orderBy('name')->get(),
+            'cities'               => $this->countryId
                 ? City::where('country_id', $this->countryId)->orderBy('name')->get()
                 : collect(),
-            'positions'     => RefPosition::orderBy('name')->get(),
-            'dominantFeet'  => RefDominantFoot::orderBy('name')->get(),
+            'positions'            => $positionsQuery->orderBy('name')->get(),
+            'dominantFeet'         => RefDominantFoot::orderBy('name')->get(),
+            'showDominantFoot'     => $this->showDominantFoot(),
         ])->layout('layouts.app');
+    }
+
+    /**
+     * Определяет, нужно ли показывать поле "Ведущая нога"
+     * Актуально для игровых видов спорта с ногами: футбол, хоккей
+     */
+    public function showDominantFoot(): bool
+    {
+        if (! $this->playerSportTypeId) {
+            return false;
+        }
+
+        // Виды спорта, где актуальна ведущая нога
+        $legSports = [1, 2]; // 1 = Футбол, 2 = Хоккей
+
+        return in_array($this->playerSportTypeId, $legSports);
     }
 
     public function updatedCountryId()
     {
         $this->cityId = null;
+    }
+
+    public function updatedPlayerSportTypeId()
+    {
+        // Сбрасываем позицию при смене вида спорта
+        $this->playerPositionId = null;
     }
 
     // ── Step count per role ─────────────────────────────────────
