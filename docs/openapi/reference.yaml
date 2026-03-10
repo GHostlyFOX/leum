@@ -108,11 +108,43 @@ paths:
                 items:
                   $ref: '#/components/schemas/RefItem'
 
+  /refs/match-event-groups:
+    get:
+      tags: [Reference]
+      summary: Группы типов событий матча
+      operationId: getMatchEventGroups
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по виду спорта
+      responses:
+        '200':
+          description: Список групп событий (голы, карточки, замены и т.д.)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchEventGroupItem'
+
   /refs/match-event-types:
     get:
       tags: [Reference]
       summary: Типы событий матча
       operationId: getMatchEventTypes
+      parameters:
+        - name: sport_type_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по виду спорта
+        - name: group_id
+          in: query
+          schema:
+            type: integer
+          description: Фильтр по группе событий
       responses:
         '200':
           description: Список типов событий (гол, жёлтая карточка и т.д.)
@@ -121,7 +153,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RefItem'
+                  $ref: '#/components/schemas/MatchEventTypeItem'
 
   /refs/countries:
     get:
@@ -256,3 +288,68 @@ components:
           example: "Чемпионат"
         sport_type_id:
           type: integer
+
+    MatchEventGroupItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Голы"
+        code:
+          type: string
+          example: "goals"
+        icon:
+          type: string
+          nullable: true
+          example: "soccer-ball"
+        color:
+          type: string
+          nullable: true
+          example: "#28a745"
+        sort_order:
+          type: integer
+          example: 10
+        sport_type_id:
+          type: integer
+          nullable: true
+          description: "NULL для общих групп, ID вида спорта для специфичных"
+
+    MatchEventTypeItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Гол с пенальти"
+        code:
+          type: string
+          example: "goal_penalty"
+        group_id:
+          type: integer
+          description: "ID группы событий"
+        sport_type_id:
+          type: integer
+          nullable: true
+          description: "NULL для общих типов, ID вида спорта для специфичных"
+        sort_order:
+          type: integer
+          example: 11
+        is_statistical:
+          type: boolean
+          description: "Учитывается в статистике игрока"
+          example: true
+        affects_score:
+          type: boolean
+          description: "Влияет на счёт матча"
+          example: true
+        icon:
+          type: string
+          nullable: true
+          example: "soccer-ball"
+        color:
+          type: string
+          nullable: true
+          example: "#28a745"

@@ -17,7 +17,9 @@ Route::prefix('refs')->group(function () {
     Route::get('positions',         [ReferenceController::class, 'positions']);
     Route::get('dominant-feet',     [ReferenceController::class, 'dominantFeet']);
     Route::get('kinship-types',     [ReferenceController::class, 'kinshipTypes']);
-    Route::get('match-event-types', [ReferenceController::class, 'matchEventTypes']);
+    Route::get('match-event-groups', [ReferenceController::class, 'matchEventGroups']);
+    Route::get('match-event-types',  [ReferenceController::class, 'matchEventTypes']);
+    Route::get('tournament-types',   [ReferenceController::class, 'tournamentTypes']);
     Route::get('countries',         [ReferenceController::class, 'countries']);
     Route::get('cities',            [ReferenceController::class, 'cities']);
 });
