@@ -2,7 +2,8 @@
 
         @endsection
 
-                            @section('content')
+        @section('content')
+        <div class="dashboard-container">
 
                             <!-- PAGE-HEADER -->
                             <div class="page-header">
@@ -763,7 +764,8 @@
                             </div>
                             <!-- ROW-4 END -->
 
-                            @endsection
+                            </div>
+        @endsection
 
         @section('modal')
 

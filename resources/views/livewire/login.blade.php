@@ -1,5 +1,4 @@
-@section('content')
-
+<div>
 <!-- PAGE -->
 <div class="page">
     <div>
@@ -66,5 +65,4 @@
     </div>
 </div>
 <!-- End PAGE -->
-
-@endsection
+</div>
