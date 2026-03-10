@@ -22,7 +22,7 @@ class EncryptCookies
     /**
      * The names of the cookies that should not be encrypted.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $except = [];
 
@@ -84,7 +84,7 @@ class EncryptCookies
                 $value = $this->decryptCookie($key, $cookie);
 
                 $request->cookies->set($key, $this->validateValue($key, $value));
-            } catch (DecryptException $e) {
+            } catch (DecryptException) {
                 $request->cookies->set($key, null);
             }
         }
@@ -118,7 +118,7 @@ class EncryptCookies
         $validated = [];
 
         foreach ($value as $index => $subValue) {
-            $validated[$index] = $this->validateValue("${key}[${index}]", $subValue);
+            $validated[$index] = $this->validateValue("{$key}[{$index}]", $subValue);
         }
 
         return $validated;
@@ -195,11 +195,7 @@ class EncryptCookies
      */
     protected function duplicate(Cookie $cookie, $value)
     {
-        return new Cookie(
-            $cookie->getName(), $value, $cookie->getExpiresTime(),
-            $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(),
-            $cookie->isHttpOnly(), $cookie->isRaw(), $cookie->getSameSite()
-        );
+        return $cookie->withValue($value);
     }
 
     /**

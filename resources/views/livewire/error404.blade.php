@@ -11,6 +11,7 @@
         @endsection
 
         @section('content')
+<div>
 
 		<!-- PAGE -->
 		<div class="page">

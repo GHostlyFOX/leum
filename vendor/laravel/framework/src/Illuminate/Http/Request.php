@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -22,7 +22,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
-    use Concerns\InteractsWithContentTypes,
+    use Concerns\CanBePrecognitive,
+        Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
         Macroable;
@@ -30,7 +31,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * The decoded JSON content for the request.
      *
-     * @var \Symfony\Component\HttpFoundation\ParameterBag|null
+     * @var \Symfony\Component\HttpFoundation\InputBag|null
      */
     protected $json;
 
@@ -239,6 +240,36 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the host name.
+     *
+     * @return string
+     */
+    public function host()
+    {
+        return $this->getHost();
+    }
+
+    /**
+     * Get the HTTP host being requested.
+     *
+     * @return string
+     */
+    public function httpHost()
+    {
+        return $this->getHttpHost();
+    }
+
+    /**
+     * Get the scheme and HTTP host.
+     *
+     * @return string
+     */
+    public function schemeAndHttpHost()
+    {
+        return $this->getSchemeAndHttpHost();
+    }
+
+    /**
      * Determine if the request is the result of an AJAX call.
      *
      * @return bool
@@ -266,7 +297,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function prefetch()
     {
         return strcasecmp($this->server->get('HTTP_X_MOZ') ?? '', 'prefetch') === 0 ||
-               strcasecmp($this->headers->get('Purpose') ?? '', 'prefetch') === 0;
+               strcasecmp($this->headers->get('Purpose') ?? '', 'prefetch') === 0 ||
+               strcasecmp($this->headers->get('Sec-Purpose') ?? '', 'prefetch') === 0;
     }
 
     /**
@@ -367,12 +399,12 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
+     * @return \Symfony\Component\HttpFoundation\InputBag|mixed
      */
     public function json($key = null, $default = null)
     {
         if (! isset($this->json)) {
-            $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+            $this->json = new InputBag((array) json_decode($this->getContent() ?: '[]', true));
         }
 
         if (is_null($key)) {
@@ -385,7 +417,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the input source for the request.
      *
-     * @return \Symfony\Component\HttpFoundation\ParameterBag
+     * @return \Symfony\Component\HttpFoundation\InputBag
      */
     protected function getInputSource()
     {
@@ -421,6 +453,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $request->headers->replace($from->headers->all());
 
+        $request->setRequestLocale($from->getLocale());
+
+        $request->setDefaultRequestLocale($from->getDefaultLocale());
+
         $request->setJson($from->json());
 
         if ($from->hasSession() && $session = $from->session()) {
@@ -442,9 +478,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public static function createFromBase(SymfonyRequest $request)
     {
-        $newRequest = (new static)->duplicate(
+        $newRequest = new static(
             $request->query->all(), $request->request->all(), $request->attributes->all(),
-            $request->cookies->all(), $request->files->all(), $request->server->all()
+            $request->cookies->all(), (new static)->filterFiles($request->files->all()) ?? [], $request->server->all()
         );
 
         $newRequest->headers->replace($request->headers->all());
@@ -463,7 +499,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return static
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null): static
+    public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null): static
     {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
@@ -539,6 +575,28 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Set the locale for the request instance.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public function setRequestLocale(string $locale)
+    {
+        $this->locale = $locale;
+    }
+
+    /**
+     * Set the default locale for the request instance.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public function setDefaultRequestLocale(string $locale)
+    {
+        $this->defaultLocale = $locale;
+    }
+
+    /**
      * Get the user making the request.
      *
      * @param  string|null  $guard
@@ -589,7 +647,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Set the JSON payload for the request.
      *
-     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $json
+     * @param  \Symfony\Component\HttpFoundation\InputBag  $json
      * @return $this
      */
     public function setJson($json)
@@ -667,8 +725,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetExists($offset): bool
     {
+        $route = $this->route();
+
         return Arr::has(
-            $this->all() + $this->route()->parameters(),
+            $this->all() + ($route ? $route->parameters() : []),
             $offset
         );
     }
@@ -726,8 +786,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        return Arr::get($this->all(), $key, function () use ($key) {
-            return $this->route($key);
-        });
+        return Arr::get($this->all(), $key, fn () => $this->route($key));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -92,17 +93,19 @@ trait InteractsWithPivotTable
         $current = $this->getCurrentlyAttachedPivots()
                         ->pluck($this->relatedPivotKey)->all();
 
-        $detach = array_diff($current, array_keys(
-            $records = $this->formatRecordsList($this->parseIds($ids))
-        ));
+        $records = $this->formatRecordsList($this->parseIds($ids));
 
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
         // array of the new IDs given to the method which will complete the sync.
-        if ($detaching && count($detach) > 0) {
-            $this->detach($detach);
+        if ($detaching) {
+            $detach = array_diff($current, array_keys($records));
 
-            $changes['detached'] = $this->castKeys($detach);
+            if (count($detach) > 0) {
+                $this->detach($detach);
+
+                $changes['detached'] = $this->castKeys($detach);
+            }
         }
 
         // Now we are finally ready to attach the new records. Note that we'll disable
@@ -150,6 +153,10 @@ trait InteractsWithPivotTable
         return collect($records)->mapWithKeys(function ($attributes, $id) {
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
+            }
+
+            if ($id instanceof BackedEnum) {
+                $id = $id->value;
             }
 
             return [$id => $attributes];
@@ -394,7 +401,7 @@ trait InteractsWithPivotTable
         if ($this->using) {
             $pivotModel = new $this->using;
 
-            $fresh = $fresh->format($pivotModel->getDateFormat());
+            $fresh = $pivotModel->fromDateTime($fresh);
         }
 
         if (! $exists && $this->hasPivotColumn($this->createdAt())) {
@@ -508,6 +515,8 @@ trait InteractsWithPivotTable
      */
     public function newPivot(array $attributes = [], $exists = false)
     {
+        $attributes = array_merge(array_column($this->pivotValues, 'value', 'column'), $attributes);
+
         $pivot = $this->related->newPivot(
             $this->parent, $attributes, $this->table, $exists, $this->using
         );

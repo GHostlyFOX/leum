@@ -22,11 +22,17 @@ class Schedule
     use Macroable;
 
     const SUNDAY = 0;
+
     const MONDAY = 1;
+
     const TUESDAY = 2;
+
     const WEDNESDAY = 3;
+
     const THURSDAY = 4;
+
     const FRIDAY = 5;
+
     const SATURDAY = 6;
 
     /**
@@ -63,6 +69,13 @@ class Schedule
      * @var \Illuminate\Contracts\Bus\Dispatcher
      */
     protected $dispatcher;
+
+    /**
+     * The cache of mutex results.
+     *
+     * @var array<string, bool>
+     */
+    protected $mutexCache = [];
 
     /**
      * Create a new schedule instance.
@@ -293,7 +306,7 @@ class Schedule
      */
     public function serverShouldRun(Event $event, DateTimeInterface $time)
     {
-        return $this->schedulingMutex->create($event, $time);
+        return $this->mutexCache[$event->mutexName()] ??= $this->schedulingMutex->create($event, $time);
     }
 
     /**
@@ -351,7 +364,7 @@ class Schedule
             } catch (BindingResolutionException $e) {
                 throw new RuntimeException(
                     'Unable to resolve the dispatcher from the service container. Please bind it or install the illuminate/bus package.',
-                    $e->getCode(), $e
+                    is_int($e->getCode()) ? $e->getCode() : 0, $e
                 );
             }
         }
