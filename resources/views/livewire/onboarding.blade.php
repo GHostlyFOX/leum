@@ -291,8 +291,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="saveClub" class="btn btn-primary btn-lg px-5">
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="saveClub" class="btn btn-primary btn-lg px-5">
                     <span wire:loading.remove wire:target="saveClub">Далее</span>
                     <span wire:loading wire:target="saveClub">Сохранение...</span>
                 </button>
@@ -351,8 +351,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="goToCoaches" class="btn btn-primary btn-lg px-5">Далее</button>
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="goToCoaches" class="btn btn-primary btn-lg px-5">Далее</button>
             </div>
         @endif
 
@@ -416,8 +416,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="goToPlayers" class="btn btn-primary btn-lg px-5">Далее</button>
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="goToPlayers" class="btn btn-primary btn-lg px-5">Далее</button>
             </div>
         @endif
 
@@ -488,8 +488,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="finish" class="btn btn-success btn-lg px-5">
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="finish" class="btn btn-success btn-lg px-5">
                     <i class="fe fe-check me-1"></i> Завершить
                 </button>
             </div>
@@ -533,8 +533,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="saveCoachProfile" class="btn btn-primary btn-lg px-5">
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="saveCoachProfile" class="btn btn-primary btn-lg px-5">
                     <span wire:loading.remove wire:target="saveCoachProfile">Далее</span>
                     <span wire:loading wire:target="saveCoachProfile">Сохранение...</span>
                 </button>
@@ -582,8 +582,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="savePlayerProfile" class="btn btn-primary btn-lg px-5">
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="savePlayerProfile" class="btn btn-primary btn-lg px-5">
                     <span wire:loading.remove wire:target="savePlayerProfile">Далее</span>
                     <span wire:loading wire:target="savePlayerProfile">Сохранение...</span>
                 </button>
@@ -646,8 +646,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-                <button wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
-                <button wire:click="goToParentDone" class="btn btn-primary btn-lg px-5">Далее</button>
+                <button type="button" wire:click="prevStep" class="btn btn-light btn-lg px-4">Назад</button>
+                <button type="button" wire:click="goToParentDone" class="btn btn-primary btn-lg px-5">Далее</button>
             </div>
         @endif
 
