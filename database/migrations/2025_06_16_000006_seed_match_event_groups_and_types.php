@@ -45,7 +45,7 @@ return new class extends Migration
         ];
 
         foreach ($groups as $group) {
-            DB::table('ref_match_event_groups')->insertOrIgnore($group);
+            DB::table('ref_match_event_groups')->insert($group);
         }
 
         // ═════════════════════════════════════════════════════════════════════
@@ -125,7 +125,7 @@ return new class extends Migration
         ];
 
         foreach ($eventTypes as $type) {
-            DB::table('ref_match_event_types')->insertOrIgnore($type);
+            DB::table('ref_match_event_types')->insert($type);
         }
     }
 
