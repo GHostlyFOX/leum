@@ -20,6 +20,7 @@
 
 ### Changed
 - Реструктуризация документации: удалена папка `docs/api/`, оставлена только `docs/openapi/`
+- **Roadmap:** `roadmap.puml` заменён на `roadmap.md` — теперь используется Mermaid Gantt + Markdown таблицы вместо PlantUML (лучше поддержка в различных рендерерах)
 
 ### Fixed
 - **C4 Diagrams:** Исправлены includes для офлайн-работы — C4-PlantUML библиотека скачана локально в `docs/c4/lib/`, все диаграммы используют `!include lib/C4_*.puml`

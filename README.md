@@ -42,7 +42,7 @@
 │   │   ├── data_flow.puml      — Карта движения данных
 │   │   ├── journey_*.puml      — User Journeys для всех ролей
 │   │   ├── sequence_*.puml     — Sequence диаграммы
-│   │   └── roadmap.puml        — Дорожная карта разработки
+│   │   └── roadmap.md          — Дорожная карта разработки (Gantt + таблицы)
 │   ├── sql/                    — Оптимизированные SQL-схемы PostgreSQL
 │   │   ├── schema_01_users_clubs_teams.sql
 │   │   ├── schema_02_trainings.sql
@@ -344,7 +344,7 @@ Activity-диаграмма полного пути администратора
 
 ## Дорожная карта
 
-[`docs/c4/roadmap.puml`](docs/c4/roadmap.puml) — Gantt-диаграмма разработки от первого коммита до полной платформы.
+[`docs/c4/roadmap.md`](docs/c4/roadmap.md) — Дорожная карта разработки (Mermaid Gantt + Markdown таблицы).
 
 | Фаза | Длительность | Результат |
 |------|-------------|-----------|
