@@ -67,12 +67,39 @@
 │   │   ├── curl/               — curl команды
 │   │   └── postman/            — Postman коллекция
 │   ├── CHANGELOG.md            — История изменений API
+│   ├── API_IMPLEMENTATION_SUMMARY.md — Сводка реализованных API (100+ endpoints)
+│   ├── API_MIGRATION_AUDIT.md  — Аудит соответствия OpenAPI и БД
 │   ├── TZ.md                   — Техническое задание
 │   └── png/                    — PNG-рендеры архитектурных диаграмм
 ├── resources/                  — Шаблоны и фронтенд-ресурсы
 ├── routes/                     — Маршруты API и веб
+├── Modules/                    — Модули Laravel (DDD)
+│   ├── Auth/                   — Аутентификация (Sanctum, OAuth)
+│   ├── User/                   — Пользователи, профили игроков и тренеров
+│   ├── Club/                   — Клубы, управление организациями
+│   ├── Team/                   — Команды, сезоны, инвайты
+│   ├── Training/               — Тренировки, площадки, объявления, RSVP
+│   ├── Match/                  — Матчи, live-события, составы
+│   ├── Tournament/             — Турниры, регистрация команд
+│   ├── Reference/              — Справочники (география, виды спорта)
+│   └── File/                   — Файловое хранилище (S3)
 └── ...
 ```
+
+### API Модули (100+ endpoints)
+
+Все API endpoints реализованы в модулях `Modules/{Module}/Http/Controllers/V1/`:
+
+| Модуль | Контроллеры | Основные endpoints |
+|--------|-------------|-------------------|
+| Auth | `AuthController` | `/auth/*` — вход, регистрация, OAuth |
+| User | `UserController`, `PlayerController`, `CoachController` | `/users`, `/players`, `/coaches`, `/me` |
+| Club | `ClubController` | `/clubs` |
+| Team | `TeamController`, `SeasonController`, `InviteController` | `/teams`, `/seasons`, `/invite-links` |
+| Training | `TrainingController`, `VenueController`, `AnnouncementController`, `EventResponseController`, `RecurringTrainingController` | `/trainings`, `/venues`, `/announcements`, `/events/*/responses` |
+| Match | `MatchController` | `/matches` |
+| Tournament | `TournamentController` | `/tournaments` |
+| Reference | `ReferenceController` | `/refs/*` |
 
 ---
 
@@ -427,10 +454,46 @@ java -jar plantuml.jar docs/c4/c1_context.puml
 | [`reference.yaml`](docs/openapi/reference.yaml) | Справочники (публичные endpoint) |
 | [`file.yaml`](docs/openapi/file.yaml) | Файловый сервис (внутренний) |
 
+### REST API Реализация
+
+API полностью реализовано по OpenAPI контрактам:
+
+- **15 модулей** API
+- **100+ endpoints**
+- **8 основных модулей:** Auth, User, Club, Team, Training, Match, Tournament, Reference
+- **6 дополнительных модулей:** Season, Venue, Invite, Announcement, EventResponse, RecurringTraining
+
+| Модуль | Endpoints | Ключевые функции |
+|--------|-----------|------------------|
+| Auth | 6 | Регистрация, вход, OAuth, refresh токенов |
+| User | 10 | Пользователи, профили игроков и тренеров |
+| Club | 5 | CRUD клубов, логотипы в S3 |
+| Team | 10 | Команды, составы, участники |
+| Season | 7 | Сезоны, привязка команд |
+| Invite | 6 | Пригласительные ссылки, вступление в команду |
+| Training | 10 | Тренировки, посещаемость, RSVP |
+| Venue | 5 | Места проведения (площадки) |
+| Announcement | 6 | Объявления с приоритетами и черновиками |
+| EventResponse | 7 | RSVP/отклики на тренировки и матчи |
+| RecurringTraining | 6 | Шаблоны регулярных тренировок |
+| Match | 8 | Матчи, live-события, составы |
+| Tournament | 5 | Турниры, регистрация команд |
+| Reference | 9 | Справочники (страны, города, виды спорта) |
+
+📖 [Полная документация API](docs/API_IMPLEMENTATION_SUMMARY.md)
+
+### Безопасность API
+
+- **Аутентификация:** Laravel Sanctum (Bearer tokens)
+- **Авторизация:** Spatie Permission (роли и разрешения)
+- **Валидация:** Laravel Form Requests
+- **Защита:** Rate limiting, CORS
+
 ### История изменений и аудит
 
 - [`CHANGELOG.md`](docs/CHANGELOG.md) — История изменений API (Keep a Changelog)
 - [`API_MIGRATION_AUDIT.md`](docs/API_MIGRATION_AUDIT.md) — Аудит соответствия OpenAPI и миграций БД (100% покрытие)
+- [`API_IMPLEMENTATION_SUMMARY.md`](docs/API_IMPLEMENTATION_SUMMARY.md) — Полная сводка реализованных API endpoints (100+ методов)
 
 ### Примеры использования
 

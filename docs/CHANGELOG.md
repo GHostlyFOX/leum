@@ -17,6 +17,12 @@
   - `announcement.yaml` — Объявления клуба/команды
   - `event-response.yaml` — RSVP/отклики на тренировки и матчи
   - `recurring-training.yaml` — Шаблоны регулярных тренировок
+- **Полная реализация REST API по OpenAPI контрактам:**
+  - Созданы модели: `Season`, `InviteLink`, `Announcement`, `EventResponse`
+  - Созданы API Resources для форматирования ответов
+  - Созданы контроллеры: `SeasonController`, `VenueController`, `InviteController`, `AnnouncementController`, `EventResponseController`, `RecurringTrainingController`
+  - Реализовано 90+ API endpoints согласно OpenAPI спецификациям
+  - Документация: [`API_IMPLEMENTATION_SUMMARY.md`](docs/API_IMPLEMENTATION_SUMMARY.md)
 
 ### Changed
 - Реструктуризация документации: удалена папка `docs/api/`, оставлена только `docs/openapi/`
