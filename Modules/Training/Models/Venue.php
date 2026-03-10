@@ -14,7 +14,7 @@ class Venue extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'name', 'country_id', 'city_id', 'address', 'club_id',
+        'name', 'country_id', 'city_id', 'address', 'club_id', 'description',
     ];
 
     protected $casts = [
