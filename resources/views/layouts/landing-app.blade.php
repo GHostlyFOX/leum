@@ -11,6 +11,7 @@
 		<meta name="keywords" content="детский спорт, спортивные команды, сбор, squadup, турниры, тренировки, управление клубом, расписание тренировок">
 
         @include('layouts.components.landing.styles')
+        @stack('styles')
 
 	</head>
 
@@ -62,6 +63,7 @@
 
         @include('layouts.components.landing.scripts')
         @livewireScripts
+        @stack('scripts')
 
 	</body>
 </html>

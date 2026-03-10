@@ -482,9 +482,9 @@
         </div>
     </section>
 
-@endsection
+</div>
 
-@section('scripts')
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var green  = '#8fbd56';
@@ -561,4 +561,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-</div>
+@endpush

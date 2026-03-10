@@ -1,8 +1,4 @@
-        @section('styles')
-
-        @endsection
-
-        @section('content')
+        <div>
         <div class="dashboard-container">
 
                             <!-- PAGE-HEADER -->
@@ -765,9 +761,8 @@
                             <!-- ROW-4 END -->
 
                             </div>
-        @endsection
 
-        @section('modal')
+        @push('modal')
 
 		<!--TASK MODAL-->
 		<div class="modal fade" id="Vertically">
@@ -1123,9 +1118,9 @@
 			</div>
 		</div><!--TASK MODAL ENDS-->
 
-        @endsection
+        @endpush
 
-        @section('scripts')
+        @push('scripts')
 
         <!-- APEXCHART JS -->
         <script src="{{asset('assets/js/apexcharts.js')}}"></script>
@@ -1148,4 +1143,6 @@
         <!-- Reply JS-->
 		<script src="{{asset('assets/js/reply.js')}}"></script>
 
-        @endsection
+        @endpush
+
+        </div>

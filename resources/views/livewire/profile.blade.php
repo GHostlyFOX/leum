@@ -1,8 +1,4 @@
-        @section('styles')
-
-        @endsection
-
-                            @section('content')
+        <div>
 
 							<!-- PAGE-HEADER -->
 							<div class="page-header">
@@ -1108,9 +1104,8 @@
 							</div>
 							<!-- ROW-1 CLOSED -->
 
-                            @endsection
 
-        @section('scripts')
+        @push('scripts')
 
 		<!-- INTERNAL GALLERY JS -->
 		<script src="{{asset('assets/plugins/gallery/picturefill.js')}}"></script>
@@ -1126,4 +1121,6 @@
         <!-- PROFILE JS -->
 		<script src="{{asset('assets/js/profile.js')}}"></script>
 
-        @endsection
+        @endpush
+
+        </div>

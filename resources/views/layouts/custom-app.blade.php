@@ -11,10 +11,11 @@
 
         @include('layouts.components.styles')
         @livewireStyles
+        @stack('styles')
 
     </head>
 
-    @yield('body')
+    <body class="ltr login-img">
 
             <!-- GLOBAL-LOADER -->
             <div id="global-loader">
@@ -26,6 +27,7 @@
 
         @include('layouts.components.custom-scripts')
         @livewireScripts
+        @stack('scripts')
 
     </body>
 

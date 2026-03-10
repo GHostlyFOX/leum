@@ -12,6 +12,7 @@
 
         @include('layouts.components.styles')
         @livewireStyles
+        @stack('styles')
 
     </head>
 
@@ -50,6 +51,7 @@
             @include('layouts.components.modal')
 
             @yield('modal')
+            @stack('modal')
 
             @include('layouts.components.footer')
 
@@ -58,6 +60,7 @@
 
         @include('layouts.components.scripts')
         @livewireScripts
+        @stack('scripts')
 
     </body>
 

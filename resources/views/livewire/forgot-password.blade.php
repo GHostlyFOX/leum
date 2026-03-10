@@ -1,15 +1,4 @@
-        @section('styles')
-
-        @endsection
-
-        @section('body')
-
-        <body class="ltr login-img">
-
-        @endsection
-
-            @section('content')
-
+<div>
 			<!-- PAGE -->
 			<div class="page">
 				<div>
@@ -66,9 +55,5 @@
 			</div>
 			<!--END PAGE -->
 
-            @endsection
-
-        @section('scripts')
-
-        @endsection
+</div>
 
