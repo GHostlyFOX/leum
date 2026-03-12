@@ -4,22 +4,7 @@
                     <div class="d-flex">
                         <a aria-label="Hide Sidebar" class="app-sidebar__toggle" data-bs-toggle="sidebar" href="#"></a>
                         <!-- sidebar-toggle-->
-                        <a class="logo-horizontal" href="{{url('index')}}" style="display: flex; align-items: center; text-decoration: none; height: 50px;">
-                            <!-- Logo SVG inline -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" style="height: 45px; width: auto;">
-                              <!-- Icon part - Team figures -->
-                              <g transform="translate(5, 5)">
-                                <circle cx="35" cy="35" r="34" fill="#74bc1f"/>
-                                <circle cx="35" cy="28" r="7" fill="#000000"/>
-                                <path d="M35 37 L27 58 L33 58 L35 47 L37 58 L43 58 Z" fill="#000000"/>
-                                <circle cx="17" cy="33" r="5.5" fill="#ffffff"/>
-                                <path d="M17 40 L10 58 L15 58 L17 49 L19 58 L24 58 Z" fill="#ffffff"/>
-                                <circle cx="53" cy="33" r="5.5" fill="#ffffff"/>
-                                <path d="M53 40 L46 58 L51 58 L53 49 L55 58 L60 58 Z" fill="#ffffff"/>
-                              </g>
-                              <text x="90" y="50" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#000000">sbor<tspan fill="#74bc1f">.team</tspan></text>
-                            </svg>
-                        </a>
+                        {{-- Логотип отображается в сайдбаре, здесь не дублируем --}}
                         <!-- LOGO -->
                         <div class="main-header-center ms-3 d-none d-xl-block">
 							<input class="form-control" placeholder="Поиск по сайту..." type="search">
