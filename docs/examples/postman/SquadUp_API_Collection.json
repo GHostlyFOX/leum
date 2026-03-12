@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "squadup-api-v1",
-    "name": "Детская лига (SquadUp) API",
+    "_postman_id": "sbor-api-v1",
+    "name": "Детская лига (Сбор) API",
     "description": "API коллекция для платформы управления детским спортом",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },

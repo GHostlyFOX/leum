@@ -12,7 +12,7 @@ skinparam SwimlaneBorderColor #BDC3C7
 skinparam SwimlaneTitleFontSize 12
 skinparam backgroundColor #FFFFFF
 
-title Пользовательский путь: Администратор (веб)\n«Сбор» (SquadUp.ru)
+title Пользовательский путь: Администратор (веб)\n«Сбор» (sbor.team)
 
 |#D6EAF8|Администратор (браузер)|
 |#E9F7EF|Backend API|

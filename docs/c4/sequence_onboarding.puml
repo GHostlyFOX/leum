@@ -15,7 +15,7 @@ skinparam backgroundColor #FFFFFF
 skinparam noteBorderColor #D4AC0D
 skinparam noteBackgroundColor #FEF9E7
 
-title Sequence: Онбординг клуба — «Сбор» (SquadUp.ru)\n(Регистрация → Роль → Клуб → Команда → Сезон → Тренеры → Игроки)
+title Sequence: Онбординг клуба — «Сбор» (sbor.team)\n(Регистрация → Роль → Клуб → Команда → Сезон → Тренеры → Игроки)
 
 actor "Администратор" as admin
 participant "Веб-приложение" as web

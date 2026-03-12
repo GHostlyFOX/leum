@@ -14,7 +14,7 @@
                                 <h6 class="text-uppercase mb-0 fw-bold" style="color: #1a2e0a;">О платформе</h6>
                             </div>
                             <p class="text-muted">
-                                Сбор (SquadUp.ru) — сервис для детского спорта, где важна не только игра, но и вся жизнь команды вокруг неё.
+                                Сбор (sbor.team) — сервис для детского спорта, где важна не только игра, но и вся жизнь команды вокруг неё.
                                 Объединяет клуб, тренера, родителей и юных спортсменов в единое цифровое пространство —
                                 от расписания тренировок до итогов турнира и личной статистики каждого игрока.
                             </p>
@@ -134,7 +134,7 @@
                 <footer class="main-footer px-0 pb-0 border-0">
                     <div class="row align-items-center">
                         <div class="col-md-8 footer1">
-                            &copy; {{ date('Y') }} <a href="{{ url('/') }}" class="text-decoration-none" style="color: #8fbd56;">Сбор (SquadUp.ru)</a>. Все права защищены.
+                            &copy; {{ date('Y') }} <a href="{{ url('/') }}" class="text-decoration-none" style="color: #8fbd56;">Сбор (sbor.team)</a>. Все права защищены.
                         </div>
                         <div class="col-md-4 text-end">
                             <a href="{{ route('personal.data.agreement') }}" class="text-muted small text-decoration-none" style="transition: all 0.3s;">Политика конфиденциальности</a>

@@ -44,7 +44,7 @@ skinparam node {
     BorderColor #AEB6BF
 }
 
-title Карта движения данных — Сбор (SquadUp.ru)\n(System Data Flow)
+title Карта движения данных — Сбор (sbor.team)\n(System Data Flow)
 
 ' ═══════════════════════════════════════════════════════════
 ' АКТОРЫ

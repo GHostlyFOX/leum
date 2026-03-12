@@ -6,9 +6,9 @@
 		<meta charset="UTF-8">
 		<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="description" content="Сбор (SquadUp.ru) — сервис для детского спорта. Единое цифровое пространство для клубов, тренеров, родителей и юных спортсменов.">
+		<meta name="description" content="Сбор (sbor.team) — сервис для детского спорта. Единое цифровое пространство для клубов, тренеров, родителей и юных спортсменов.">
 		<meta name="author" content="Сбор">
-		<meta name="keywords" content="детский спорт, спортивные команды, сбор, squadup, турниры, тренировки, управление клубом, расписание тренировок">
+		<meta name="keywords" content="детский спорт, спортивные команды, сбор, sbor, турниры, тренировки, управление клубом, расписание тренировок">
 
         @include('layouts.components.landing.styles')
         @stack('styles')

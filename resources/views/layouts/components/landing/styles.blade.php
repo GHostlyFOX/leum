@@ -2,7 +2,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/images/brand/favicon.ico')}}" />
 
         <!-- TITLE -->
-        <title>Сбор — единое пространство для детского спорта | SquadUp.ru</title>
+        <title>Сбор — единое пространство для детского спорта | sbor.team</title>
 
         <!-- BOOTSTRAP CSS -->
         <link id="style" href="{{asset('assets/plugins/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" />
