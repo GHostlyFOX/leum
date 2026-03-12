@@ -7,7 +7,6 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 
 class RouteServiceProvider extends ServiceProvider
 {
-    protected $moduleNamespace = 'Modules\Auth\Http\Controllers';
 
     public function boot(): void
     {
@@ -30,7 +29,6 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes(): void
     {
         Route::middleware('web')
-            ->namespace($this->moduleNamespace)
             ->group(module_path('Auth', '/Routes/web.php'));
     }
 }

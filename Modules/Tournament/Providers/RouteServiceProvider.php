@@ -28,7 +28,6 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes(): void
     {
         Route::middleware('web')
-            ->namespace('Modules\Tournament\Http\Controllers')
             ->group(module_path('Tournament', '/Routes/web.php'));
     }
 }

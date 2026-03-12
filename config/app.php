@@ -177,6 +177,19 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /*
+         * Module Service Providers...
+         */
+        Modules\Auth\Providers\AuthServiceProvider::class,
+        Modules\Club\Providers\ClubServiceProvider::class,
+        Modules\File\Providers\FileServiceProvider::class,
+        Modules\Match\Providers\MatchServiceProvider::class,
+        Modules\Reference\Providers\ReferenceServiceProvider::class,
+        Modules\Team\Providers\TeamServiceProvider::class,
+        Modules\Tournament\Providers\TournamentServiceProvider::class,
+        Modules\Training\Providers\TrainingServiceProvider::class,
+        Modules\User\Providers\UserServiceProvider::class,
+
     ],
 
     /*
