@@ -9,15 +9,31 @@
     text-decoration: none !important;
 }
 
-/* Fix for old logo images */
-.header-brand-img.desktop-logo,
-.header-brand-img.light-logo1 {
+/* Sidebar logo: full logo when expanded, icon when collapsed */
+.app-sidebar .header-brand-img.desktop-logo {
+    display: block !important;
+    height: 40px;
+    width: auto;
+}
+
+.app-sidebar .header-brand-img.toggle-logo {
     display: none !important;
 }
 
-/* Ensure logo is visible */
-.hor-header .logo-horizontal svg,
-.app-header .logo-horizontal svg {
-    visibility: visible !important;
-    opacity: 1 !important;
+/* When sidebar is collapsed — show icon, hide full logo */
+.app.sidenav-toggled .header-brand-img.desktop-logo {
+    display: none !important;
+}
+
+.app.sidenav-toggled .header-brand-img.toggle-logo {
+    display: block !important;
+}
+
+/* Light theme variants follow the same pattern */
+.app-sidebar .header-brand-img.light-logo {
+    display: none !important;
+}
+
+.app-sidebar .header-brand-img.light-logo1 {
+    display: none !important;
 }
