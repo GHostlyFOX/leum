@@ -13,6 +13,7 @@ use Modules\Club\Services\ClubService;
 use Modules\Reference\Models\RefClubType;
 use Modules\Reference\Models\RefSportType;
 use Modules\Team\Models\Team;
+use Modules\Team\Models\TeamMember;
 use Modules\User\Models\User;
 
 /**
@@ -213,9 +214,19 @@ class Register extends Component
                 $teamData['logo_file_id'] = $logoFile->id;
             }
 
-            Team::create($teamData);
+            $team = Team::create($teamData);
 
-            // 4. Login
+            // 4. Add admin as team member
+            TeamMember::create([
+                'user_id'   => $user->id,
+                'club_id'   => $club->id,
+                'team_id'   => $team->id,
+                'role_id'   => 7, // Администратор клуба
+                'joined_at' => now(),
+                'is_active' => true,
+            ]);
+
+            // 5. Login
             Auth::login($user);
         });
 

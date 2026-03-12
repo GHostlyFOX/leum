@@ -7,6 +7,7 @@ use App\Livewire\Login;
 use App\Livewire\Profile;
 use App\Livewire\Register;
 use App\Livewire\ClubOnboarding;
+use App\Livewire\JoinTeam;
 use App\Livewire\Onboarding;
 use App\Livewire\Settings;
 
@@ -32,6 +33,9 @@ Route::middleware('guest')->group(function () {
     Route::get('register', Register::class)->name('auth.register');
     Route::get('forgot-password', ForgotPassword::class);
 });
+
+// ── Публичная страница приглашения ────────────────────────────────
+Route::get('join/{token}', JoinTeam::class)->name('join.team');
 
 // ── Онбординг (auth, но без проверки onboarded) ─────────────────
 Route::middleware('auth')->group(function () {

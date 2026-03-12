@@ -163,9 +163,9 @@ class InviteController extends Controller
 
         // Определяем роль
         $roleId = match ($invite->role) {
-            'coach' => 3, // coach role id
-            'parent' => 4, // parent role id
-            default => 2, // player role id
+            'coach'  => 2, // Тренер
+            'parent' => 9, // Родитель
+            default  => 6, // Игрок
         };
 
         $team->members()->attach($user->id, [
