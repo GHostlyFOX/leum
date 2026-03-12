@@ -2,13 +2,12 @@
 
 namespace App\Livewire;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Modules\Club\Models\Club;
-use Modules\Team\Models\Season;
 use Modules\Team\Models\Team;
 use Modules\Team\Models\TeamMember;
 
@@ -90,13 +89,15 @@ class Index extends Component
 
         $club = Club::find($membership->club_id);
 
-        Season::create([
+        DB::table('seasons')->insert([
             'name'          => $this->seasonName,
             'club_id'       => $membership->club_id,
             'sport_type_id' => $club?->sport_type_id,
             'status'        => $this->seasonStatus,
             'start_date'    => $this->seasonStartDate,
             'end_date'      => $this->seasonEndDate,
+            'created_at'    => now(),
+            'updated_at'    => now(),
         ]);
 
         $this->closeSeasonModal();
@@ -160,9 +161,9 @@ class Index extends Component
             ? TeamMember::where('club_id', $clubId)->where('user_id', '!=', $user->id)->count()
             : 0;
 
-        // Онбординг-чеклист — реальная проверка сезонов
+        // Онбординг-чеклист
         $hasTeams = $teams->isNotEmpty();
-        $hasSeason = $clubId ? Season::where('club_id', $clubId)->exists() : false;
+        $hasSeason = $clubId ? DB::table('seasons')->where('club_id', $clubId)->exists() : false;
         $hasMembers = $membersCount > 0;
         $hasEvents = false; // TODO: проверить тренировки/матчи
 

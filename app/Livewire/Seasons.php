@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\On;
 use Livewire\Component;
 use Modules\Club\Models\Club;
 use Modules\Team\Models\Season;
@@ -148,9 +147,7 @@ class Seasons extends Component
 
         $season = Season::find($this->deletingSeasonId);
         if ($season && $season->club_id === $this->clubId) {
-            // Detach teams first (pivot)
             $season->teams()->detach();
-            // Delete season (cascade will handle season_teams via FK)
             $season->delete();
         }
 
@@ -188,7 +185,7 @@ class Seasons extends Component
             $teams = Team::where('club_id', $this->clubId)->orderBy('name')->get();
         }
 
-        return view('livewire.seasons', [
+        return view('club::seasons', [
             'seasons' => $seasons,
             'teams'   => $teams,
         ]);
