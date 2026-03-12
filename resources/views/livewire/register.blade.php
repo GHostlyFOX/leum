@@ -383,6 +383,18 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">Тип клуба <span class="text-danger">*</span></label>
+                <select wire:model="clubTypeId"
+                        class="form-select @error('clubTypeId') is-invalid @enderror">
+                    <option value="">— Выберите тип клуба —</option>
+                    @foreach ($clubTypes as $ct)
+                        <option value="{{ $ct->id }}">{{ $ct->name }}</option>
+                    @endforeach
+                </select>
+                @error('clubTypeId') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Вид спорта <span class="text-danger">*</span></label>
                 <select wire:model="sportTypeId"
                         class="form-select @error('sportTypeId') is-invalid @enderror">

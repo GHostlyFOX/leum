@@ -10,6 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Modules\Club\Services\ClubService;
+use Modules\Reference\Models\RefClubType;
 use Modules\Reference\Models\RefSportType;
 use Modules\Team\Models\Team;
 use Modules\User\Models\User;
@@ -47,6 +48,7 @@ class Register extends Component
 
     // ── Step 3 (admin): Club/League ─────────────────────────────────
     public string $clubName = '';
+    public ?int $clubTypeId = null;
     public ?int $sportTypeId = null;
     public string $clubDescription = '';
 
@@ -77,6 +79,7 @@ class Register extends Component
         'password.required'   => 'Введите пароль',
         'password.min'        => 'Пароль должен содержать минимум 8 символов',
         'clubName.required'   => 'Введите название клуба или лиги',
+        'clubTypeId.required' => 'Выберите тип клуба',
         'sportTypeId.required' => 'Выберите вид спорта',
     ];
 
@@ -96,6 +99,7 @@ class Register extends Component
     public function render()
     {
         return view('livewire.register', [
+            'clubTypes'  => RefClubType::orderBy('name')->get(),
             'sportTypes' => RefSportType::orderBy('name')->get(),
         ]);
     }
@@ -149,6 +153,7 @@ class Register extends Component
     {
         $this->validate([
             'clubName'    => 'required|string|max:255',
+            'clubTypeId'  => 'required|exists:ref_club_types,id',
             'sportTypeId' => 'required|exists:ref_sport_types,id',
             'clubDescription' => 'nullable|string|max:1000',
         ]);
@@ -189,6 +194,7 @@ class Register extends Component
             $club = $clubService->create([
                 'name'          => $this->clubName,
                 'description'   => $this->clubDescription ?: null,
+                'club_type_id'  => $this->clubTypeId,
                 'sport_type_id' => $this->sportTypeId,
             ]);
 
