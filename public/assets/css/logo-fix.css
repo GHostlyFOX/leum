@@ -1,0 +1,23 @@
+/* Logo styles for sbor.team */
+.logo-horizontal svg {
+    display: block;
+    max-height: 100%;
+    width: auto;
+}
+
+.logo-horizontal {
+    text-decoration: none !important;
+}
+
+/* Fix for old logo images */
+.header-brand-img.desktop-logo,
+.header-brand-img.light-logo1 {
+    display: none !important;
+}
+
+/* Ensure logo is visible */
+.hor-header .logo-horizontal svg,
+.app-header .logo-horizontal svg {
+    visibility: visible !important;
+    opacity: 1 !important;
+}

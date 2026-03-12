@@ -26,7 +26,7 @@
 		<div class="page">
 			<div class="page-main">
 
-                @include('layouts.components.app-header1')
+                @include('layouts.components.app-header')
 
                 @include('layouts.components.app-sidebar')
 

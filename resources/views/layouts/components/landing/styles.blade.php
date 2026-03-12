@@ -13,6 +13,9 @@
 
         <!--- FONT-ICONS CSS -->
         <link href="{{asset('assets/plugins/icons/icons.css')}}" rel="stylesheet"/>
+        
+        <!-- LOGO FIX CSS -->
+        <link href="{{asset('assets/css/logo-fix.css')}}" rel="stylesheet"/>
 
         <!-- INTERNAL Switcher css -->
 		<!-- <link href="{{asset('assets/switcher/css/switcher.css')}}" rel="stylesheet" />
