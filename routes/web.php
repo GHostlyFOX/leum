@@ -9,6 +9,7 @@ use App\Livewire\Register;
 use App\Livewire\ClubOnboarding;
 use App\Livewire\JoinTeam;
 use App\Livewire\Onboarding;
+use App\Livewire\Seasons;
 use App\Livewire\Settings;
 
 use Illuminate\Support\Facades\Route;
@@ -48,4 +49,5 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('dashboard', Index::class)->name('home');
     Route::get('profile', Profile::class);
     Route::get('settings', Settings::class);
+    Route::get('club/seasons', Seasons::class)->name('club.seasons');
 });

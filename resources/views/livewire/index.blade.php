@@ -156,7 +156,7 @@
             <div class="step-body">
                 <h6 class="{{ $hasSeason ? 'done-title' : '' }}">Создайте первый сезон @if($hasSeason)<span class="badge-done">Готово!</span>@endif</h6>
                 <p>Настройте сезон с датами начала и окончания для организации расписания.</p>
-                @unless($hasSeason)<a href="{{ url('club/seasons') }}" class="btn btn-sm btn-create-event mt-2">Создать сезон</a>@endunless
+                @unless($hasSeason)<button wire:click="openSeasonModal" class="btn btn-sm btn-create-event mt-2">Создать сезон</button>@endunless
             </div>
         </div>
 
@@ -290,6 +290,53 @@
     {{-- Модальное окно приглашений --}}
     @if($showInviteModal)
         @livewire('invite-modal', ['teamId' => $inviteTeamId], key('invite-modal'))
+    @endif
+
+    {{-- Модальное окно создания сезона (из онбординга) --}}
+    @if($showSeasonModal)
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; justify-content: center;" wire:click.self="closeSeasonModal">
+        <div style="background: #fff; border-radius: 16px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden; animation: inviteSlideUp 0.25s ease-out;" @click.stop>
+            <div style="padding: 20px 24px 0; display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="font-weight: 700; font-size: 1.15rem; margin: 0;">Новый сезон</h5>
+                <button wire:click="closeSeasonModal" style="background: none; border: none; color: #9ca3af; cursor: pointer;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div style="padding: 20px 24px;">
+                <div class="mb-3">
+                    <label style="font-weight: 600; font-size: 0.88rem; color: #374151; display: block; margin-bottom: 6px;">Название сезона</label>
+                    <input type="text" class="form-control" wire:model="seasonName" placeholder="Сезон 2025/2026" style="border-radius: 10px; border: 1.5px solid #e5e7eb; padding: 10px 14px;">
+                    @error('seasonName') <span class="text-danger" style="font-size: 0.8rem;">{{ $message }}</span> @enderror
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label style="font-weight: 600; font-size: 0.88rem; color: #374151; display: block; margin-bottom: 6px;">Дата начала</label>
+                        <input type="date" class="form-control" wire:model="seasonStartDate" style="border-radius: 10px; border: 1.5px solid #e5e7eb; padding: 10px 14px;">
+                        @error('seasonStartDate') <span class="text-danger" style="font-size: 0.8rem;">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="col-6">
+                        <label style="font-weight: 600; font-size: 0.88rem; color: #374151; display: block; margin-bottom: 6px;">Дата окончания</label>
+                        <input type="date" class="form-control" wire:model="seasonEndDate" style="border-radius: 10px; border: 1.5px solid #e5e7eb; padding: 10px 14px;">
+                        @error('seasonEndDate') <span class="text-danger" style="font-size: 0.8rem;">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <label style="font-weight: 600; font-size: 0.88rem; color: #374151; display: block; margin-bottom: 6px;">Статус</label>
+                    <select class="form-select" wire:model="seasonStatus" style="border-radius: 10px; border: 1.5px solid #e5e7eb; padding: 10px 14px;">
+                        <option value="planned">Запланирован</option>
+                        <option value="active">Активный</option>
+                    </select>
+                </div>
+            </div>
+            <div style="padding: 16px 24px 20px; display: flex; gap: 10px;">
+                <button wire:click="closeSeasonModal" style="flex: 1; background: #fff; border: 1.5px solid #e5e7eb; color: #374151; font-weight: 600; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">Отмена</button>
+                <button wire:click="createSeason" wire:loading.attr="disabled" style="flex: 1; background: #6366f1; border: none; color: #fff; font-weight: 600; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">
+                    <span wire:loading.remove wire:target="createSeason">Создать</span>
+                    <span wire:loading wire:target="createSeason">Создание...</span>
+                </button>
+            </div>
+        </div>
+    </div>
     @endif
 
 @else

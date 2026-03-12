@@ -3,7 +3,7 @@
     <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
     <div class="app-sidebar">
         <div class="side-header">
-            <a class="header-brand1" href="{{url('index')}}">
+            <a class="header-brand1" href="{{url('dashboard')}}">
                 <img src="{{asset('assets/images/brand/logo-header.svg')}}" class="header-brand-img desktop-logo" alt="sbor.team" style="height: 40px; width: auto;">
                 <img src="{{asset('assets/images/brand/logo-icon.svg')}}" class="header-brand-img toggle-logo" alt="sbor.team" style="height: 36px; width: auto;">
                 <img src="{{asset('assets/images/brand/logo-header.svg')}}" class="header-brand-img light-logo" alt="sbor.team" style="height: 40px; width: auto;">
@@ -34,7 +34,7 @@
                 
                 {{-- Dashboard --}}
                 <li class="slide">
-                    <a class="side-menu__item has-link" href="{{url('index')}}">
+                    <a class="side-menu__item has-link" href="{{url('dashboard')}}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="7" height="7"></rect>
                             <rect x="14" y="3" width="7" height="7"></rect>

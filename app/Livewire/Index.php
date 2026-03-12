@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Modules\Club\Models\Club;
+use Modules\Team\Models\Season;
 use Modules\Team\Models\Team;
 use Modules\Team\Models\TeamMember;
 
@@ -20,9 +21,15 @@ class Index extends Component
     public bool $showInviteModal = false;
     public ?int $inviteTeamId = null;
 
+    // Season creation modal (from onboarding)
+    public bool $showSeasonModal = false;
+    public string $seasonName = '';
+    public string $seasonStartDate = '';
+    public string $seasonEndDate = '';
+    public string $seasonStatus = 'planned';
+
     public function mount()
     {
-        // Скрыть онбординг если пользователь закрыл его (сохраняем в сессии)
         $this->showOnboarding = !session('hide_onboarding', false);
     }
 
@@ -31,6 +38,8 @@ class Index extends Component
         $this->showOnboarding = false;
         session(['hide_onboarding' => true]);
     }
+
+    // ── Invite Modal ──────────────────────────────────────────────
 
     public function openInviteModal(?int $teamId = null)
     {
@@ -44,6 +53,64 @@ class Index extends Component
         $this->showInviteModal = false;
         $this->inviteTeamId = null;
     }
+
+    // ── Season Modal ──────────────────────────────────────────────
+
+    public function openSeasonModal()
+    {
+        $this->resetSeasonForm();
+        $this->showSeasonModal = true;
+    }
+
+    public function closeSeasonModal()
+    {
+        $this->showSeasonModal = false;
+        $this->resetSeasonForm();
+    }
+
+    public function createSeason()
+    {
+        $this->validate([
+            'seasonName'      => 'required|string|max:255',
+            'seasonStartDate' => 'required|date',
+            'seasonEndDate'   => 'required|date|after_or_equal:seasonStartDate',
+        ], [
+            'seasonName.required'          => 'Введите название сезона.',
+            'seasonStartDate.required'     => 'Укажите дату начала.',
+            'seasonEndDate.required'       => 'Укажите дату окончания.',
+            'seasonEndDate.after_or_equal' => 'Дата окончания должна быть позже даты начала.',
+        ]);
+
+        $user = Auth::user();
+        $membership = TeamMember::where('user_id', $user->id)
+            ->where('role_id', 7)
+            ->first();
+
+        if (!$membership?->club_id) return;
+
+        $club = Club::find($membership->club_id);
+
+        Season::create([
+            'name'          => $this->seasonName,
+            'club_id'       => $membership->club_id,
+            'sport_type_id' => $club?->sport_type_id,
+            'status'        => $this->seasonStatus,
+            'start_date'    => $this->seasonStartDate,
+            'end_date'      => $this->seasonEndDate,
+        ]);
+
+        $this->closeSeasonModal();
+    }
+
+    private function resetSeasonForm()
+    {
+        $this->seasonName = '';
+        $this->seasonStartDate = '';
+        $this->seasonEndDate = '';
+        $this->seasonStatus = 'planned';
+    }
+
+    // ── Render ─────────────────────────────────────────────────────
 
     public function render()
     {
@@ -80,25 +147,22 @@ class Index extends Component
 
     private function getAdminDashboardData($user): array
     {
-        // Найти клуб администратора через team_members
         $membership = TeamMember::where('user_id', $user->id)
-            ->where('role_id', 7) // Администратор клуба
+            ->where('role_id', 7)
             ->first();
 
         $clubId = $membership?->club_id;
         $club = $clubId ? Club::find($clubId) : null;
 
-        // Команды клуба
         $teams = $club ? Team::where('club_id', $club->id)->get() : collect();
 
-        // Участники (кроме самого админа)
         $membersCount = $clubId
             ? TeamMember::where('club_id', $clubId)->where('user_id', '!=', $user->id)->count()
             : 0;
 
-        // Онбординг-чеклист
+        // Онбординг-чеклист — реальная проверка сезонов
         $hasTeams = $teams->isNotEmpty();
-        $hasSeason = false; // TODO: проверить сезоны когда модуль будет готов
+        $hasSeason = $clubId ? Season::where('club_id', $clubId)->exists() : false;
         $hasMembers = $membersCount > 0;
         $hasEvents = false; // TODO: проверить тренировки/матчи
 
@@ -114,9 +178,9 @@ class Index extends Component
             'hasEvents' => $hasEvents,
             'completedSteps' => $completedSteps,
             'totalSteps' => 4,
-            'upcomingMatches' => collect(), // TODO
-            'weekTrainings' => collect(),   // TODO
-            'announcements' => collect(),   // TODO
+            'upcomingMatches' => collect(),
+            'weekTrainings' => collect(),
+            'announcements' => collect(),
         ];
     }
 }
