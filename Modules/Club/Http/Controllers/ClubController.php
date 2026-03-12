@@ -9,6 +9,10 @@ use Modules\File\Models\File;
 use Modules\Reference\Models\RefClubType;
 use Modules\Reference\Models\RefSportType;
 use Modules\Club\Services\ClubService;
+use Modules\Team\Models\Team;
+use Modules\Team\Models\TeamMember;
+use Modules\Team\Models\Season;
+use Modules\Training\Models\Venue;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -17,7 +21,7 @@ use Illuminate\Support\Facades\Auth;
 class ClubController extends Controller
 {
     /**
-     * Список клубов текущего пользователя.
+     * Главная страница клуба текущего пользователя.
      */
     public function index()
     {
@@ -26,9 +30,51 @@ class ClubController extends Controller
             return redirect()->route('auth.index');
         }
 
-        // TODO: реализовать фильтрацию клубов через team_members (role = admin)
-        $clubs = Club::orderBy('name')->simplePaginate(15);
-        return view('club::index', compact('clubs'));
+        // Получаем клуб пользователя через team_members
+        $membership = TeamMember::where('user_id', $currentUser->id)
+            ->whereIn('role_id', [7, 8]) // admin или coach
+            ->first();
+
+        if (!$membership) {
+            $membership = TeamMember::where('user_id', $currentUser->id)->first();
+        }
+
+        if (!$membership) {
+            return redirect()->route('home')
+                ->with('error', 'Вы не привязаны к клубу');
+        }
+
+        $clubId = $membership->club_id;
+
+        // Команды клуба с количеством игроков
+        $teams = Team::where('club_id', $clubId)
+            ->withCount(['members' => function ($query) {
+                $query->where('status', 'active');
+            }])
+            ->orderBy('name')
+            ->get();
+
+        // Активные сезоны
+        $seasons = Season::where('club_id', $clubId)
+            ->where('status', 'active')
+            ->orderBy('start_date', 'desc')
+            ->get();
+
+        // Тренеры клуба (через team_members с role_id = 8 - coach)
+        $coaches = TeamMember::where('club_id', $clubId)
+            ->where('role_id', 8)
+            ->with(['user', 'team'])
+            ->get()
+            ->unique('user_id');
+
+        // Места проведения тренировок
+        $venues = Venue::where('club_id', $clubId)
+            ->orderBy('name')
+            ->get();
+
+        $club = Club::find($clubId);
+
+        return view('club::index', compact('club', 'teams', 'seasons', 'coaches', 'venues'));
     }
 
     /**
