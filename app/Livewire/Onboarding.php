@@ -453,7 +453,8 @@ class Onboarding extends Component
             ]
         );
 
-        $this->step = 3;
+        // Перенаправляем на поиск клуба
+        return redirect()->route('club.search');
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -479,7 +480,8 @@ class Onboarding extends Component
             ]
         );
 
-        $this->step = 3;
+        // Перенаправляем на поиск клуба
+        return redirect()->route('club.search');
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -532,7 +534,8 @@ class Onboarding extends Component
             $this->addError('children', 'Добавьте хотя бы одного ребёнка');
             return;
         }
-        $this->step = 3;
+        // Перенаправляем на поиск клуба
+        return redirect()->route('club.search');
     }
 
     // ══════════════════════════════════════════════════════════════

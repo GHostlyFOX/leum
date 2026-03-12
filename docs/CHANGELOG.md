@@ -42,7 +42,7 @@
 - **Конфликт классов «Cannot declare class App\Livewire\Index»:** файлы `public/fix-cache.php` и `public/reset.php` вызывали `class_exists('App\Livewire\Index')`, провоцируя двойную загрузку. Решение — переименование класса в `Dashboard`, очистка старого файла
 - **Создание сезона (POST без результата):** `DB::table('seasons')->insert()` падал молча из-за NOT NULL constraint на `sport_type_id` и PostgreSQL ENUM типа `season_status`. Заменён на `Season::create(...)` с try/catch и проверкой `sport_type_id` клуба
 - **Роут /club/seasons — Invalid route action:** класс `Seasons` перемещён в `app/Livewire/Seasons.php` для корректной автозагрузки без `composer dump-autoload`
-- **Проверка ролей при создании сезона:** расширена с `role_id = 7` (admin) до `whereIn([7, 8])` (admin + coach) с fallback на любую запись в `team_members`
+- **Проверка ролей при создании сезона:** расширена с `role_id = 7` (admin) до `whereIn([7, 8])` (admin + coach) с fallback на любую запись в `team_members` и fallback на первый клуб для админов системы
 - **Дубликаты классов:** удалён `Modules/Club/Http/Livewire/Seasons.php`, оставлен `app/Livewire/Seasons.php`
 
 ### API Completeness

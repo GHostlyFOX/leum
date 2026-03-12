@@ -37,17 +37,31 @@ class Seasons extends Component
     public function mount()
     {
         $user = Auth::user();
-        // Получаем club_id из любого членства пользователя
-        $membership = TeamMember::where('user_id', $user->id)
-            ->whereIn('role_id', [7, 8]) // 7 - admin, 8 - coach
-            ->first();
-
-        $this->clubId = $membership?->club_id;
         
-        // Если не нашли по role_id, пробуем найти любое членство
-        if (!$this->clubId) {
-            $membership = TeamMember::where('user_id', $user->id)->first();
-            $this->clubId = $membership?->club_id;
+        // Пробуем найти членство с ролями admin/coach
+        $membership = TeamMember::where('user_id', $user->id)
+            ->whereIn('role_id', [7, 8])
+            ->first();
+        
+        if ($membership) {
+            $this->clubId = $membership->club_id;
+            return;
+        }
+        
+        // Пробуем любое членство
+        $membership = TeamMember::where('user_id', $user->id)->first();
+        if ($membership) {
+            $this->clubId = $membership->club_id;
+            return;
+        }
+        
+        // Для админов - берём первый доступный клуб
+        if ($user->global_role === 'admin') {
+            $firstClub = Club::first();
+            if ($firstClub) {
+                $this->clubId = $firstClub->id;
+                return;
+            }
         }
     }
 
@@ -96,7 +110,7 @@ class Seasons extends Component
         ]);
 
         if (!$this->clubId) {
-            $this->dispatch('notify', type: 'error', message: 'У вас нет доступа к управлению клубом');
+            $this->dispatch('notify', type: 'error', message: 'Вы не привязаны к клубу. Обратитесь к администратору.');
             return;
         }
 

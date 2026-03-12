@@ -9,5 +9,5 @@ foreach ($paths as $pattern) {
     }
 }
 if (function_exists('opcache_reset')) opcache_reset();
-echo "✅ Кеш очищен!";
+echo "OK";
 unlink(__FILE__);

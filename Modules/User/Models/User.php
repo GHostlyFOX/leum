@@ -78,6 +78,18 @@ class User extends Authenticatable
         return $this->hasMany(TeamMember::class, 'user_id');
     }
 
+    public function clubs()
+    {
+        return $this->belongsToMany(Club::class, 'team_members', 'user_id', 'club_id')
+            ->distinct();
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(\Modules\Team\Models\Team::class, 'team_members', 'user_id', 'team_id')
+            ->distinct();
+    }
+
     public function children()
     {
         return $this->hasMany(UserParentPlayer::class, 'parent_user_id');

@@ -10,6 +10,8 @@ use App\Livewire\ClubOnboarding;
 use App\Livewire\JoinTeam;
 use App\Livewire\Onboarding;
 use App\Livewire\Settings;
+use App\Livewire\JoinRequests;
+use App\Livewire\ClubSearch;
 
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +43,7 @@ Route::get('join/{token}', JoinTeam::class)->name('join.team');
 Route::middleware('auth')->group(function () {
     Route::get('onboarding', Onboarding::class)->name('onboarding');
     Route::get('onboarding/club', ClubOnboarding::class)->name('club.onboarding');
+    Route::get('onboarding/search', ClubSearch::class)->name('club.search');
 });
 
 // ── Защищённые страницы (требуется авторизация + онбординг) ──────
@@ -48,4 +51,5 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('dashboard', Dashboard::class)->name('home');
     Route::get('profile', Profile::class);
     Route::get('settings', Settings::class);
+    Route::get('join-requests', JoinRequests::class)->name('join.requests');
 });
