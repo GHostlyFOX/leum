@@ -238,6 +238,42 @@
         text-decoration: none;
     }
     .register-footer a:hover { color: #6d9e3a; text-decoration: underline; }
+
+    /* Invite banner */
+    .invite-banner {
+        background: linear-gradient(135deg, #f3f9ea 0%, #e8f5d6 100%);
+        border: 1px solid #c3dba0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    .invite-banner-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #4a7a25;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .invite-banner-info {
+        font-size: 0.9rem;
+        color: #374151;
+        line-height: 1.5;
+    }
+    .invite-banner-info strong {
+        color: #1f2937;
+    }
+    .invite-role-badge {
+        display: inline-block;
+        background: #8fbd56;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-top: 8px;
+    }
 </style>
 
 <div class="register-container">
@@ -248,19 +284,38 @@
             <h1>Сбор</h1>
         </div>
 
-        {{-- Progress bar --}}
-        <div class="progress-bar-wrap">
-            @for ($i = 1; $i <= $this->totalSteps; $i++)
-                <div class="progress-segment {{ $i < $step ? 'completed' : ($i === $step ? 'active' : '') }}"></div>
-            @endfor
-        </div>
+        {{-- Progress bar (скрыт при приглашении) --}}
+        @if (!$hasInvite)
+            <div class="progress-bar-wrap">
+                @for ($i = 1; $i <= $this->totalSteps; $i++)
+                    <div class="progress-segment {{ $i < $step ? 'completed' : ($i === $step ? 'active' : '') }}"></div>
+                @endfor
+            </div>
+        @endif
 
         {{-- ═══════════════════════════════════════════════════════
              ШАГ 1: СОЗДАНИЕ АККАУНТА
         ═══════════════════════════════════════════════════════ --}}
         @if ($step === 1)
-            <div class="step-counter">Шаг 1 из {{ $this->totalSteps }}</div>
+            @if (!$hasInvite)
+                <div class="step-counter">Шаг 1 из {{ $this->totalSteps }}</div>
+            @endif
             <div class="step-title">Создайте аккаунт</div>
+
+            {{-- Информация о приглашении --}}
+            @if ($hasInvite)
+                <div class="invite-banner">
+                    <div class="invite-banner-title">
+                        <i class="fe fe-mail"></i>
+                        Вас пригласили в команду
+                    </div>
+                    <div class="invite-banner-info">
+                        <strong>{{ $inviteClubName }}</strong><br>
+                        {{ $inviteTeamName }}
+                    </div>
+                    <span class="invite-role-badge">{{ $inviteRoleName }}</span>
+                </div>
+            @endif
 
             <div class="mb-3">
                 <label class="form-label">Имя</label>
@@ -296,8 +351,12 @@
             </div>
 
             <button wire:click="nextToRole" class="btn btn-register w-100">
-                <span wire:loading.remove wire:target="nextToRole">Продолжить</span>
-                <span wire:loading wire:target="nextToRole">Проверка...</span>
+                <span wire:loading.remove wire:target="nextToRole">
+                    {{ $hasInvite ? 'Завершить регистрацию' : 'Продолжить' }}
+                </span>
+                <span wire:loading wire:target="nextToRole">
+                    {{ $hasInvite ? 'Регистрация...' : 'Проверка...' }}
+                </span>
             </button>
 
             <div class="register-footer">
@@ -306,9 +365,9 @@
         @endif
 
         {{-- ═══════════════════════════════════════════════════════
-             ШАГ 2: ВЫБОР РОЛИ
+             ШАГ 2: ВЫБОР РОЛИ (скрыт при приглашении)
         ═══════════════════════════════════════════════════════ --}}
-        @if ($step === 2)
+        @if ($step === 2 && !$hasInvite)
             <div class="step-counter">Шаг 2 из {{ $this->totalSteps }}</div>
             <div class="step-title">Как вы будете использовать Сбор?</div>
 

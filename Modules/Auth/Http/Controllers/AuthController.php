@@ -40,6 +40,11 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        // Сохраняем invite token в сессию если пришёл в запросе
+        if ($request->has('invite')) {
+            session(['invite_token' => $request->input('invite')]);
+        }
+
         $field = filter_var($data['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
         $credentials = [
@@ -49,6 +54,12 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            
+            // Если есть приглашение - редиректим на него
+            if ($inviteToken = session('invite_token')) {
+                return redirect()->route('join.team', ['token' => $inviteToken]);
+            }
+            
             return redirect()->route('home');
         }
 

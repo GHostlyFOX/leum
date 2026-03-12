@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Modules\Club\Services\ClubService;
 use Modules\Reference\Models\RefClubType;
 use Modules\Reference\Models\RefSportType;
+use Modules\Team\Models\InviteLink;
 use Modules\Team\Models\Team;
 use Modules\Team\Models\TeamMember;
 use Modules\User\Models\User;
@@ -29,11 +31,23 @@ use Modules\User\Models\User;
  *
  * Если другая роль:
  *   → Регистрация + вход + redirect → onboarding (EnsureOnboarded middleware)
+ *
+ * Если приглашение (invite token):
+ *   → Только шаг 1 → автоматическая привязка к команде → dashboard
  */
 #[Layout('layouts.custom-app')]
 class Register extends Component
 {
     use WithFileUploads;
+
+    // ── Invite mode ─────────────────────────────────────────────────
+    #[Url(as: 'invite')]
+    public ?string $inviteToken = null;
+    public bool $hasInvite = false;
+    public ?InviteLink $invite = null;
+    public ?string $inviteTeamName = null;
+    public ?string $inviteClubName = null;
+    public ?string $inviteRoleName = null;
 
     // ── Wizard state ────────────────────────────────────────────────
     public int $step = 1;
@@ -89,6 +103,11 @@ class Register extends Component
     #[Computed]
     public function totalSteps(): int
     {
+        // При приглашении только 1 шаг
+        if ($this->hasInvite) {
+            return 1;
+        }
+        
         if ($this->selectedRole === 'admin') {
             return 4;
         }
@@ -96,6 +115,44 @@ class Register extends Component
     }
 
     // ── Lifecycle ───────────────────────────────────────────────────
+
+    public function mount()
+    {
+        // Проверяем токен в URL или сессии
+        $token = $this->inviteToken ?? session('invite_token');
+        
+        if ($token) {
+            $this->loadInvite($token);
+        }
+    }
+
+    private function loadInvite(string $token): void
+    {
+        $invite = InviteLink::where('token', $token)->with('team.club')->first();
+
+        if (!$invite) {
+            return;
+        }
+
+        if ($invite->isExpired() || $invite->isLimitReached()) {
+            return;
+        }
+
+        $this->hasInvite = true;
+        $this->invite = $invite;
+        $this->inviteToken = $token;
+        
+        $this->inviteTeamName = $invite->team->name ?? 'Неизвестная команда';
+        $this->inviteClubName = $invite->team->club->name ?? '';
+        $this->inviteRoleName = match ($invite->role) {
+            'coach'  => 'Тренер',
+            'parent' => 'Родитель',
+            default  => 'Игрок',
+        };
+
+        // Сохраняем в сессию на случай перезагрузки
+        session(['invite_token' => $token]);
+    }
 
     public function render()
     {
@@ -116,7 +173,69 @@ class Register extends Component
             'password'  => 'required|string|min:8',
         ]);
 
+        // Если есть приглашение - сразу регистрируем и привязываем
+        if ($this->hasInvite && $this->invite) {
+            return $this->registerWithInvite();
+        }
+
         $this->step = 2;
+    }
+
+    // ── Registration with invite ────────────────────────────────────
+
+    private function registerWithInvite()
+    {
+        $invite = $this->invite;
+
+        DB::transaction(function () use ($invite) {
+            // Определяем роль из приглашения
+            $globalRole = match ($invite->role) {
+                'coach'  => 'coach',
+                'parent' => 'parent',
+                default  => 'player',
+            };
+
+            // Создаём пользователя
+            $user = User::create([
+                'first_name'    => $this->firstName,
+                'last_name'     => $this->lastName,
+                'email'         => $this->email,
+                'password_hash' => Hash::make($this->password),
+                'birth_date'    => '2000-01-01', // placeholder
+                'gender'        => 'male',       // placeholder
+                'global_role'   => $globalRole,
+                'onboarded_at'  => now(), // При приглашении пропускаем онбординг
+            ]);
+
+            // Map role to role_id
+            $roleId = match ($invite->role) {
+                'coach'  => 2, // Тренер
+                'parent' => 9, // Родитель
+                default  => 6, // Игрок
+            };
+
+            // Привязываем к команде
+            TeamMember::create([
+                'user_id'   => $user->id,
+                'club_id'   => $invite->team->club_id,
+                'team_id'   => $invite->team_id,
+                'role_id'   => $roleId,
+                'joined_at' => now(),
+                'is_active' => true,
+            ]);
+
+            // Увеличиваем счётчик использований
+            $invite->incrementUsage();
+
+            // Авторизуем
+            Auth::login($user);
+        });
+
+        // Очищаем сессию
+        session()->forget('invite_token');
+
+        session()->flash('success', 'Добро пожаловать в команду «' . $this->inviteTeamName . '»!');
+        return redirect()->route('home');
     }
 
     // ── Step 2: Select role ─────────────────────────────────────────

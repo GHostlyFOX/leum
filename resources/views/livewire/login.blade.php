@@ -12,6 +12,9 @@
                 <div class="card-body">
                     <form class="login100-form validate-form" method="POST" action="{{ route('auth.login') }}">
                         @csrf
+                        @if(request('invite'))
+                            <input type="hidden" name="invite" value="{{ request('invite') }}">
+                        @endif
                         <span class="login100-form-title">Вход</span>
 
                         @if(session('status'))
@@ -56,7 +59,11 @@
                         </div>
 
                         <div class="text-center pt-3">
-                            <p class="text-dark mb-0">Нет аккаунта? <a href="{{ route('auth.register') }}" class="text-primary ms-1">Зарегистрируйтесь</a></p>
+                            <p class="text-dark mb-0">Нет аккаунта? 
+                                <a href="{{ request('invite') ? route('auth.register', ['invite' => request('invite')]) : route('auth.register') }}" class="text-primary ms-1">
+                                    Зарегистрируйтесь
+                                </a>
+                            </p>
                         </div>
                     </form>
                 </div>
