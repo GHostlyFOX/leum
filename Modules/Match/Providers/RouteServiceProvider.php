@@ -22,12 +22,12 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api/v1')
             ->middleware('api')
-            ->group(module_path('Match', '/Routes/api_v1.php'));
+            ->group(base_path('Modules/Match/Routes/api_v1.php'));
     }
 
     protected function mapWebRoutes(): void
     {
         Route::middleware('web')
-            ->group(module_path('Match', '/Routes/web.php'));
+            ->group(base_path('Modules/Match/Routes/web.php'));
     }
 }

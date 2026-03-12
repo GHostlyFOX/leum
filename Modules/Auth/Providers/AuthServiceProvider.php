@@ -22,7 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     protected function registerViews(): void
     {
         $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
-        $sourcePath = module_path($this->moduleName, 'Resources/views');
+        $sourcePath = base_path('Modules/' . $this->moduleName . '/Resources/views');
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
     }

@@ -21,7 +21,7 @@ class MatchServiceProvider extends ServiceProvider
 
     protected function registerViews(): void
     {
-        $sourcePath = module_path($this->moduleName, 'Resources/views');
+        $sourcePath = base_path('Modules/' . $this->moduleName . '/Resources/views');
         $this->loadViewsFrom([$sourcePath], $this->moduleNameLower);
     }
 }
