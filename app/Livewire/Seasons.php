@@ -37,11 +37,18 @@ class Seasons extends Component
     public function mount()
     {
         $user = Auth::user();
+        // Получаем club_id из любого членства пользователя
         $membership = TeamMember::where('user_id', $user->id)
-            ->where('role_id', 7)
+            ->whereIn('role_id', [7, 8]) // 7 - admin, 8 - coach
             ->first();
 
         $this->clubId = $membership?->club_id;
+        
+        // Если не нашли по role_id, пробуем найти любое членство
+        if (!$this->clubId) {
+            $membership = TeamMember::where('user_id', $user->id)->first();
+            $this->clubId = $membership?->club_id;
+        }
     }
 
     public function openCreateModal()
@@ -88,7 +95,10 @@ class Seasons extends Component
             'endDate.after_or_equal'  => 'Дата окончания должна быть позже даты начала.',
         ]);
 
-        if (!$this->clubId) return;
+        if (!$this->clubId) {
+            $this->dispatch('notify', type: 'error', message: 'У вас нет доступа к управлению клубом');
+            return;
+        }
 
         $club = Club::find($this->clubId);
         $sportTypeId = $this->sportTypeId ?? $club?->sport_type_id;
@@ -115,6 +125,7 @@ class Seasons extends Component
             }
         }
 
+        $this->dispatch('notify', type: 'success', message: $this->isEditing ? 'Сезон обновлён' : 'Сезон создан');
         $this->closeModal();
     }
 

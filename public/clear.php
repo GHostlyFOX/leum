@@ -1,32 +1,13 @@
 <?php
-// Очистка ВСЕХ кешей
-
 $paths = [
     '../storage/framework/views/*',
-    '../storage/framework/cache/data/*',
-    '../storage/framework/cache/*.php',
-    '../storage/framework/sessions/*',
-    '../bootstrap/cache/*.php',
+    '../storage/framework/cache/*',
 ];
-
-$deleted = 0;
 foreach ($paths as $pattern) {
     foreach (glob(__DIR__ . '/' . $pattern) as $file) {
-        if (is_file($file)) {
-            unlink($file);
-            $deleted++;
-        }
+        if (is_file($file)) unlink($file);
     }
 }
-
-if (function_exists('opcache_reset')) {
-    opcache_reset();
-}
-
-echo "✅ Кеш очищен!\n";
-echo "Удалено файлов: {$deleted}\n\n";
-echo "Проверьте:\n";
-echo "- https://sbor.team/dashboard\n";
-echo "- https://sbor.team/club/seasons\n";
-
+if (function_exists('opcache_reset')) opcache_reset();
+echo "✅ Кеш очищен!";
 unlink(__FILE__);
