@@ -1,7 +1,7 @@
 <?php
 
 use App\Livewire\ForgotPassword;
-use App\Livewire\Index;
+use App\Livewire\Dashboard;
 use App\Livewire\Landing;
 use App\Livewire\Login;
 use App\Livewire\Profile;
@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
 
 // ── Защищённые страницы (требуется авторизация + онбординг) ──────
 Route::middleware(['auth', 'onboarded'])->group(function () {
-    Route::get('dashboard', Index::class)->name('home');
+    Route::get('dashboard', Dashboard::class)->name('home');
     Route::get('profile', Profile::class);
     Route::get('settings', Settings::class);
 });

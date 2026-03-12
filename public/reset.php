@@ -36,10 +36,10 @@ try {
     require __DIR__ . '/../vendor/autoload.php';
     $app = require_once __DIR__ . '/../bootstrap/app.php';
     
-    if (class_exists('App\Livewire\Index')) {
-        echo "✅ Класс App\Livewire\Index загружается корректно\n";
+    if (class_exists('App\Livewire\Dashboard')) {
+        echo "✅ Класс App\Livewire\Dashboard загружается корректно\n";
     } else {
-        echo "❌ Класс App\Livewire\Index не найден\n";
+        echo "❌ Класс App\Livewire\Dashboard не найден\n";
     }
     
     echo "\n✅ Все кеши очищены!\n";

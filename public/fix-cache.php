@@ -35,10 +35,10 @@ echo "1. Главную страницу: /dashboard\n";
 echo "2. Страницу сезонов: /club/seasons\n\n";
 
 // Проверяем существование классов
-if (class_exists('App\Livewire\Index')) {
-    echo "✅ Класс App\Livewire\Index найден\n";
+if (class_exists('App\Livewire\Dashboard')) {
+    echo "✅ Класс App\Livewire\Dashboard найден\n";
 } else {
-    echo "❌ Класс App\Livewire\Index НЕ найден\n";
+    echo "❌ Класс App\Livewire\Dashboard НЕ найден\n";
 }
 
 if (class_exists('App\Livewire\Seasons')) {
