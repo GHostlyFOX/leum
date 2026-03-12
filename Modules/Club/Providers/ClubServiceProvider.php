@@ -3,8 +3,6 @@
 namespace Modules\Club\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
-use Modules\Club\Http\Livewire\Seasons;
 
 class ClubServiceProvider extends ServiceProvider
 {
@@ -14,12 +12,6 @@ class ClubServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerViews();
-        $this->registerLivewireComponents();
-    }
-
-    protected function registerLivewireComponents(): void
-    {
-        Livewire::component('club::seasons', Seasons::class);
     }
 
     public function register(): void

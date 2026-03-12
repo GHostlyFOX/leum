@@ -1,6 +1,6 @@
 <?php
 
-use Modules\Club\Http\Livewire\Seasons;
+use App\Livewire\Seasons;
 use Modules\Club\Http\Controllers\ClubController;
 
 /*
