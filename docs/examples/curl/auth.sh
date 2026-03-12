@@ -3,7 +3,7 @@
 # Аутентификация — примеры curl
 # ============================================
 
-BASE_URL="https://api.squadup.ru/api/v1"
+BASE_URL="https://api.sbor.team/api/v1"
 # BASE_URL="http://localhost:8000/api/v1"  # для локальной разработки
 
 echo "=== Регистрация ==="

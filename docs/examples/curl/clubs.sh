@@ -3,7 +3,7 @@
 # Клубы — примеры curl
 # ============================================
 
-BASE_URL="https://api.squadup.ru/api/v1"
+BASE_URL="https://api.sbor.team/api/v1"
 TOKEN="YOUR_ACCESS_TOKEN_HERE"
 
 echo "=== Список клубов ==="

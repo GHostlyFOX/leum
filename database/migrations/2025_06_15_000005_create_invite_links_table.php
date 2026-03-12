@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Создаёт таблицу invite_links — пригласительные ссылки для вступления
- * в команду по токену (squadup.ru/join/{token}).
+ * в команду по токену (sbor.team/join/{token}).
  *
  * Администратор генерирует ссылку с указанием:
  *   - команды
@@ -43,7 +43,7 @@ return new class extends Migration
         DB::statement("ALTER TABLE invite_links ALTER COLUMN role DROP DEFAULT");
         DB::statement("ALTER TABLE invite_links ALTER COLUMN role TYPE invite_role USING role::invite_role");
 
-        DB::statement("COMMENT ON TABLE invite_links IS 'Пригласительные ссылки для вступления в команду. Переход по ссылке squadup.ru/join/{token} → регистрация/логин → автовступление'");
+        DB::statement("COMMENT ON TABLE invite_links IS 'Пригласительные ссылки для вступления в команду. Переход по ссылке sbor.team/join/{token} → регистрация/логин → автовступление'");
         DB::statement("COMMENT ON COLUMN invite_links.token IS 'Уникальный случайный токен (64 символа). Используется в URL приглашения'");
         DB::statement("COMMENT ON COLUMN invite_links.team_id IS 'Команда, в которую приглашают'");
         DB::statement("COMMENT ON COLUMN invite_links.role IS 'Роль, с которой пользователь вступит в команду: player / coach / parent'");

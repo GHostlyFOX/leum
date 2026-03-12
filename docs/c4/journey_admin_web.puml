@@ -281,7 +281,7 @@ fork again
     |Backend API|
     :POST /invite-links\nСоздаёт invite_links\n(token = random, unique);
     |Администратор (браузер)|
-    :Копирует ссылку\n(squadup.ru/join/{token})\nОтправляет вручную;
+    :Копирует ссылку\n(sbor.team/join/{token})\nОтправляет вручную;
     note right: Получатель переходит по ссылке →\nрегистрация / логин →\nавтоматическое вступление в команду
 
 fork again

@@ -4,7 +4,7 @@
 # ============================================
 # Публичные endpoint — не требуют авторизации
 
-BASE_URL="https://api.squadup.ru/api/v1"
+BASE_URL="https://api.sbor.team/api/v1"
 
 echo "=== Виды спорта ==="
 curl -X GET "${BASE_URL}/refs/sport-types" \
