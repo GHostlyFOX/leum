@@ -7,9 +7,14 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
                             <div class="d-flex align-items-center gap-2 mb-3">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8fbd56" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polygon points="12 6 15.09 12.26 22 12.27 16.82 16.41 18.73 23 12 19.27 5.27 23 7.18 16.41 2 12.27 8.91 12.26 12 6"></polygon>
+                                <svg width="28" height="28" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="48" fill="#74bc1f"/>
+                                    <circle cx="50" cy="40" r="10" fill="#000"/>
+                                    <path d="M50 53 L38 85 L46 85 L50 68 L54 85 L62 85 Z" fill="#000"/>
+                                    <circle cx="25" cy="48" r="8" fill="#fff"/>
+                                    <path d="M25 58 L15 85 L22 85 L25 72 L28 85 L35 85 Z" fill="#fff"/>
+                                    <circle cx="75" cy="48" r="8" fill="#fff"/>
+                                    <path d="M75 58 L65 85 L72 85 L75 72 L78 85 L85 85 Z" fill="#fff"/>
                                 </svg>
                                 <h6 class="text-uppercase mb-0 fw-bold" style="color: #1a2e0a;">О платформе</h6>
                             </div>
