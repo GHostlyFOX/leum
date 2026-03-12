@@ -109,6 +109,16 @@
         font-weight: 600; padding: 8px 20px; border-radius: 10px; font-size: 0.85rem;
     }
     .btn-import:hover { background: #f0fdf4; }
+    
+    /* Quick action cards */
+    .quick-action-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .quick-action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+    }
 </style>
 
 <!-- PAGE-HEADER -->
@@ -120,6 +130,80 @@
 </div>
 
 @if ($role === 'admin')
+
+    {{-- БЫСТРЫЕ ДЕЙСТВИЯ --}}
+    <div class="mb-4">
+        <h5 class="fw-bold mb-3">Быстрые действия</h5>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a href="{{ url('trainings/create') }}" class="text-decoration-none quick-action-card">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #e8f5d6; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a7a25" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Тренировка</h6>
+                            <small class="text-muted">Запланировать</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{{ url('matches/create') }}" class="text-decoration-none quick-action-card">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Матч</h6>
+                            <small class="text-muted">Создать матч</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{{ url('club/teams') }}" class="text-decoration-none quick-action-card">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Игрок</h6>
+                            <small class="text-muted">Добавить в команду</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <button wire:click="openInviteModal" class="btn p-0 w-100 h-100 text-start quick-action-card" style="background: none; border: none;">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #fce7f3; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Приглашение</h6>
+                            <small class="text-muted">Отправить ссылку</small>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
 
     {{-- ОНБОРДИНГ-ЧЕКЛИСТ --}}
     @if ($showOnboarding && $completedSteps < $totalSteps)

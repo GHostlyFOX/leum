@@ -49,7 +49,7 @@ class ClubController extends Controller
         // Команды клуба с количеством игроков
         $teams = Team::where('club_id', $clubId)
             ->withCount(['members' => function ($query) {
-                $query->where('status', 'active');
+                $query->where('is_active', true);
             }])
             ->orderBy('name')
             ->get();
