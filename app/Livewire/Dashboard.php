@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Modules\Club\Models\Club;
+use Modules\Team\Models\Season;
 use Modules\Team\Models\Team;
 use Modules\Team\Models\TeamMember;
 
@@ -89,18 +90,25 @@ class Dashboard extends Component
 
         $club = Club::find($membership->club_id);
 
-        DB::table('seasons')->insert([
-            'name'          => $this->seasonName,
-            'club_id'       => $membership->club_id,
-            'sport_type_id' => $club?->sport_type_id,
-            'status'        => $this->seasonStatus,
-            'start_date'    => $this->seasonStartDate,
-            'end_date'      => $this->seasonEndDate,
-            'created_at'    => now(),
-            'updated_at'    => now(),
-        ]);
+        if (!$club?->sport_type_id) {
+            $this->addError('seasonName', 'У клуба не указан вид спорта. Сначала настройте клуб.');
+            return;
+        }
 
-        $this->closeSeasonModal();
+        try {
+            Season::create([
+                'name'          => $this->seasonName,
+                'club_id'       => $membership->club_id,
+                'sport_type_id' => $club->sport_type_id,
+                'status'        => $this->seasonStatus,
+                'start_date'    => $this->seasonStartDate,
+                'end_date'      => $this->seasonEndDate,
+            ]);
+
+            $this->closeSeasonModal();
+        } catch (\Exception $e) {
+            $this->addError('seasonName', 'Ошибка при создании сезона: ' . $e->getMessage());
+        }
     }
 
     private function resetSeasonForm()
