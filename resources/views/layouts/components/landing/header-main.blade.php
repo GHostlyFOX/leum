@@ -515,7 +515,7 @@
                         </div>
                         <div>
                             <div class="text-white fw-bold">Бесплатно для клубов</div>
-                            <div class="text-white opacity-75 small">Пробный период 14 дней</div>
+                            <div class="text-white opacity-75 small">Бесплатно навсегда</div>
                         </div>
                     </div>
                 </div>
