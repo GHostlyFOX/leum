@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120">
+  <!-- Icon part - Team figures -->
+  <g transform="translate(10, 10)">
+    <!-- Circle background -->
+    <circle cx="50" cy="50" r="48" fill="#74bc1f"/>
+    
+    <!-- Center figure (coach/leader) - black -->
+    <circle cx="50" cy="40" r="10" fill="#000000"/>
+    <path d="M50 53 
+             L38 85 
+             L46 85 
+             L50 68 
+             L54 85 
+             L62 85 
+             Z" fill="#000000"/>
+    
+    <!-- Left figure - white -->
+    <circle cx="25" cy="48" r="8" fill="#ffffff"/>
+    <path d="M25 58 
+             L15 85 
+             L22 85 
+             L25 72 
+             L28 85 
+             L35 85 
+             Z" fill="#ffffff"/>
+    
+    <!-- Right figure - white -->
+    <circle cx="75" cy="48" r="8" fill="#ffffff"/>
+    <path d="M75 58 
+             L65 85 
+             L72 85 
+             L75 72 
+             L78 85 
+             L85 85 
+             Z" fill="#ffffff"/>
+    
+    <!-- Connection ring at bottom -->
+    <ellipse cx="50" cy="88" rx="28" ry="8" fill="none" stroke="#000000" stroke-width="2" opacity="0.3"/>
+  </g>
+  
+  <!-- Text part: sbor.team -->
+  <text x="130" y="72" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="#000000">
+    sbor<tspan fill="#74bc1f">.team</tspan>
+  </text>
+  
+  <!-- Tagline -->
+  <text x="130" y="98" font-family="Arial, sans-serif" font-size="14" fill="#666666">
+    платформа для детского спорта
+  </text>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120">
+  <!-- Icon part -->
+  <g transform="translate(20, 10)">
+    <!-- Circle background -->
+    <circle cx="50" cy="50" r="48" fill="#74bc1f"/>
+    
+    <!-- Stylized S / Team symbol -->
+    <path d="M50 20 
+             A 30 30 0 0 1 75 40 
+             A 20 20 0 0 1 65 58
+             L35 58
+             A 20 20 0 0 0 25 75
+             A 30 30 0 0 0 50 90
+             A 30 30 0 0 0 75 75" 
+          stroke="#000000" stroke-width="10" fill="none" stroke-linecap="round"/>
+    
+    <!-- Dot accent -->
+    <circle cx="75" cy="25" r="6" fill="#ffffff"/>
+  </g>
+  
+  <!-- Text part: sbor.team -->
+  <text x="140" y="72" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="#000000">
+    sbor<tspan fill="#74bc1f">.team</tspan>
+  </text>
+  
+  <!-- Tagline -->
+  <text x="140" y="98" font-family="Arial, sans-serif" font-size="14" fill="#666666">
+    платформа для детского спорта
+  </text>
+</svg>

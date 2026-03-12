@@ -1,9 +1,10 @@
 
 		<!-- TITLE -->
-		<title>Noa - Laravel Bootstrap 5 Admin & Dashboard Template</title>
+		<title>sbor.team — платформа для детского спорта</title>
 
         <!-- FAVICON -->
-        <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/images/brand/favicon.ico')}}" />
+        <link rel="icon" type="image/svg+xml" href="{{asset('assets/images/favicon/favicon.svg')}}" />
+        <link rel="apple-touch-icon" href="{{asset('assets/images/favicon/apple-touch-icon.svg')}}" />
 
         <!-- BOOTSTRAP CSS -->
         <link id="style" href="{{asset('assets/plugins/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" />

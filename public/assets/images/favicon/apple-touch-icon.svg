@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Background with rounded corners for iOS -->
+  <rect x="5" y="5" width="170" height="170" rx="40" fill="#74bc1f"/>
+  
+  <!-- Three stylized figures forming a team - scaled for 180x180 -->
+  <!-- Center figure -->
+  <circle cx="90" cy="70" r="11" fill="#000000"/>
+  <path d="M90 82 
+           L77 115 
+           L86 115 
+           L90 98 
+           L94 115 
+           L103 115 
+           Z" fill="#000000"/>
+  
+  <!-- Left figure -->
+  <circle cx="59" cy="78" r="9" fill="#ffffff"/>
+  <path d="M59 89 
+           L47 118 
+           L55 118 
+           L59 103 
+           L63 118 
+           L71 118 
+           Z" fill="#ffffff"/>
+  
+  <!-- Right figure -->
+  <circle cx="121" cy="78" r="9" fill="#ffffff"/>
+  <path d="M121 89 
+           L109 118 
+           L117 118 
+           L121 103 
+           L125 118 
+           L133 118 
+           Z" fill="#ffffff"/>
+  
+  <!-- Connection ring -->
+  <ellipse cx="90" cy="128" rx="42" ry="12" fill="none" stroke="#000000" stroke-width="2.5" opacity="0.4"/>
+</svg>

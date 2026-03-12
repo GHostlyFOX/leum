@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#000000"/>
+  
+  <!-- Stylized letter C / Team circle -->
+  <path d="M100 35 
+           A 65 65 0 1 0 100 165
+           A 65 65 0 0 0 100 135
+           A 35 35 0 1 1 100 65
+           A 35 35 0 0 1 100 35Z" 
+        fill="#74bc1f"/>
+  
+  <!-- Small accent circle -->
+  <circle cx="145" cy="55" r="8" fill="#ffffff"/>
+</svg>

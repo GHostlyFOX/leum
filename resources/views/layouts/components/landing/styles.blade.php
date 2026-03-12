@@ -1,5 +1,6 @@
         <!-- FAVICON -->
-        <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/images/brand/favicon.ico')}}" />
+        <link rel="icon" type="image/svg+xml" href="{{asset('assets/images/favicon/favicon.svg')}}" />
+        <link rel="apple-touch-icon" href="{{asset('assets/images/favicon/apple-touch-icon.svg')}}" />
 
         <!-- TITLE -->
         <title>Сбор — единое пространство для детского спорта | sbor.team</title>
