@@ -16,7 +16,7 @@
         overflow: hidden;
     }
     .join-card-header {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, #8fbd56 0%, #6d9e3a 100%);
         padding: 32px;
         text-align: center;
         color: #fff;
@@ -51,7 +51,7 @@
         border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
-        color: #6366f1;
+        color: #8fbd56;
     }
     .join-info-row .info-label {
         font-size: 0.8rem; color: #9ca3af;
@@ -61,18 +61,18 @@
     }
     .btn-join {
         width: 100%;
-        background: #6366f1; border: none;
+        background: #8fbd56; border: none;
         color: #fff; font-weight: 700;
         padding: 14px; border-radius: 12px;
         cursor: pointer; font-size: 1rem;
         transition: all 0.2s;
         margin-top: 20px;
     }
-    .btn-join:hover { background: #4f46e5; }
-    .btn-join:disabled { background: #c7d2fe; cursor: not-allowed; }
+    .btn-join:hover { background: #6d9e3a; }
+    .btn-join:disabled { background: #d1e7b7; cursor: not-allowed; }
     .btn-dashboard {
         width: 100%;
-        background: #22c55e; border: none;
+        background: #6d9e3a; border: none;
         color: #fff; font-weight: 700;
         padding: 14px; border-radius: 12px;
         cursor: pointer; font-size: 1rem;

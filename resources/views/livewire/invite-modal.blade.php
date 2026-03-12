@@ -52,9 +52,9 @@
         display: flex; align-items: center; justify-content: center; gap: 6px;
         transition: color 0.2s;
     }
-    .invite-tabs button:hover { color: #6366f1; }
+    .invite-tabs button:hover { color: #8fbd56; }
     .invite-tabs button.active {
-        color: #6366f1;
+        color: #8fbd56;
     }
     .invite-tabs button.active::after {
         content: '';
@@ -62,7 +62,7 @@
         bottom: -2px;
         left: 0; right: 0;
         height: 2px;
-        background: #6366f1;
+        background: #8fbd56;
         border-radius: 2px 2px 0 0;
     }
     .invite-body { padding: 20px 24px; }
@@ -80,8 +80,8 @@
     }
     .invite-body .form-control:focus,
     .invite-body .form-select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        border-color: #8fbd56;
+        box-shadow: 0 0 0 3px rgba(143,189,86,0.1);
     }
     .invite-body .role-hint {
         font-size: 0.8rem; color: #9ca3af; margin-top: 4px;
@@ -110,19 +110,19 @@
     .invite-footer .btn-cancel:hover { background: #f9fafb; }
     .invite-footer .btn-send {
         flex: 1;
-        background: #6366f1; border: none;
+        background: #8fbd56; border: none;
         color: #fff; font-weight: 600;
         padding: 10px; border-radius: 10px;
         cursor: pointer; font-size: 0.9rem;
         transition: all 0.2s;
     }
-    .invite-footer .btn-send:hover { background: #4f46e5; }
+    .invite-footer .btn-send:hover { background: #6d9e3a; }
     .invite-footer .btn-send:disabled {
-        background: #c7d2fe; cursor: not-allowed;
+        background: #d1e7b7; cursor: not-allowed;
     }
     .btn-generate {
         width: 100%;
-        background: #6366f1; border: none;
+        background: #8fbd56; border: none;
         color: #fff; font-weight: 600;
         padding: 12px; border-radius: 10px;
         cursor: pointer; font-size: 0.9rem;
@@ -130,7 +130,7 @@
         transition: all 0.2s;
         margin-top: 16px;
     }
-    .btn-generate:hover { background: #4f46e5; }
+    .btn-generate:hover { background: #6d9e3a; }
     .link-result {
         margin-top: 16px;
     }
@@ -147,7 +147,7 @@
         color: #374151;
     }
     .link-result .btn-copy {
-        background: #6366f1; border: none;
+        background: #8fbd56; border: none;
         color: #fff; font-weight: 600;
         padding: 10px 16px; border-radius: 10px;
         cursor: pointer; font-size: 0.82rem;

@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: ['Футбол','Баскетбол','Хоккей','Волейбол','Плавание','Другие'],
             datasets: [{
                 data: [35, 20, 15, 12, 10, 8],
-                backgroundColor: [green, blue, '#ef4444', amber, '#8b5cf6', '#6b7280'],
+                backgroundColor: [green, blue, '#ef4444', amber, '#6d9e3a', '#6b7280'],
                 borderWidth: 0,
                 hoverOffset: 8
             }]

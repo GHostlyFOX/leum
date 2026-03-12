@@ -1,7 +1,7 @@
 <div>
 <style>
     .onboarding-header {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, #8fbd56 0%, #6d9e3a 100%);
         border-radius: 16px 16px 0 0;
         padding: 24px;
         color: #fff;
@@ -50,21 +50,21 @@
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
     }
-    .step-icon.done { background: #22c55e; color: #fff; }
-    .step-icon.pending { background: #f3f4f6; color: #9ca3af; }
+    .step-icon.done { background: #8fbd56; color: #fff; }
+    .step-icon.pending { background: #f3f4f6; color: #8fbd56; }
     .onboarding-step .step-body { flex: 1; }
     .onboarding-step .step-body h6 {
         font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; color: #1f2937;
     }
     .onboarding-step .step-body h6 .badge-done {
-        background: #dcfce7; color: #16a34a;
+        background: #f0fdf4; color: #6d9e3a;
         font-size: 0.75rem; font-weight: 600;
         padding: 2px 8px; border-radius: 6px; margin-left: 8px;
     }
     .onboarding-step .step-body p {
         font-size: 0.85rem; color: #6b7280; margin: 0;
     }
-    .onboarding-step .step-body h6.done-title { color: #22c55e; }
+    .onboarding-step .step-body h6.done-title { color: #6d9e3a; }
     .empty-state {
         text-align: center;
         padding: 40px 20px;
@@ -95,20 +95,20 @@
     .team-card .team-info h6 { font-weight: 600; margin: 0; font-size: 0.95rem; }
     .team-card .team-info small { color: #6b7280; font-size: 0.8rem; }
     .btn-invite {
-        background: #6366f1; border: none; color: #fff;
+        background: #8fbd56; border: none; color: #fff;
         font-weight: 600; padding: 8px 20px; border-radius: 10px; font-size: 0.85rem;
     }
-    .btn-invite:hover { background: #4f46e5; color: #fff; }
+    .btn-invite:hover { background: #6d9e3a; color: #fff; }
     .btn-create-event {
-        background: #6366f1; border: none; color: #fff;
+        background: #8fbd56; border: none; color: #fff;
         font-weight: 600; padding: 8px 20px; border-radius: 10px; font-size: 0.85rem;
     }
-    .btn-create-event:hover { background: #4f46e5; color: #fff; }
+    .btn-create-event:hover { background: #6d9e3a; color: #fff; }
     .btn-import {
-        background: #fff; border: 1.5px solid #6366f1; color: #6366f1;
+        background: #fff; border: 1.5px solid #8fbd56; color: #6d9e3a;
         font-weight: 600; padding: 8px 20px; border-radius: 10px; font-size: 0.85rem;
     }
-    .btn-import:hover { background: #eef2ff; }
+    .btn-import:hover { background: #f0fdf4; }
 </style>
 
 <!-- PAGE-HEADER -->
