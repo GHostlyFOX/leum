@@ -23,9 +23,11 @@
 **Telegram бот:**
 - `app/Services/Telegram/TelegramService.php` — сервис для отправки сообщений
 - `Modules/Auth/Http/Controllers/TelegramController.php` — API для подключения
+- `app/Console/Commands/TelegramSetWebhook.php` — команда установки webhook
 - Поддержка команд: /start, /schedule, /next
 - Webhook для получения сообщений: `/telegram/webhook`
 - API: `POST /telegram/connect`, `/telegram/disconnect`
+- Команда: `php artisan telegram:set-webhook --url=https://sbor.team/telegram/webhook`
 
 **Журнал активности (Audit Log):**
 - `app/Models/ActivityLog.php` — модель журнала
