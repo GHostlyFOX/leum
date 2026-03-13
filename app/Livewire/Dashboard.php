@@ -134,6 +134,8 @@ class Dashboard extends Component
 
         if ($role === 'admin') {
             $data = array_merge($data, $this->getAdminDashboardData($user));
+        } elseif ($role === 'coach') {
+            $data = array_merge($data, $this->getCoachDashboardData($user));
         }
 
         return view('livewire.index', $data);
@@ -191,5 +193,122 @@ class Dashboard extends Component
             'weekTrainings' => collect(),
             'announcements' => collect(),
         ];
+    }
+
+    private function getCoachDashboardData($user): array
+    {
+        // Получаем членства тренера (может быть в нескольких командах)
+        $memberships = TeamMember::where('user_id', $user->id)
+            ->whereIn('role_id', [8, 11]) // coach, assistant
+            ->with('team.club')
+            ->get();
+
+        $teamIds = $memberships->pluck('team_id')->toArray();
+        $clubIds = $memberships->pluck('club_id')->unique()->toArray();
+
+        // Команды тренера с количеством игроков
+        $teams = Team::whereIn('id', $teamIds)
+            ->withCount(['members' => function ($query) {
+                $query->where('is_active', true);
+            }])
+            ->get();
+
+        // Тренировки на текущую неделю
+        $weekTrainings = collect();
+        try {
+            $weekTrainings = \Modules\Training\Models\Training::whereIn('team_id', $teamIds)
+                ->whereBetween('start_time', [now()->startOfWeek(), now()->endOfWeek()])
+                ->with('venue', 'team')
+                ->orderBy('start_time')
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+
+        // Матчи и соревнования на текущую неделю
+        $weekMatches = collect();
+        $upcomingTournaments = collect();
+        try {
+            $weekMatches = \Modules\Match\Models\MatchModel::whereIn('team_id', $teamIds)
+                ->whereBetween('match_date', [now()->startOfWeek(), now()->endOfWeek()])
+                ->with('team')
+                ->orderBy('match_date')
+                ->get();
+
+            $upcomingTournaments = \Modules\Tournament\Models\Tournament::whereIn('club_id', $clubIds)
+                ->where('start_date', '>=', now())
+                ->orderBy('start_date')
+                ->take(5)
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+
+        // Заявки на вступление в команды тренера
+        $pendingRequests = collect();
+        try {
+            $pendingRequests = \Modules\Team\Models\JoinRequest::whereIn('team_id', $teamIds)
+                ->where('status', 'pending')
+                ->where('type', 'team')
+                ->with(['user', 'team'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+
+        // Объявления от клуба или для команд тренера
+        $announcements = collect();
+        try {
+            $announcements = \Modules\Training\Models\Announcement::where(function ($q) use ($clubIds, $teamIds) {
+                $q->whereIn('club_id', $clubIds)
+                  ->orWhereIn('team_id', $teamIds);
+            })
+                ->where('is_published', true)
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+
+        return [
+            'teams' => $teams,
+            'weekTrainings' => $weekTrainings,
+            'weekMatches' => $weekMatches,
+            'upcomingTournaments' => $upcomingTournaments,
+            'pendingRequests' => $pendingRequests,
+            'announcements' => $announcements,
+            'totalPlayers' => $teams->sum('members_count'),
+        ];
+    }
+
+    public function approveRequest(int $requestId)
+    {
+        $user = Auth::user();
+        
+        try {
+            $request = \Modules\Team\Models\JoinRequest::find($requestId);
+            if (!$request || $request->status !== 'pending') {
+                $this->dispatch('notify', type: 'error', message: 'Заявка не найдена');
+                return;
+            }
+
+            // Проверяем, что тренер имеет доступ к этой команде
+            $hasAccess = TeamMember::where('user_id', $user->id)
+                ->where('team_id', $request->team_id)
+                ->whereIn('role_id', [8, 11]) // coach или assistant
+                ->exists();
+
+            if (!$hasAccess && $user->global_role !== 'admin') {
+                $this->dispatch('notify', type: 'error', message: 'Нет доступа');
+                return;
+            }
+
+            $request->approve($user->id);
+            $this->dispatch('notify', type: 'success', message: 'Заявка одобрена');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Ошибка: ' . $e->getMessage());
+        }
     }
 }

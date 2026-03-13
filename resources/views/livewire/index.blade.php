@@ -431,6 +431,307 @@
     </div>
     @endif
 
+@elseif ($role === 'coach')
+    {{-- ═══════════════════════════════════════════════════════════════
+         ДАШБОРД ТРЕНЕРА
+    ═══════════════════════════════════════════════════════════════ --}}
+
+    {{-- Быстрые действия --}}
+    <div class="mb-4">
+        <h5 class="fw-bold mb-3">Быстрые действия</h5>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <a href="{{ url('trainings/create') }}" class="text-decoration-none quick-action-card">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #e8f5d6; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a7a25" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Тренировка</h6>
+                            <small class="text-muted">Запланировать</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{{ url('matches/create') }}" class="text-decoration-none quick-action-card">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #dbeafe; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Матч</h6>
+                            <small class="text-muted">Создать игру</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{{ url('announcements/create') }}" class="text-decoration-none quick-action-card">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Объявление</h6>
+                            <small class="text-muted">Опубликовать</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <button wire:click="openInviteModal" class="btn p-0 w-100 h-100 text-start quick-action-card" style="background: none; border: none;">
+                    <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                            <div style="width: 48px; height: 48px; background: #fce7f3; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#db2777" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                            </div>
+                            <h6 class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1f2937;">Приглашение</h6>
+                            <small class="text-muted">Игрок/Родитель</small>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Заявки на вступление --}}
+    @if($pendingRequests->isNotEmpty())
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; border: 1px solid #e8f5d6;">
+        <div class="card-header bg-white border-0 pt-4 pb-3 px-4" style="border-radius: 16px 16px 0 0;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold" style="color: #2d4a14;">
+                            Заявки на вступление
+                            <span class="badge bg-warning text-dark ms-2" style="font-size: 0.75rem;">{{ $pendingRequests->count() }}</span>
+                        </h5>
+                        <small class="text-muted">Ожидают рассмотрения</small>
+                    </div>
+                </div>
+                <a href="{{ route('join.requests') }}" class="btn btn-sm btn-outline-success">Все заявки</a>
+            </div>
+        </div>
+        <div class="card-body px-4 pb-4 pt-0">
+            <div class="list-group list-group-flush">
+                @foreach($pendingRequests->take(3) as $request)
+                    <div class="list-group-item px-0 py-3 border-bottom" style="border-color: #f3f4f6;">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #8fbd56 0%, #6d9e3a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600;">
+                                    {{ mb_strtoupper(mb_substr($request->user?->first_name ?? '?', 0, 1)) }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <h6 class="mb-0 fw-semibold">{{ $request->user?->full_name ?? 'Неизвестный' }}</h6>
+                                <p class="text-muted mb-0 small">{{ $request->team?->name }}</p>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-sm btn-success" wire:click="approveRequest({{ $request->id }})" style="background: #8fbd56; border: none;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Принять
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <div class="row g-4">
+        {{-- Левая колонка --}}
+        <div class="col-lg-8">
+            {{-- Тренировки на неделю --}}
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fe fe-calendar text-success me-2"></i>Тренировки на неделю
+                    </h5>
+                    <a href="{{ url('trainings') }}" class="btn btn-sm btn-outline-success">Все тренировки</a>
+                </div>
+                <div class="card-body px-4">
+                    @if($weekTrainings->isEmpty())
+                        <div class="text-center py-4 text-muted">
+                            <i class="fe fe-calendar fs-1 mb-2 d-block opacity-25"></i>
+                            <p>Нет тренировок на этой неделе</p>
+                            <a href="{{ url('trainings/create') }}" class="btn btn-sm btn-success">Запланировать</a>
+                        </div>
+                    @else
+                        <div class="list-group list-group-flush">
+                            @foreach($weekTrainings as $training)
+                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 48px; height: 48px; background: #f0fdf4; color: #8fbd56;">
+                                            <i class="fe fe-clock fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ $training->title ?? 'Тренировка' }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fe fe-calendar me-1"></i>{{ $training->start_time?->format('d.m.Y H:i') ?? '-' }}
+                                                <span class="mx-2">|</span>
+                                                <i class="fe fe-map-pin me-1"></i>{{ $training->venue?->name ?? 'Место не указано' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success">{{ $training->team?->name }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Матчи и соревнования --}}
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fe fe-trophy text-warning me-2"></i>Игры и соревнования
+                    </h5>
+                    <a href="{{ url('matches') }}" class="btn btn-sm btn-outline-warning">Все матчи</a>
+                </div>
+                <div class="card-body px-4">
+                    @if($weekMatches->isEmpty() && $upcomingTournaments->isEmpty())
+                        <div class="text-center py-4 text-muted">
+                            <i class="fe fe-trophy fs-1 mb-2 d-block opacity-25"></i>
+                            <p>Нет предстоящих игр</p>
+                            <a href="{{ url('matches/create') }}" class="btn btn-sm btn-warning">Создать матч</a>
+                        </div>
+                    @else
+                        <div class="list-group list-group-flush">
+                            @foreach($weekMatches as $match)
+                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 48px; height: 48px; background: #dbeafe; color: #3b82f6;">
+                                            <i class="fe fe-shield fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">Матч</h6>
+                                            <small class="text-muted">
+                                                <i class="fe fe-calendar me-1"></i>{{ $match->match_date?->format('d.m.Y H:i') ?? '-' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary">{{ $match->team?->name }}</span>
+                                </div>
+                            @endforeach
+                            @foreach($upcomingTournaments as $tournament)
+                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 48px; height: 48px; background: #fef3c7; color: #f59e0b;">
+                                            <i class="fe fe-award fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ $tournament->name }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fe fe-calendar me-1"></i>{{ $tournament->start_date?->format('d.m.Y') ?? '-' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-warning text-dark">Турнир</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- Правая колонка --}}
+        <div class="col-lg-4">
+            {{-- Мои команды --}}
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fe fe-users text-success me-2"></i>Мои команды
+                        <span class="badge bg-light text-dark ms-2">{{ $totalPlayers }} игроков</span>
+                    </h5>
+                </div>
+                <div class="card-body px-4">
+                    @if($teams->isEmpty())
+                        <div class="text-center py-4 text-muted">
+                            <p>У вас пока нет команд</p>
+                        </div>
+                    @else
+                        <div class="row g-3">
+                            @foreach($teams as $team)
+                                <div class="col-6">
+                                    <a href="{{ route('club.team.show', $team->id) }}" class="text-decoration-none">
+                                        <div class="card h-100" style="border-radius: 12px; border: 1px solid #e5e7eb; transition: all 0.2s;">
+                                            <div class="card-body text-center p-3">
+                                                <div class="rounded-3 mx-auto mb-2" 
+                                                     style="width: 48px; height: 48px; background: {{ $team->team_color ?? '#8fbd56' }}; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">
+                                                    {{ mb_strtoupper(mb_substr($team->name, 0, 1)) }}
+                                                </div>
+                                                <h6 class="fw-bold mb-1" style="font-size: 0.9rem; color: #1f2937;">{{ $team->name }}</h6>
+                                                <small class="text-muted">{{ $team->members_count }} игроков</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Объявления --}}
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fe fe-bell text-info me-2"></i>Объявления
+                    </h5>
+                    <a href="{{ url('announcements') }}" class="btn btn-sm btn-outline-info">Все</a>
+                </div>
+                <div class="card-body px-4">
+                    @if($announcements->isEmpty())
+                        <div class="text-center py-4 text-muted">
+                            <i class="fe fe-bell fs-1 mb-2 d-block opacity-25"></i>
+                            <p>Нет объявлений</p>
+                        </div>
+                    @else
+                        <div class="list-group list-group-flush">
+                            @foreach($announcements as $announcement)
+                                <div class="list-group-item px-0 py-3">
+                                    <h6 class="fw-bold mb-1">{{ $announcement->title }}</h6>
+                                    <p class="text-muted mb-1 small">{{ \Illuminate\Support\Str::limit($announcement->content, 80) }}</p>
+                                    <small class="text-muted">{{ $announcement->created_at->diffForHumans() }}</small>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
 @else
     <div class="card border-0 shadow-sm" style="border-radius: 16px;">
         <div class="card-body p-5 text-center">
