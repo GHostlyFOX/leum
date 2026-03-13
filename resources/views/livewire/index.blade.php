@@ -306,6 +306,9 @@
     </div>
     @endif
 
+    {{-- ЗАЯВКИ НА ВСТУПЛЕНИЕ --}}
+    @livewire('pending-requests', ['viewMode' => 'dashboard'])
+
     {{-- БЛИЖАЙШИЕ МАТЧИ + ОБЪЯВЛЕНИЯ --}}
     <div class="row mb-4">
         <div class="col-lg-8 col-md-12 mb-4 mb-lg-0">
@@ -355,13 +358,18 @@
         <div class="row g-3">
             @foreach($teams as $team)
                 <div class="col-lg-4 col-md-6 col-12">
-                    <a href="{{ url('club/teams') }}" class="team-card">
-                        <div class="team-avatar" style="background: {{ $team->team_color ?? '#6366f1' }};">
+                    <a href="{{ route('club.team.show', $team->id) }}" class="team-card" style="text-decoration: none; color: inherit;">
+                        <div class="team-avatar" style="background: {{ $team->team_color ?? '#8fbd56' }};">
                             {{ mb_strtoupper(mb_substr($team->name, 0, 1)) }}
                         </div>
                         <div class="team-info">
                             <h6>{{ $team->name }}</h6>
                             <small>{{ $club->name ?? '' }}</small>
+                            <div class="mt-1">
+                                <span class="badge bg-light text-dark">
+                                    <i class="fe fe-user me-1"></i>{{ $team->members_count ?? 0 }} игроков
+                                </span>
+                            </div>
                         </div>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </a>

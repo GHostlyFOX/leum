@@ -453,6 +453,10 @@ class Onboarding extends Component
             ]
         );
 
+        // Отмечаем онбординг завершённым
+        $user->onboarded_at = now();
+        $user->save();
+
         // Перенаправляем на поиск клуба
         return redirect()->route('club.search');
     }
@@ -479,6 +483,10 @@ class Onboarding extends Component
                 'dominant_foot_id' => $this->playerDominantFootId,
             ]
         );
+
+        // Отмечаем онбординг завершённым
+        $user->onboarded_at = now();
+        $user->save();
 
         // Перенаправляем на поиск клуба
         return redirect()->route('club.search');
@@ -534,6 +542,12 @@ class Onboarding extends Component
             $this->addError('children', 'Добавьте хотя бы одного ребёнка');
             return;
         }
+        
+        // Отмечаем онбординг завершённым
+        $user = Auth::user();
+        $user->onboarded_at = now();
+        $user->save();
+        
         // Перенаправляем на поиск клуба
         return redirect()->route('club.search');
     }

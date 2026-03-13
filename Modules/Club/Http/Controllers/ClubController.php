@@ -199,6 +199,75 @@ class ClubController extends Controller
         return view('club::team.add');
     }
 
+    public function teamShow($id)
+    {
+        $team = Team::with(['club', 'members.user'])->findOrFail($id);
+        
+        // Проверяем, что пользователь имеет доступ к этой команде
+        $user = Auth::user();
+        $hasAccess = TeamMember::where('user_id', $user->id)
+            ->where(function ($q) use ($team) {
+                $q->where('club_id', $team->club_id)
+                  ->whereIn('role_id', [7, 8]); // admin или coach
+            })
+            ->exists();
+        
+        if (!$hasAccess && $user->global_role !== 'admin') {
+            return redirect()->route('club.index')
+                ->with('error', 'У вас нет доступа к этой команде');
+        }
+        
+        $members = $team->members;
+        $coaches = $members->whereIn('role_id', [8, 11]); // coach, assistant
+        $players = $members->whereIn('role_id', [6, 9, 10]); // player, parent, assistant
+        
+        // Тренировки на текущую неделю
+        $weekTrainings = [];
+        try {
+            $weekTrainings = \Modules\Training\Models\Training::where('team_id', $team->id)
+                ->whereBetween('start_time', [now()->startOfWeek(), now()->endOfWeek()])
+                ->with('venue')
+                ->orderBy('start_time')
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+        
+        // Объявления команды
+        $announcements = [];
+        try {
+            $announcements = \Modules\Training\Models\Announcement::where('team_id', $team->id)
+                ->where('is_published', true)
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+        
+        // Предстоящие матчи/турниры
+        $upcomingMatches = 0;
+        $upcomingEvents = [];
+        try {
+            $upcomingMatches = \Modules\Match\Models\MatchModel::where('team_id', $team->id)
+                ->where('match_date', '>=', now())
+                ->count();
+            
+            $upcomingEvents = \Modules\Match\Models\MatchModel::where('team_id', $team->id)
+                ->where('match_date', '>=', now())
+                ->orderBy('match_date')
+                ->take(5)
+                ->get();
+        } catch (\Exception $e) {
+            // Модель может не существовать
+        }
+        
+        return view('club::team.show', compact(
+            'team', 'members', 'coaches', 'players', 
+            'weekTrainings', 'announcements', 'upcomingMatches', 'upcomingEvents'
+        ));
+    }
+
     public function create()
     {
         return view('club::create');

@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Seasons;
+use App\Livewire\TeamManagement;
+use App\Livewire\ClubStaff;
 use Modules\Club\Http\Controllers\ClubController;
 
 /*
@@ -17,4 +19,14 @@ Route::prefix('club')->middleware(['auth', 'onboarded'])->group(function () {
 
     // Сезоны (Livewire)
     Route::get('/seasons', Seasons::class)->name('club.seasons');
+    
+    // Команды (Livewire)
+    Route::get('/teams',           TeamManagement::class)->name('club.teams');
+    Route::get('/team/{id}',       [ClubController::class, 'teamShow'])->name('club.team.show');
+    
+    // Сотрудники
+    Route::get('/staff',           ClubStaff::class)->name('club.staff');
+    
+    // Приглашения
+    Route::get('/invites',         \App\Livewire\InviteManagement::class)->name('club.invites');
 });

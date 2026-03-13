@@ -78,6 +78,11 @@
         </div>
     </div>
 
+    {{-- ЗАЯВКИ НА ВСТУПЛЕНИЕ --}}
+    @if(isset($club) && $club)
+        @livewire('pending-requests', ['clubId' => $club->id, 'viewMode' => 'club'])
+    @endif
+
     <div class="row g-4">
         <!-- Teams Section -->
         <div class="col-lg-6">
@@ -98,7 +103,7 @@
                     @else
                         <div class="list-group list-group-flush">
                             @foreach($teams as $team)
-                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between">
+                                <a href="{{ route('club.team.show', $team->id) }}" class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between text-decoration-none" style="color: inherit;">
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
                                              style="width: 44px; height: 44px; background: #8fbd56; color: #fff; font-weight: 600;">
@@ -114,7 +119,7 @@
                                             <i class="fe fe-user me-1"></i>{{ $team->members_count }}
                                         </span>
                                     </div>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     @endif
