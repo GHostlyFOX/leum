@@ -109,6 +109,16 @@ class Onboarding extends Component
         if ($user && in_array($user->global_role, ['admin', 'coach', 'player', 'parent'])) {
             $this->selectedRole = $user->global_role;
             $this->step = 2; // Сразу переходим к шагу профиля
+
+            // Загружаем существующий профиль тренера (если есть)
+            if ($user->global_role === 'coach') {
+                $coachProfile = CoachProfile::where('user_id', $user->id)->first();
+                if ($coachProfile) {
+                    $this->coachSportTypeId = $coachProfile->sport_type_id;
+                    $this->coachLicense = $coachProfile->license_number ?? '';
+                    $this->coachCareerStart = $coachProfile->career_start ?? '';
+                }
+            }
         }
     }
 

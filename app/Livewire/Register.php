@@ -187,13 +187,16 @@ class Register extends Component
     {
         $invite = $this->invite;
 
-        DB::transaction(function () use ($invite) {
+        $user = DB::transaction(function () use ($invite) {
             // Определяем роль из приглашения
             $globalRole = match ($invite->role) {
                 'coach'  => 'coach',
                 'parent' => 'parent',
                 default  => 'player',
             };
+
+            // Для тренеров не пропускаем онбординг - нужно заполнить профиль
+            $shouldSkipOnboarding = in_array($invite->role, ['player', 'parent']);
 
             // Создаём пользователя
             $user = User::create([
@@ -204,7 +207,7 @@ class Register extends Component
                 'birth_date'    => '2000-01-01', // placeholder
                 'gender'        => 'male',       // placeholder
                 'global_role'   => $globalRole,
-                'onboarded_at'  => now(), // При приглашении пропускаем онбординг
+                'onboarded_at'  => $shouldSkipOnboarding ? now() : null, // Только игроки/родители пропускают онбординг
             ]);
 
             // Map role to role_id
@@ -224,15 +227,31 @@ class Register extends Component
                 'is_active' => true,
             ]);
 
+            // Для тренеров создаём пустой профиль
+            if ($invite->role === 'coach') {
+                \Modules\User\Models\CoachProfile::create([
+                    'user_id' => $user->id,
+                    'sport_type_id' => $invite->team->sport_type_id,
+                ]);
+            }
+
             // Увеличиваем счётчик использований
             $invite->incrementUsage();
 
-            // Авторизуем
-            Auth::login($user);
+            return $user;
         });
+
+        // Авторизуем
+        Auth::login($user);
 
         // Очищаем сессию
         session()->forget('invite_token');
+
+        // Для тренеров перенаправляем на онбординг для заполнения профиля
+        if ($invite->role === 'coach') {
+            session()->flash('success', 'Добро пожаловать! Заполните профиль тренера.');
+            return redirect()->route('onboarding');
+        }
 
         session()->flash('success', 'Добро пожаловать в команду «' . $this->inviteTeamName . '»!');
         return redirect()->route('home');

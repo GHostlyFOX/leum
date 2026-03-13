@@ -249,11 +249,11 @@ class ClubController extends Controller
         $upcomingMatches = 0;
         $upcomingEvents = [];
         try {
-            $upcomingMatches = \Modules\Match\Models\MatchModel::where('team_id', $team->id)
+            $upcomingMatches = \Modules\Match\Models\GameMatch::where('team_id', $team->id)
                 ->where('match_date', '>=', now())
                 ->count();
             
-            $upcomingEvents = \Modules\Match\Models\MatchModel::where('team_id', $team->id)
+            $upcomingEvents = \Modules\Match\Models\GameMatch::where('team_id', $team->id)
                 ->where('match_date', '>=', now())
                 ->orderBy('match_date')
                 ->take(5)

@@ -229,7 +229,7 @@ class Dashboard extends Component
         $weekMatches = collect();
         $upcomingTournaments = collect();
         try {
-            $weekMatches = \Modules\Match\Models\MatchModel::whereIn('team_id', $teamIds)
+            $weekMatches = \Modules\Match\Models\GameMatch::whereIn('team_id', $teamIds)
                 ->whereBetween('match_date', [now()->startOfWeek(), now()->endOfWeek()])
                 ->with('team')
                 ->orderBy('match_date')
