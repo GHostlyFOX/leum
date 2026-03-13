@@ -25,6 +25,18 @@ Artisan::command('telegram:set-webhook {--url= : URL для webhook}', function 
     
     $this->info("Установка webhook: {$url}");
     
+    // Проверка токена
+    $token = config('services.telegram.bot_token') ?: env('TELEGRAM_BOT_TOKEN');
+    if (empty($token)) {
+        $this->error('❌ TELEGRAM_BOT_TOKEN не найден!');
+        $this->info('Проверьте:');
+        $this->info('1. Файл .env содержит TELEGRAM_BOT_TOKEN=ваш_токен');
+        $this->info('2. Конфиг кэша очищен: php artisan config:clear');
+        return 1;
+    }
+    
+    $this->info('Токен найден: ' . substr($token, 0, 10) . '...');
+    
     $telegramService = new TelegramService();
     $result = $telegramService->setWebhook($url);
     
@@ -34,8 +46,8 @@ Artisan::command('telegram:set-webhook {--url= : URL для webhook}', function 
     } else {
         $this->error('❌ Ошибка установки webhook');
         $this->error('Проверьте:');
-        $this->error('1. TELEGRAM_BOT_TOKEN в .env');
-        $this->error('2. Доступность URL по HTTPS');
-        $this->error('3. Что бот создан в @BotFather');
+        $this->error('1. Корректность токена (возьмите новый у @BotFather)');
+        $this->error('2. Доступность URL по HTTPS (откройте ' . $url . ' в браузере)');
+        $this->error('3. Что бот не удален в @BotFather');
     }
 })->purpose('Установка webhook для Telegram бота');
