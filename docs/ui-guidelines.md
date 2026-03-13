@@ -309,4 +309,52 @@ input[type="checkbox"] {
 
 ---
 
+## Табы (Tabs)
+
+### Justified Nav Tabs (основной стиль)
+
+Используется для навигации по разделам на детальных страницах (команда, турнир и т.д.). Табы занимают всю доступную ширину и распределяются равномерно.
+
+**HTML структура:**
+```html
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-tabs-justified" id="myTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#content1" type="button" role="tab">
+                    <i class="fe fe-icon me-2"></i>Название таба
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab2" data-bs-toggle="tab" data-bs-target="#content2" type="button" role="tab">
+                    <i class="fe fe-icon me-2"></i>Название таба
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="tab-content" id="myTabsContent">
+    <div class="tab-pane fade show active" id="content1" role="tabpanel">...</div>
+    <div class="tab-pane fade" id="content2" role="tabpanel">...</div>
+</div>
+```
+
+**CSS классы:**
+- `.nav-tabs-justified` — равномерное распределение по ширине
+- `.nav-link.active` — активный таб (зелёный цвет + подчёркивание)
+
+**Характеристики:**
+- Равномерное распределение табов по ширине контейнера
+- Активный таб: зелёный цвет `#8fbd56`, полупрозрачный фон, подчёркивание снизу
+- Неактивный таб: серый текст `#6b7280`, подсветка при наведении
+- Иконки Feather Icons перед текстом (опционально)
+- Обёртка в карточку с `border-radius: 14px` и тенью
+
+**Мобильная адаптация:**
+- На экранах < 768px иконки переносятся над текстом
+- Табы переносятся на новую строку при необходимости
+
+---
+
 *Последнее обновление: {{ date('Y-m-d') }}*

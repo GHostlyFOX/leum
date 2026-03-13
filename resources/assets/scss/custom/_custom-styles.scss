@@ -5429,3 +5429,73 @@ div.dataTables_wrapper div.dataTables_length label {
 .pricing-card .card-header {
     border-bottom: 0px !important;
 }
+
+
+/* ============================================
+   JUSTIFIED NAV TABS - стиль табов по ширине
+   ============================================ */
+
+.nav-tabs-justified {
+    display: flex;
+    width: 100%;
+    border-bottom: none;
+    
+    .nav-item {
+        flex: 1;
+        text-align: center;
+        margin: 0;
+    }
+    
+    .nav-link {
+        width: 100%;
+        border: none;
+        border-bottom: 2px solid transparent;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        padding: 16px 12px;
+        transition: all 0.2s ease;
+        border-radius: 0;
+        white-space: nowrap;
+        
+        &:hover {
+            color: #8fbd56;
+            background: rgba(143, 189, 86, 0.05);
+            border-bottom-color: #e5e7eb;
+        }
+        
+        &.active {
+            color: #8fbd56;
+            background: rgba(143, 189, 86, 0.08);
+            border-bottom-color: #8fbd56;
+            font-weight: 600;
+        }
+        
+        i {
+            font-size: 1.1rem;
+        }
+    }
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .nav-tabs-justified {
+        flex-wrap: wrap;
+        
+        .nav-item {
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+        
+        .nav-link {
+            padding: 12px 8px;
+            font-size: 0.85rem;
+            
+            i {
+                display: block;
+                margin-bottom: 4px;
+                margin-right: 0 !important;
+            }
+        }
+    }
+}

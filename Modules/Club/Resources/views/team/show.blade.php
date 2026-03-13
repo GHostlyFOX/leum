@@ -94,33 +94,37 @@
     </div>
 
     <!-- Tabs -->
-    <ul class="nav nav-tabs mb-4" id="teamTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab">
-                <i class="fe fe-users me-2"></i>Состав
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="coaches-tab" data-bs-toggle="tab" data-bs-target="#coaches" type="button" role="tab">
-                <i class="fe fe-user-check me-2"></i>Тренеры
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab">
-                <i class="fe fe-calendar me-2"></i>Расписание
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements" type="button" role="tab">
-                <i class="fe fe-bell me-2"></i>Объявления
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tournaments-tab" data-bs-toggle="tab" data-bs-target="#tournaments" type="button" role="tab">
-                <i class="fe fe-trophy me-2"></i>Турниры
-            </button>
-        </li>
-    </ul>
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+        <div class="card-body p-0">
+            <ul class="nav nav-tabs nav-tabs-justified" id="teamTabs" role="tablist" style="border-bottom: none;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab">
+                        <i class="fe fe-users me-2"></i>Состав
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="coaches-tab" data-bs-toggle="tab" data-bs-target="#coaches" type="button" role="tab">
+                        <i class="fe fe-user-check me-2"></i>Тренеры
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab">
+                        <i class="fe fe-calendar me-2"></i>Расписание
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements" type="button" role="tab">
+                        <i class="fe fe-bell me-2"></i>Объявления
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tournaments-tab" data-bs-toggle="tab" data-bs-target="#tournaments" type="button" role="tab">
+                        <i class="fe fe-trophy me-2"></i>Турниры
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
 
     <div class="tab-content" id="teamTabsContent">
         <!-- Players Tab -->
