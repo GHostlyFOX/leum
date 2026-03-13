@@ -18,6 +18,7 @@ use App\Livewire\MatchDetail;
 use App\Livewire\ParentDashboard;
 use App\Livewire\PlayerImport;
 use App\Livewire\TeamCalendar;
+use App\Livewire\TelegramConnect;
 use App\Livewire\TrainingDetail;
 
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,7 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('training/{id}', TrainingDetail::class)->name('training.detail');
     Route::get('match/{id}', MatchDetail::class)->name('match.detail');
     Route::get('admin/activity-log', ActivityLog::class)->name('admin.activity-log');
+    Route::get('settings/telegram', TelegramConnect::class)->name('settings.telegram');
 });
 
 // Telegram webhook (публичный)

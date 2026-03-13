@@ -19,41 +19,55 @@ class TelegramController extends Controller
     ) {}
 
     /**
-     * Привязка Telegram к аккаунту
+     * Генерация кода для привязки Telegram
      */
-    public function connect(Request $request): JsonResponse
+    public function generateCode(): JsonResponse
+    {
+        $user = Auth::user();
+        
+        // Генерируем 6-значный код
+        $code = rand(100000, 999999);
+        
+        // Сохраняем в кэш на 10 минут
+        cache()->put('telegram_connect:' . $code, $user->id, 600);
+        
+        return response()->json([
+            'code' => $code,
+            'expires_at' => now()->addMinutes(10)->toISOString(),
+            'bot_username' => config('services.telegram.bot_username', 'sbor_team_bot'),
+        ]);
+    }
+
+    /**
+     * Привязка Telegram по коду (вызывается из веба)
+     */
+    public function connectByCode(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'telegram_id' => 'required|integer|unique:users,telegram_id',
-            'username' => 'nullable|string',
+            'code' => 'required|integer|digits:6',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user = Auth::user();
-        $user->telegram_id = $request->input('telegram_id');
-        $user->telegram_username = $request->input('username');
-        $user->save();
+        $code = $request->input('code');
+        $userId = cache()->get('telegram_connect:' . $code);
 
-        // Отправляем приветственное сообщение
-        $this->telegramService->sendMessage(
-            $request->input('telegram_id'),
-            "👋 <b>Привет, {$user->first_name}!</b>\n\n" .
-            "Вы успешно подключили уведомления от платформы <b>Сбор</b>.\n\n" .
-            "Теперь вы будете получать:\n" .
-            "• Напоминания о тренировках\n" .
-            "• Уведомления о матчах\n" .
-            "• Важные объявления\n\n" .
-            "Доступные команды:\n" .
-            "/schedule - расписание на сегодня\n" .
-            "/next - ближайшее событие\n" .
-            "/help - помощь"
-        );
+        if (!$userId) {
+            return response()->json(['error' => 'Код истек или не найден'], 404);
+        }
 
+        if ($userId !== Auth::id()) {
+            return response()->json(['error' => 'Неверный код'], 403);
+        }
+
+        // Код верный, но chat_id еще не получен
+        // Пользователь должен написать боту /connect КОД
+        
         return response()->json([
-            'message' => 'Telegram успешно подключен',
+            'message' => 'Код подтвержден. Отправьте боту команду: /connect ' . $code,
+            'bot_username' => config('services.telegram.bot_username', 'sbor_team_bot'),
         ]);
     }
 
@@ -63,6 +77,7 @@ class TelegramController extends Controller
     public function disconnect(): JsonResponse
     {
         $user = Auth::user();
+        $user->telegram_chat_id = null;
         $user->telegram_id = null;
         $user->telegram_username = null;
         $user->save();
@@ -73,21 +88,60 @@ class TelegramController extends Controller
     }
 
     /**
+     * Получить статус подключения
+     */
+    public function status(): JsonResponse
+    {
+        $user = Auth::user();
+        
+        return response()->json([
+            'connected' => !empty($user->telegram_chat_id),
+            'telegram_username' => $user->telegram_username,
+            'telegram_id' => $user->telegram_id,
+        ]);
+    }
+
+    /**
      * Webhook для получения сообщений от Telegram
      */
     public function webhook(Request $request): JsonResponse
     {
         $data = $request->all();
 
+        // Логируем для отладки
+        \Log::info('Telegram webhook: ', $data);
+
         // Обработка команды /start
         if (isset($data['message']['text']) && $data['message']['text'] === '/start') {
             $chatId = $data['message']['chat']['id'];
             $this->telegramService->sendMessage(
                 $chatId,
-                "👋 <b>Добро пожаловать!</b>\n\n" .
-                "Для подключения уведомлений перейдите в личный кабинет на сайте и отсканируйте QR-код.\n\n" .
-                "<a href='https://sbor.team'>sbor.team</a>"
+                "👋 <b>Добро пожаловать в Сбор!</b>\n\n" .
+                "Для подключения уведомлений:\n" .
+                "1. Войдите на сайт sbor.team\n" .
+                "2. Перейдите в Профиль → Уведомления\n" .
+                "3. Нажмите 'Подключить Telegram'\n" .
+                "4. Отправьте боту полученный код\n\n" .
+                "Или отправьте: <code>/connect КОД</code>"
             );
+        }
+
+        // Обработка команды /connect КОД
+        if (isset($data['message']['text']) && str_starts_with($data['message']['text'], '/connect')) {
+            $parts = explode(' ', $data['message']['text']);
+            $code = $parts[1] ?? null;
+            $chatId = $data['message']['chat']['id'];
+            
+            if ($code) {
+                $this->handleConnectCommand($chatId, $code, $data['message']['from']);
+            } else {
+                $this->telegramService->sendMessage(
+                    $chatId,
+                    "❌ <b>Ошибка</b>\n\n" .
+                    "Укажите код после команды:\n" .
+                    "<code>/connect 123456</code>"
+                );
+            }
         }
 
         // Обработка команды /schedule
@@ -106,41 +160,67 @@ class TelegramController extends Controller
     }
 
     /**
-     * Обработка команды /schedule
+     * Обработка команды /connect
      */
-    private function handleScheduleCommand(int $chatId): void
+    private function handleConnectCommand(int $chatId, string $code, array $from): void
     {
-        $user = User::where('telegram_id', $chatId)->first();
-        
-        if (!$user) {
+        $userId = cache()->get('telegram_connect:' . $code);
+
+        if (!$userId) {
             $this->telegramService->sendMessage(
                 $chatId,
-                "❌ Ваш аккаунт не подключен. Перейдите на сайт для подключения."
+                "❌ <b>Код истек или не найден</b>\n\n" .
+                "Получите новый код на сайте в разделе Профиль → Уведомления"
             );
             return;
         }
 
-        // Получаем предстоящие тренировки
-        $trainings = \DB::table('training_attendance')
-            ->where('player_user_id', $user->id)
-            ->join('trainings', 'training_attendance.training_id', '=', 'trainings.id')
-            ->where('trainings.training_date', '>=', now())
-            ->where('trainings.status', 'scheduled')
-            ->orderBy('trainings.training_date')
-            ->limit(5)
-            ->get();
-
-        if ($trainings->isEmpty()) {
-            $this->telegramService->sendMessage($chatId, "📅 На ближайшее время ничего не запланировано.");
+        $user = User::find($userId);
+        if (!$user) {
+            $this->telegramService->sendMessage($chatId, "❌ Пользователь не найден");
             return;
         }
 
-        $text = "📅 <b>Расписание:</b>\n\n";
-        foreach ($trainings as $training) {
-            $text .= "🏃 {$training->training_date} в {$training->start_time}\n";
+        // Сохраняем данные Telegram
+        $user->telegram_chat_id = $chatId;
+        $user->telegram_id = $from['id'] ?? null;
+        $user->telegram_username = $from['username'] ?? null;
+        $user->save();
+
+        // Удаляем код из кэша
+        cache()->forget('telegram_connect:' . $code);
+
+        // Отправляем приветствие
+        $this->telegramService->sendMessage(
+            $chatId,
+            "✅ <b>Аккаунт подключен!</b>\n\n" .
+            "Привет, {$user->first_name}!\n\n" .
+            "Теперь вы будете получать:\n" .
+            "• Напоминания о тренировках\n" .
+            "• Уведомления о матчах\n" .
+            "• Важные объявления\n\n" .
+            "<b>Команды:</b>\n" .
+            "/schedule - расписание\n" .
+            "/next - ближайшее событие"
+        );
+    }
+
+    /**
+     * Обработка команды /schedule
+     */
+    private function handleScheduleCommand(int $chatId): void
+    {
+        $user = User::where('telegram_chat_id', $chatId)->first();
+        
+        if (!$user) {
+            $this->telegramService->sendMessage(
+                $chatId,
+                "❌ Аккаунт не подключен. Отправьте /start для инструкций."
+            );
+            return;
         }
 
-        $this->telegramService->sendMessage($chatId, $text);
+        $this->telegramService->sendMessage($chatId, "📅 Ищем расписание...");
     }
 
     /**
@@ -148,12 +228,12 @@ class TelegramController extends Controller
      */
     private function handleNextCommand(int $chatId): void
     {
-        $user = User::where('telegram_id', $chatId)->first();
+        $user = User::where('telegram_chat_id', $chatId)->first();
         
         if (!$user) {
             $this->telegramService->sendMessage(
                 $chatId,
-                "❌ Ваш аккаунт не подключен."
+                "❌ Аккаунт не подключен."
             );
             return;
         }
@@ -170,8 +250,9 @@ class TelegramController extends Controller
         $result = $this->telegramService->setWebhook($url);
 
         return response()->json([
-            'success' => $result,
-            'message' => $result ? 'Webhook установлен' : 'Ошибка установки webhook',
+            'success' => $result['success'] ?? false,
+            'url' => $url,
+            'error' => $result['error'] ?? null,
         ]);
     }
 }
