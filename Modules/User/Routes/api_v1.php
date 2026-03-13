@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\User\Http\Controllers\V1\CoachAchievementController;
 use Modules\User\Http\Controllers\V1\CoachController;
 use Modules\User\Http\Controllers\V1\PlayerController;
 use Modules\User\Http\Controllers\V1\UserController;
@@ -37,4 +38,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('coaches/{id}', [CoachController::class, 'show'])->middleware('permission:coaches.view');
     Route::put('coaches/{id}', [CoachController::class, 'update'])->middleware('permission:coaches.update');
     Route::delete('coaches/{id}', [CoachController::class, 'destroy'])->middleware('permission:coaches.delete');
+
+    // ── Достижения тренера ───────────────────────────────────────────
+    Route::get('coaches/{id}/achievements', [CoachAchievementController::class, 'index'])
+        ->middleware('permission:coaches.view');
+    Route::post('coaches/{id}/achievements', [CoachAchievementController::class, 'store'])
+        ->middleware('permission:coaches.update');
+    Route::put('coaches/{id}/achievements/{achievementId}', [CoachAchievementController::class, 'update'])
+        ->middleware('permission:coaches.update');
+    Route::delete('coaches/{id}/achievements/{achievementId}', [CoachAchievementController::class, 'destroy'])
+        ->middleware('permission:coaches.delete');
 });

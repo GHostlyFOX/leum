@@ -41,4 +41,9 @@ class CoachProfile extends Model
     {
         return $this->belongsTo(RefPosition::class, 'specialty_id');
     }
+
+    public function achievementsList()
+    {
+        return $this->hasMany(CoachAchievement::class, 'coach_profile_id')->orderBy('year', 'desc');
+    }
 }

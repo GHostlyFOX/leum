@@ -12,7 +12,13 @@ use App\Livewire\Onboarding;
 use App\Livewire\Settings;
 use App\Livewire\JoinRequests;
 use App\Livewire\ClubSearch;
+use App\Livewire\ActivityLog;
+use App\Livewire\CoachAchievements;
+use App\Livewire\MatchDetail;
+use App\Livewire\ParentDashboard;
 use App\Livewire\PlayerImport;
+use App\Livewire\TeamCalendar;
+use App\Livewire\TrainingDetail;
 
 use Illuminate\Support\Facades\Route;
 
@@ -54,4 +60,14 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('settings', Settings::class);
     Route::get('join-requests', JoinRequests::class)->name('join.requests');
     Route::get('players/import', PlayerImport::class)->name('players.import');
+    Route::get('parent/dashboard', ParentDashboard::class)->name('parent.dashboard');
+    Route::get('coach/{coachId}/achievements', CoachAchievements::class)->name('coach.achievements');
+    Route::get('team/calendar', TeamCalendar::class)->name('team.calendar');
+    Route::get('training/{id}', TrainingDetail::class)->name('training.detail');
+    Route::get('match/{id}', MatchDetail::class)->name('match.detail');
+    Route::get('admin/activity-log', ActivityLog::class)->name('admin.activity-log');
 });
+
+// Telegram webhook (публичный)
+Route::post('/telegram/webhook', [\Modules\Auth\Http\Controllers\TelegramController::class, 'webhook'])
+    ->name('telegram.webhook');
