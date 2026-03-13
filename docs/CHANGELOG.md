@@ -9,6 +9,56 @@
 
 ### Added
 
+#### Импорт/Экспорт данных (Фаза 1)
+- **Импорт игроков из CSV:**
+  - `app/Services/Import/PlayerImportService.php` — сервис импорта с валидацией
+  - `Modules/Team/Http/Controllers/V1/ImportExportController.php` — API контроллер
+  - `app/Livewire/PlayerImport.php` — Livewire компонент
+  - `resources/views/livewire/player-import.blade.php` — шаблон с drag-n-drop
+  - Маршрут: `/players/import` — страница импорта
+  - API: `POST /teams/{teamId}/players/import` — загрузка файла
+  - API: `GET /teams/players/import/template` — скачивание шаблона
+  - Поддержка позиций: Вратарь, Защитник, Полузащитник, Нападающий
+  - Поддержка рабочей ноги: левая, правая, обе
+  - Автоматическое создание родителей при указании в файле
+  
+- **Экспорт данных:**
+  - `app/Services/Export/PlayerExportService.php` — экспорт списка игроков
+  - `app/Services/Export/AttendanceExportService.php` — экспорт посещаемости
+  - API: `GET /teams/{teamId}/players/export` — CSV со списком игроков
+  - API: `GET /teams/{teamId}/attendance/export` — CSV с посещаемостью
+  
+- **PDF документы:**
+  - `app/Services/PDF/TournamentApplicationPdfGenerator.php` — генератор заявочных листов
+  - `Modules/Team/Http/Controllers/V1/PdfController.php` — PDF контроллер
+  - API: `GET /tournaments/{tournamentId}/teams/{teamId}/application.pdf` — заявочный лист
+  - API: `GET /teams/{teamId}/roster.pdf` — состав команды
+  - HTML шаблоны с фирменным стилем (цвета #8fbd56)
+
+#### Роуты Import/Export
+- Обновлен `Modules/Team/Routes/api_v1.php` — добавлены endpoints для импорта/экспорта и PDF
+
+### Changed
+
+#### Исключен функционал
+- **Управление документами игроков** исключено из проекта по бизнес-решению
+  - Удалена вкладка "Документы" из ТЗ
+  - Паспорта, медицинские справки, страховки — не реализуются
+  - Основной профиль игрока: ФИО, дата рождения, фото, пол, позиция, контакты
+  - Обновлено `docs/TZ.md`
+
+#### План разработки v1.0 (обновлен)
+- **Фаза 1** (текущая): Импорт/экспорт данных + PDF (1.5-2 недели)
+- **Фаза 2**: UI/UX профили и страницы событий (1.5-2 недели)  
+- **Фаза 3**: Уведомления и интеграции (1-1.5 недели)
+- Исключена фаза "Документы игрока" (экономия 2-3.5 недели)
+
+---
+
+## [2026-03-13]
+
+### Added
+
 #### Дашборд для тренера
 - **Дашборд тренера** (`/dashboard` для роли `coach`):
   - Список тренировок на текущую неделю с деталями (время, место)
@@ -53,10 +103,19 @@
 - **Инструкции по настройке:** `docs/EMAIL_SETUP.md`
 - Поддержка SMTP: Gmail, Yandex, Mail.ru, SendGrid, Mailgun
 
+#### Документация для AI-агентов
+- **Создан `docs/AGENTS.md`** — правила работы с проектом:
+  - Все изменения только в `docs/CHANGELOG.md`
+  - Структура проекта: `docs/`, `database/`, `Modules/`
+  - UI Guidelines обязательны (`docs/ui-guidelines.md`)
+  - Форматирование кода
+
 ### Changed
 
 - Добавлена колонка `members_count` в карточки команд на дашборде администратора
 - Улучшен UI страницы команды с вкладками для разных разделов
+- Обновлено ТЗ (`docs/TZ.md`) — исключен раздел "Документы"
+- Обновлена дорожная карта (`docs/c4/roadmap.md`) — добавлена Фаза 4a (Импорт/Экспорт), указаны не реализованные функции
 
 ### Fixed
 

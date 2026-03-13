@@ -12,6 +12,7 @@ use App\Livewire\Onboarding;
 use App\Livewire\Settings;
 use App\Livewire\JoinRequests;
 use App\Livewire\ClubSearch;
+use App\Livewire\PlayerImport;
 
 use Illuminate\Support\Facades\Route;
 
@@ -52,4 +53,5 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('profile', Profile::class);
     Route::get('settings', Settings::class);
     Route::get('join-requests', JoinRequests::class)->name('join.requests');
+    Route::get('players/import', PlayerImport::class)->name('players.import');
 });

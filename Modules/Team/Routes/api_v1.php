@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Team\Http\Controllers\V1\ImportExportController;
 use Modules\Team\Http\Controllers\V1\InviteController;
+use Modules\Team\Http\Controllers\V1\PdfController;
 use Modules\Team\Http\Controllers\V1\SeasonController;
 use Modules\Team\Http\Controllers\V1\TeamController;
 
@@ -29,6 +31,28 @@ Route::middleware('auth:sanctum')->group(function () {
     // Управление составом
     Route::post('teams/{teamId}/members', [TeamController::class, 'addMember'])
         ->middleware('permission:teams.members');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Import / Export
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    Route::post('teams/{teamId}/players/import', [ImportExportController::class, 'importPlayers'])
+        ->middleware('permission:teams.update');
+    Route::get('teams/players/import/template', [ImportExportController::class, 'downloadTemplate'])
+        ->middleware('permission:teams.view');
+    Route::get('teams/{teamId}/players/export', [ImportExportController::class, 'exportPlayers'])
+        ->middleware('permission:teams.view');
+    Route::get('teams/{teamId}/attendance/export', [ImportExportController::class, 'exportAttendance'])
+        ->middleware('permission:teams.view');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PDF Documents
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    Route::get('teams/{teamId}/roster.pdf', [PdfController::class, 'teamRoster'])
+        ->middleware('permission:teams.view');
+    Route::get('tournaments/{tournamentId}/teams/{teamId}/application.pdf', [PdfController::class, 'tournamentApplication'])
+        ->middleware('permission:teams.view');
 
     // ═══════════════════════════════════════════════════════════════════════════
     // Seasons
