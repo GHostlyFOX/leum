@@ -118,7 +118,22 @@
                                 <circle cx="9" cy="7" r="4"></circle>
                             </svg>
                             <span class="fw-semibold" style="color: #4a7a25;">{{ $team->members_count }}</span>
-                            <span class="text-muted">{{ pluralize_players($team->members_count) }}</span>
+                            <span class="text-muted">
+                                @php
+                                    $count = $team->members_count;
+                                    $lastDigit = $count % 10;
+                                    $lastTwoDigits = $count % 100;
+                                    if ($lastTwoDigits >= 11 && $lastTwoDigits <= 19) {
+                                        echo 'игроков';
+                                    } elseif ($lastDigit === 1) {
+                                        echo 'игрок';
+                                    } elseif ($lastDigit >= 2 && $lastDigit <= 4) {
+                                        echo 'игрока';
+                                    } else {
+                                        echo 'игроков';
+                                    }
+                                @endphp
+                            </span>
                         </div>
                     </div>
 
