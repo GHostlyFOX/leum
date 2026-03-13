@@ -50,10 +50,10 @@ class TelegramService
     /**
      * Установить webhook
      */
-    public function setWebhook(string $url): bool
+    public function setWebhook(string $url): array
     {
         if (empty($this->botToken)) {
-            return false;
+            return ['success' => false, 'error' => 'Token not configured'];
         }
 
         try {
@@ -61,10 +61,16 @@ class TelegramService
                 'url' => $url,
             ]);
 
-            return $response->successful();
+            $data = $response->json();
+            
+            if ($response->successful() && ($data['ok'] ?? false)) {
+                return ['success' => true, 'result' => $data['result'] ?? true];
+            }
+            
+            return ['success' => false, 'error' => $data['description'] ?? 'Unknown error'];
         } catch (\Exception $e) {
             Log::error('Telegram set webhook error: ' . $e->getMessage());
-            return false;
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 
