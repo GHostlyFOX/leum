@@ -106,7 +106,7 @@
                             </div>
                             <div>
                                 <h5 class="fw-bold mb-1" style="color: #1f2937;">{{ $team->name }}</h5>
-                                <small class="text-muted">{{ $team->birth_year }} г.р. • {{ $team->gender === 'male' ? 'Мужская' : 'Женская' }}</small>
+                                <small class="text-muted">{{ $team->birth_year }} г.р. • {{ match($team->gender) { 'boys' => 'Мальчики', 'girls' => 'Девочки', 'mixed' => 'Смешанная', default => 'Не указан' } }}</small>
                             </div>
                         </div>
                     </div>
