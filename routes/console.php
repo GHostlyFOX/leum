@@ -20,7 +20,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Telegram webhook command
-Artisan::command('telegram:set-webhook {--url= : URL для webhook}', function ($url) {
+Artisan::command('telegram:set-webhook {url?}', function (?string $url) {
     $url = $url ?: config('app.url') . '/telegram/webhook';
     
     $this->info("Установка webhook: {$url}");
