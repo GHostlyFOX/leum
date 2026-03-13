@@ -96,7 +96,7 @@
     <!-- Tabs -->
     <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
         <div class="card-body p-0">
-            <ul class="nav nav-tabs nav-fill" id="teamTabs" role="tablist">
+            <ul class="nav nav-tabs" id="teamTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab">
                         <i class="fe fe-users me-2"></i>Состав

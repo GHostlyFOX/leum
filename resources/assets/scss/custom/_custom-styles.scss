@@ -5432,18 +5432,21 @@ div.dataTables_wrapper div.dataTables_length label {
 
 
 /* ============================================
-   JUSTIFIED NAV TABS - стиль табов по ширине
+   NAV TABS - стиль табов по содержимому
    ============================================ */
 
-/* Стиль табов как в шаблоне NOA */
+/* Стиль табов как в шаблоне NOA - ширина по содержимому */
 .nav-tabs {
     padding: 0;
     background: transparent;
     border-bottom: 1px solid #eaedf1;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0;
     
     .nav-item {
         position: relative;
-        flex: 1;
+        flex: 0 0 auto;
         text-align: center;
         margin: 0;
     }
@@ -5453,9 +5456,10 @@ div.dataTables_wrapper div.dataTables_length label {
         color: #5d5d68 !important;
         border-radius: 0;
         font-weight: 500;
-        padding: 15px 20px;
+        padding: 15px 30px;
         position: relative;
-        width: 100%;
+        width: auto;
+        white-space: nowrap;
         transition: all 0.3s ease;
         
         i {

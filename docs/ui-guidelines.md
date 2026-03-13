@@ -319,7 +319,7 @@ input[type="checkbox"] {
 ```html
 <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
     <div class="card-body p-0">
-        <ul class="nav nav-tabs nav-fill" id="myTabs" role="tablist">
+        <ul class="nav nav-tabs" id="myTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#content1" type="button" role="tab">
                     <i class="fe fe-icon me-2"></i>Название таба
@@ -342,8 +342,9 @@ input[type="checkbox"] {
 
 **CSS классы (Bootstrap + NOA шаблон):**
 - `.nav-tabs` — базовый класс для табов
-- `.nav-fill` — равномерное распределение табов по ширине (flex: 1)
-- `.nav-link.active` — активный таб с анимированным подчёркиванием
+- `.nav-link.active` — активный таб с подчёркиванием
+- Табы имеют ширину по содержимому (`flex: 0 0 auto`)
+- Отступы внутри таба: `padding: 15px 30px`
 
 **Характеристики стиля (NOA):**
 - **Активный таб**: цвет `$primary` (#8fbd56), подчёркивание снизу через `:before` с `transform: scaleX(1)`
@@ -372,7 +373,7 @@ $primary: #8fbd56;
 <!-- На странице детальной команды -->
 <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
     <div class="card-body p-0">
-        <ul class="nav nav-tabs nav-fill" id="teamTabs" role="tablist">
+        <ul class="nav nav-tabs" id="teamTabs" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button">
                     <i class="fe fe-users me-2"></i>Состав
