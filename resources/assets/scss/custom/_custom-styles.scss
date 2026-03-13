@@ -5435,66 +5435,103 @@ div.dataTables_wrapper div.dataTables_length label {
    JUSTIFIED NAV TABS - стиль табов по ширине
    ============================================ */
 
-.nav-tabs-justified {
-    display: flex;
-    width: 100%;
-    border-bottom: none;
+/* Стиль табов как в шаблоне NOA - с анимированным подчёркиванием */
+.nav-tabs {
+    padding: 0;
+    background: transparent;
+    border-bottom: 1px solid #eaedf1;
     
     .nav-item {
+        position: relative;
         flex: 1;
         text-align: center;
         margin: 0;
     }
     
     .nav-link {
-        width: 100%;
-        border: none;
-        border-bottom: 2px solid transparent;
-        background: transparent;
-        color: #6b7280;
-        font-weight: 500;
-        padding: 16px 12px;
-        transition: all 0.2s ease;
+        border: none !important;
+        color: #5d5d68 !important;
         border-radius: 0;
-        white-space: nowrap;
+        font-weight: 500;
+        padding: 15px 20px;
+        position: relative;
+        width: 100%;
+        transition: all 0.3s ease;
         
-        &:hover {
-            color: #8fbd56;
-            background: rgba(143, 189, 86, 0.05);
-            border-bottom-color: #e5e7eb;
+        i {
+            color: #5d5d68 !important;
+            margin-right: 8px;
+        }
+        
+        /* Анимированное подчёркивание снизу */
+        &:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: $primary;
+            transform: scaleX(0);
+            transition: all 0.3s ease;
+        }
+        
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: transparent !important;
+            color: #1f2427 !important;
+            
+            &:before {
+                transform: scaleX(0.5);
+            }
         }
         
         &.active {
-            color: #8fbd56;
-            background: rgba(143, 189, 86, 0.08);
-            border-bottom-color: #8fbd56;
-            font-weight: 600;
+            color: $primary !important;
+            background-color: transparent !important;
+            
+            i {
+                color: $primary !important;
+            }
+            
+            &:before {
+                transform: scaleX(1);
+            }
         }
+    }
+}
+
+/* Обёртка для табов в карточке (опционально) */
+.nav-tabs-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 0;
+    overflow: hidden;
+    
+    .nav-tabs {
+        border-bottom: none;
         
-        i {
-            font-size: 1.1rem;
+        .nav-link {
+            padding: 20px 15px;
         }
     }
 }
 
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
-    .nav-tabs-justified {
-        flex-wrap: wrap;
-        
-        .nav-item {
-            flex: 1 1 auto;
-            min-width: 120px;
-        }
-        
+    .nav-tabs {
         .nav-link {
             padding: 12px 8px;
             font-size: 0.85rem;
             
             i {
                 display: block;
+                text-align: center;
+                margin-right: 0;
                 margin-bottom: 4px;
-                margin-right: 0 !important;
+                font-size: 1.1rem;
             }
         }
     }

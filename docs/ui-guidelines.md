@@ -313,13 +313,13 @@ input[type="checkbox"] {
 
 ### Justified Nav Tabs (основной стиль)
 
-Используется для навигации по разделам на детальных страницах (команда, турнир и т.д.). Табы занимают всю доступную ширину и распределяются равномерно.
+Используется для навигации по разделам на детальных страницах (команда, турнир и т.д.). Табы занимают всю доступную ширину и распределяются равномерно. Стиль основан на шаблоне NOA с анимированным подчёркиванием активного таба.
 
 **HTML структура:**
 ```html
 <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
     <div class="card-body p-0">
-        <ul class="nav nav-tabs nav-tabs-justified" id="myTabs" role="tablist">
+        <ul class="nav nav-tabs nav-fill" id="myTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#content1" type="button" role="tab">
                     <i class="fe fe-icon me-2"></i>Название таба
@@ -340,20 +340,53 @@ input[type="checkbox"] {
 </div>
 ```
 
-**CSS классы:**
-- `.nav-tabs-justified` — равномерное распределение по ширине
-- `.nav-link.active` — активный таб (зелёный цвет + подчёркивание)
+**CSS классы (Bootstrap + NOA шаблон):**
+- `.nav-tabs` — базовый класс для табов
+- `.nav-fill` — равномерное распределение табов по ширине (flex: 1)
+- `.nav-link.active` — активный таб с анимированным подчёркиванием
 
-**Характеристики:**
-- Равномерное распределение табов по ширине контейнера
-- Активный таб: зелёный цвет `#8fbd56`, полупрозрачный фон, подчёркивание снизу
-- Неактивный таб: серый текст `#6b7280`, подсветка при наведении
-- Иконки Feather Icons перед текстом (опционально)
-- Обёртка в карточку с `border-radius: 14px` и тенью
+**Характеристики стиля (NOA):**
+- **Активный таб**: цвет `$primary` (#8fbd56), анимированное подчёркивание снизу через `:before` с `transform: scaleX(1)`
+- **Неактивный таб**: серый текст `#5d5d68`, при наведении подчёркивание на 50% ширины
+- **Анимация**: плавное появление подчёркивания через `transition: all 0.3s ease`
+- **Иконки**: цвет наследуется от текста таба, используются Feather Icons (`fe fe-*`)
+- **Обёртка**: карточка с `border-radius: 14px` и тенью
+
+**Переменные SCSS:**
+```scss
+// Основной цвет табов (используется $primary из проекта)
+$primary: #8fbd56;
+
+// Цвета текста
+.nav-link { color: #5d5d68; }           // Неактивный
+.nav-link.active { color: $primary; }   // Активный
+```
 
 **Мобильная адаптация:**
-- На экранах < 768px иконки переносятся над текстом
-- Табы переносятся на новую строку при необходимости
+- На экранах < 768px иконки переносятся над текстом (`display: block`)
+- Текст и иконки центрируются
+- Уменьшенные отступы (`padding: 12px 8px`)
+
+**Пример использования:**
+```blade
+<!-- На странице детальной команды -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill" id="teamTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button">
+                    <i class="fe fe-users me-2"></i>Состав
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="coaches-tab" data-bs-toggle="tab" data-bs-target="#coaches" type="button">
+                    <i class="fe fe-user-check me-2"></i>Тренеры
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+```
 
 ---
 
