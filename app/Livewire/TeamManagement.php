@@ -20,7 +20,7 @@ class TeamManagement extends Component
     // Form fields
     public string $teamName = '';
     public ?int $teamBirthYear = null;
-    public ?string $teamGender = 'male';
+    public ?string $teamGender = 'boys';
     public string $teamColor = '#8fbd56';
     public ?int $editingTeamId = null;
     
@@ -32,7 +32,7 @@ class TeamManagement extends Component
     protected array $rules = [
         'teamName' => 'required|string|max:255',
         'teamBirthYear' => 'required|integer|min:2000|max:2030',
-        'teamGender' => 'required|in:male,female',
+        'teamGender' => 'required|in:boys,girls,mixed',
         'teamColor' => 'required|string|size:7',
     ];
 
@@ -166,7 +166,7 @@ class TeamManagement extends Component
     {
         $this->teamName = '';
         $this->teamBirthYear = null;
-        $this->teamGender = 'male';
+        $this->teamGender = 'boys';
         $this->teamColor = '#8fbd56';
         $this->resetValidation();
     }

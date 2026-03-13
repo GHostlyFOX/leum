@@ -214,8 +214,9 @@
                                 <label class="form-label fw-semibold">Пол <span class="text-danger">*</span></label>
                                 <select wire:model="teamGender" class="form-select @error('teamGender') is-invalid @enderror"
                                         style="border-radius: 10px; border: 2px solid #e5e7eb; padding: 12px 16px;">
-                                    <option value="male">Мужская</option>
-                                    <option value="female">Женская</option>
+                                    <option value="boys">Мальчики</option>
+                                    <option value="girls">Девочки</option>
+                                    <option value="mixed">Смешанная</option>
                                 </select>
                                 @error('teamGender') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
