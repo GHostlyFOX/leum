@@ -20,7 +20,7 @@ class TeamManagement extends Component
     // Form fields
     public string $teamName = '';
     public ?int $teamBirthYear = null;
-    public ?string $teamGender = 'boys';
+    public string $teamGender = 'boys';
     public string $teamColor = '#8fbd56';
     public ?int $editingTeamId = null;
     
@@ -41,6 +41,8 @@ class TeamManagement extends Component
         'teamBirthYear.required' => 'Укажите год рождения',
         'teamBirthYear.min' => 'Год должен быть не ранее 2000',
         'teamBirthYear.max' => 'Год должен быть не позднее 2030',
+        'teamGender.required' => 'Выберите пол команды',
+        'teamGender.in' => 'Выберите пол из списка: Мальчики, Девочки или Смешанная',
     ];
 
     public function mount()
@@ -78,7 +80,7 @@ class TeamManagement extends Component
 
         $this->teamName = $team->name;
         $this->teamBirthYear = $team->birth_year;
-        $this->teamGender = $team->gender ?? 'male';
+        $this->teamGender = $team->gender ?? 'boys';
         $this->teamColor = $team->team_color ?? '#8fbd56';
         $this->editingTeamId = $teamId;
         $this->showForm = true;
