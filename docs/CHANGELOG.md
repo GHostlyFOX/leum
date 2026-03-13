@@ -7,9 +7,64 @@
 
 ## [Unreleased]
 
+**Git Commit:** `10bc555` — feat: Фаза 2 и Фаза 3 - UI/UX, уведомления и журнал активности  
 **Git Commit:** `a5ae557` — feat: импорт/экспорт данных и PDF документы (Фаза 1)
 
 ### Added
+
+#### Фаза 3 - Уведомления и интеграции
+
+**Email-напоминания:**
+- `app/Console/Commands/SendEventReminders.php` — команда отправки напоминаний
+- `resources/views/email_templates/training_reminder.blade.php` — шаблон письма
+- Команда: `php artisan send:event-reminders --hours=24`
+- Напоминания о тренировках за 24 часа
+
+**Telegram бот:**
+- `app/Services/Telegram/TelegramService.php` — сервис для отправки сообщений
+- `Modules/Auth/Http/Controllers/TelegramController.php` — API для подключения
+- Поддержка команд: /start, /schedule, /next
+- Webhook для получения сообщений: `/telegram/webhook`
+- API: `POST /telegram/connect`, `/telegram/disconnect`
+
+**Журнал активности (Audit Log):**
+- `app/Models/ActivityLog.php` — модель журнала
+- `app/Livewire/ActivityLog.php` — UI компонент
+- `resources/views/livewire/activity-log.blade.php` — шаблон с фильтрами
+- Таблица: `activity_log` с полями: user_id, action, entity_type, old_values, new_values
+- Маршрут: `/admin/activity-log`
+- Поддержка действий: create, update, delete, login, export, import
+
+#### Фаза 2 - Расширение профилей и UI
+
+**Управление достижениями тренера:**
+- Миграция: `coach_achievements` таблица
+- `Modules/User/Models/CoachAchievement.php` — модель
+- `Modules/User/Http/Controllers/V1/CoachAchievementController.php` — API
+- `app/Livewire/CoachAchievements.php` — UI компонент
+- API: `GET/POST/PUT/DELETE /coaches/{id}/achievements`
+- Маршрут: `/coach/{coachId}/achievements`
+- Таймлайн достижений по годам
+
+**Дашборд родителя:**
+- `app/Livewire/ParentDashboard.php` — компонент
+- `resources/views/livewire/parent-dashboard.blade.php` — шаблон
+- Маршрут: `/parent/dashboard`
+- Список детей с переключением
+- Статистика посещаемости за 30 дней (круговая диаграмма)
+- Предстоящие тренировки с RSVP статусом
+
+**Детальные страницы:**
+- Тренировка: `/training/{id}` — информация, посещаемость с возможностью отметки
+- Матч: `/match/{id}` — счет, события (голы, карточки), состав команды
+- Календарь: `/team/calendar` — месячный вид с тренировками и матчами
+
+**Миграции Фазы 2-3:**
+- `2025_06_20_000010_create_coach_achievements_table.php`
+- `2025_06_20_000011_add_telegram_to_users_table.php`
+- `2025_06_20_000012_create_activity_log_table.php`
+
+#### Фаза 1 - Импорт/Экспорт данных
 
 #### Импорт/Экспорт данных (Фаза 1)
 - **Импорт игроков из CSV:**
