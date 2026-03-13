@@ -20,7 +20,7 @@ class TeamManagement extends Component
     // Form fields
     public string $teamName = '';
     public ?int $teamBirthYear = null;
-    public string $teamGender = 'male';
+    public ?string $teamGender = 'male';
     public string $teamColor = '#8fbd56';
     public ?int $editingTeamId = null;
     
@@ -78,7 +78,7 @@ class TeamManagement extends Component
 
         $this->teamName = $team->name;
         $this->teamBirthYear = $team->birth_year;
-        $this->teamGender = $team->gender;
+        $this->teamGender = $team->gender ?? 'male';
         $this->teamColor = $team->team_color ?? '#8fbd56';
         $this->editingTeamId = $teamId;
         $this->showForm = true;
@@ -175,7 +175,8 @@ class TeamManagement extends Component
     {
         $teams = Team::where('club_id', $this->clubId)
             ->withCount(['members' => function ($query) {
-                $query->where('is_active', true);
+                $query->where('is_active', true)
+                      ->where('role_id', 10); // только игроки
             }])
             ->orderBy('name')
             ->paginate(10);

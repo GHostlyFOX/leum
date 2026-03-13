@@ -367,7 +367,7 @@
                             <small>{{ $club->name ?? '' }}</small>
                             <div class="mt-1">
                                 <span class="badge bg-light text-dark">
-                                    <i class="fe fe-user me-1"></i>{{ $team->members_count ?? 0 }} игроков
+                                    <i class="fe fe-user me-1"></i>{{ $team->members_count ?? 0 }} {{ pluralize_players($team->members_count ?? 0) }}
                                 </span>
                             </div>
                         </div>
@@ -671,7 +671,7 @@
                 <div class="card-header bg-white border-0 pt-4 px-4">
                     <h5 class="fw-bold mb-0">
                         <i class="fe fe-users text-success me-2"></i>Мои команды
-                        <span class="badge bg-light text-dark ms-2">{{ $totalPlayers }} игроков</span>
+                        <span class="badge bg-light text-dark ms-2">{{ $totalPlayers }} {{ pluralize_players($totalPlayers) }}</span>
                     </h5>
                 </div>
                 <div class="card-body px-4">
@@ -691,7 +691,7 @@
                                                     {{ mb_strtoupper(mb_substr($team->name, 0, 1)) }}
                                                 </div>
                                                 <h6 class="fw-bold mb-1" style="font-size: 0.9rem; color: #1f2937;">{{ $team->name }}</h6>
-                                                <small class="text-muted">{{ $team->members_count }} игроков</small>
+                                                <small class="text-muted">{{ $team->members_count }} {{ pluralize_players($team->members_count) }}</small>
                                             </div>
                                         </div>
                                     </a>

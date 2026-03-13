@@ -118,7 +118,7 @@
                                 <circle cx="9" cy="7" r="4"></circle>
                             </svg>
                             <span class="fw-semibold" style="color: #4a7a25;">{{ $team->members_count }}</span>
-                            <span class="text-muted">игроков</span>
+                            <span class="text-muted">{{ pluralize_players($team->members_count) }}</span>
                         </div>
                     </div>
 
