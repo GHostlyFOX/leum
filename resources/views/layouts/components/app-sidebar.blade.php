@@ -114,18 +114,6 @@
                         </a>
                     </li>
 
-                    {{-- Инвайты --}}
-                    <li class="slide">
-                        <a class="side-menu__item has-link" href="{{url('club/invites')}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                <line x1="9" y1="10" x2="15" y2="10"></line>
-                                <line x1="12" y1="7" x2="12" y2="13"></line>
-                            </svg>
-                            <span class="side-menu__label">Приглашения</span>
-                        </a>
-                    </li>
-
                     {{-- Заявки на вступление --}}
                     <li class="slide">
                         <a class="side-menu__item has-link" href="{{route('join.requests')}}">
@@ -139,7 +127,7 @@
                         </a>
                     </li>
 
-                    {{-- Приглашения --}}
+                    {{-- Приглашения по ссылке --}}
                     <li class="slide">
                         <a class="side-menu__item has-link" href="{{route('club.invites')}}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -155,46 +143,49 @@
                      ТРЕНЕР + АДМИН
                 ═══════════════════════════════════════════════════════════════ --}}
                 @if(in_array($role, ['admin', 'coach']))
-                    <li>
-                        <h3>Управление командой</h3>
-                    </li>
+                    {{-- Для coach показываем команды и заявки (для admin они уже в секции «Управление клубом») --}}
+                    @if($role === 'coach')
+                        <li>
+                            <h3>Управление командой</h3>
+                        </li>
 
-                    {{-- Мои команды --}}
-                    <li class="slide">
-                        <a class="side-menu__item has-link" href="{{route('club.teams')}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                            <span class="side-menu__label">Мои команды</span>
-                        </a>
-                    </li>
+                        {{-- Мои команды --}}
+                        <li class="slide">
+                            <a class="side-menu__item has-link" href="{{route('club.teams')}}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="side-menu__label">Мои команды</span>
+                            </a>
+                        </li>
 
-                    {{-- Заявки на вступление --}}
-                    <li class="slide">
-                        <a class="side-menu__item has-link" href="{{route('join.requests')}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="8.5" cy="7" r="4"></circle>
-                                <line x1="20" y1="8" x2="20" y2="14"></line>
-                                <line x1="23" y1="11" x2="17" y2="11"></line>
-                            </svg>
-                            <span class="side-menu__label">Заявки на вступление</span>
-                        </a>
-                    </li>
+                        {{-- Заявки на вступление --}}
+                        <li class="slide">
+                            <a class="side-menu__item has-link" href="{{route('join.requests')}}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                                <span class="side-menu__label">Заявки на вступление</span>
+                            </a>
+                        </li>
 
-                    {{-- Приглашения --}}
-                    <li class="slide">
-                        <a class="side-menu__item has-link" href="{{route('club.invites')}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                            <span class="side-menu__label">Приглашения</span>
-                        </a>
-                    </li>
+                        {{-- Приглашения --}}
+                        <li class="slide">
+                            <a class="side-menu__item has-link" href="{{route('club.invites')}}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                                <span class="side-menu__label">Приглашения</span>
+                            </a>
+                        </li>
+                    @endif
 
                     <li>
                         <h3>Тренировочный процесс</h3>

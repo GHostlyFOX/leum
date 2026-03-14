@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire;
+namespace Modules\Training\Livewire;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +24,7 @@ class TrainingCalendar extends Component
     {
         $user = Auth::user();
         $membership = TeamMember::where('user_id', $user->id)
-            ->whereIn('role_id', [7, 8]) // admin or coach
+            ->whereIn('role_id', [7, 8])
             ->first();
 
         if (!$membership) {
@@ -62,7 +62,6 @@ class TrainingCalendar extends Component
 
     private function loadCalendarData()
     {
-        // Get trainings for the current month
         $startDate = Carbon::createFromDate($this->currentYear, $this->currentMonth, 1)->startOfDay();
         $endDate = $startDate->clone()->endOfMonth()->endOfDay();
 
@@ -93,7 +92,6 @@ class TrainingCalendar extends Component
             ];
         }
 
-        // Add days of the month
         for ($day = 1; $day <= $lastDay->day; $day++) {
             $date = Carbon::createFromDate($this->currentYear, $this->currentMonth, $day);
             $dateString = $date->format('Y-m-d');
@@ -107,8 +105,7 @@ class TrainingCalendar extends Component
             ];
         }
 
-        // Add empty days for days after month ends
-        $remainingDays = 42 - count($this->calendarDays); // 6 rows * 7 days
+        $remainingDays = 42 - count($this->calendarDays);
         for ($i = 0; $i < $remainingDays; $i++) {
             $this->calendarDays[] = [
                 'date' => null,
@@ -127,7 +124,7 @@ class TrainingCalendar extends Component
             9 => 'Сентябрь', 10 => 'Октябрь', 11 => 'Ноябрь', 12 => 'Декабрь',
         ];
 
-        return view('livewire.training-calendar', [
+        return view('training::livewire.training-calendar', [
             'monthName' => $months[$this->currentMonth] ?? '',
         ]);
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire;
+namespace Modules\Tournament\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -28,7 +28,7 @@ class TournamentCreate extends Component
     {
         $user = Auth::user();
         $membership = TeamMember::where('user_id', $user->id)
-            ->whereIn('role_id', [7, 8]) // admin or coach
+            ->whereIn('role_id', [7, 8])
             ->first();
 
         if (!$membership) {
@@ -37,12 +37,10 @@ class TournamentCreate extends Component
 
         $this->clubId = $membership->club_id;
 
-        // Load tournament types
         $this->tournamentTypes = RefTournamentType::all()
             ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
             ->toArray();
 
-        // Set default dates
         $this->startsAt = now()->format('Y-m-d');
         $this->endsAt = now()->addDays(7)->format('Y-m-d');
     }
@@ -85,6 +83,6 @@ class TournamentCreate extends Component
 
     public function render()
     {
-        return view('livewire.tournament-create');
+        return view('tournament::livewire.tournament-create');
     }
 }

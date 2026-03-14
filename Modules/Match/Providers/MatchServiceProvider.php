@@ -3,6 +3,8 @@
 namespace Modules\Match\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
+use Modules\Match\Livewire\MatchList;
 
 class MatchServiceProvider extends ServiceProvider
 {
@@ -12,6 +14,12 @@ class MatchServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerViews();
+        $this->registerLivewireComponents();
+    }
+
+    protected function registerLivewireComponents(): void
+    {
+        Livewire::component('match.match-list', MatchList::class);
     }
 
     public function register(): void

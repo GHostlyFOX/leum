@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire;
+namespace Modules\Tournament\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -36,16 +36,14 @@ class TournamentDetail extends Component
             'matches.opponent',
         ])->findOrFail($this->tournamentId);
 
-        // Проверка прав через TeamMember
         $user = Auth::user();
         $this->canEdit = $this->tournament->club_id
             ? TeamMember::where('user_id', $user->id)
                 ->where('club_id', $this->tournament->club_id)
-                ->whereIn('role_id', [7, 8]) // admin or coach
+                ->whereIn('role_id', [7, 8])
                 ->exists()
             : false;
 
-        // Команды турнира
         $this->teams = $this->tournament->tournamentTeams
             ->map(fn($tt) => [
                 'id' => $tt->id,
@@ -55,7 +53,6 @@ class TournamentDetail extends Component
             ])
             ->toArray();
 
-        // Матчи турнира
         $this->matches = $this->tournament->matches
             ->sortBy('created_at')
             ->map(fn($m) => [
@@ -70,6 +67,6 @@ class TournamentDetail extends Component
 
     public function render()
     {
-        return view('livewire.tournament-detail');
+        return view('tournament::livewire.tournament-detail');
     }
 }

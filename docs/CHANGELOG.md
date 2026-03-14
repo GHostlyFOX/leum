@@ -9,6 +9,55 @@
 
 ### Added
 
+**Этап 1 — Критические исправления:**
+- `Modules/Club/Routes/web.php` — добавлены маршруты `club.team.edit`, `club.team.update`, `club.team.delete`
+- `Modules/Club/Http/Controllers/ClubController.php` — методы `teamEdit()`, `teamUpdate()`, `teamDelete()`
+- `Modules/Club/Resources/views/team/edit.blade.php` — форма редактирования команды
+  - Маршрут: `/club/team/{id}/edit`
+- `Modules/Team/Models/InviteLink.php` — добавлен алиас `creator()` для relationship `createdBy()`
+- `database/migrations/2025_06_21_000001_add_club_id_to_tournaments_and_opponents.php` — добавлена колонка `club_id` в таблицы `tournaments` и `opponents`
+- `Modules/Tournament/Models/Tournament.php` — добавлены `club_id` в fillable и relationship `club()`
+- `Modules/Match/Models/Opponent.php` — добавлен `club_id` в fillable
+- `app/Livewire/MatchCreate.php` — исправлен запрос: `end_date` → `ends_at`, добавлен fallback через `tournament_teams`
+
+**Этап 2 — Модуль «Тренировки» (Modules/Training/):**
+- `Modules/Training/Livewire/TrainingList.php` — список тренировок с фильтрами
+  - Маршрут: `/trainings`
+- `Modules/Training/Livewire/TrainingCalendar.php` — календарь тренировок
+  - Маршрут: `/trainings/calendar`
+- `Modules/Training/Livewire/RecurringTrainings.php` — шаблоны расписания
+  - Маршрут: `/trainings/recurring`
+- `Modules/Training/Livewire/VenueList.php` — управление площадками (CRUD)
+  - Маршрут: `/venues`
+- `Modules/Training/Resources/views/livewire/` — blade-шаблоны для всех компонентов
+- `Modules/Training/Routes/web.php` — web-маршруты модуля
+- `Modules/Training/Providers/TrainingServiceProvider.php` — регистрация Livewire-компонентов
+
+**Этап 2 — Модуль «Матчи» (Modules/Match/):**
+- `Modules/Match/Livewire/MatchList.php` — список матчей с фильтрами
+  - Маршрут: `/matches`
+- `Modules/Match/Resources/views/livewire/match-list.blade.php` — blade-шаблон
+- `Modules/Match/Routes/web.php` — web-маршруты модуля
+- `Modules/Match/Providers/MatchServiceProvider.php` — регистрация Livewire-компонентов
+
+**Этап 2 — Модуль «Турниры» (Modules/Tournament/):**
+- `Modules/Tournament/Livewire/TournamentList.php` — список турниров с фильтром по году
+  - Маршрут: `/tournaments`
+- `Modules/Tournament/Livewire/TournamentCreate.php` — создание турнира
+  - Маршрут: `/tournaments/create`
+- `Modules/Tournament/Livewire/TournamentDetail.php` — детали турнира
+  - Маршрут: `/tournament/{id}`
+- `Modules/Tournament/Resources/views/livewire/` — blade-шаблоны
+- `Modules/Tournament/Routes/web.php` — web-маршруты модуля
+- `Modules/Tournament/Providers/TournamentServiceProvider.php` — регистрация Livewire-компонентов
+
+### Fixed
+
+- Исправлены дублирующиеся пункты меню в сайдбаре для роли admin (убраны 3 дубля «Приглашения», 2 дубля «Заявки», дубль «Команды»/«Мои команды»)
+- `resources/views/layouts/components/app-sidebar.blade.php` — секция «Управление командой» отображается только для coach, admin видит всё в «Управление клубом»
+- `Modules/Club/Resources/views/team/show.blade.php` — исправлена переменная `$trainingsThisWeek` → `$weekTrainings->count()`
+- `.env.example` — добавлен комментарий о необходимости `APP_DEBUG=false` на продакшене
+
 **Модальное окно "Создать событие" на дашборде:**
 - `app/Livewire/Dashboard.php` — добавлены методы для работы с модальным окном
 - `resources/views/livewire/index.blade.php` — добавлено модальное окно выбора типа события

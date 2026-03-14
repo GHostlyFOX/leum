@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire;
+namespace Modules\Tournament\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -24,7 +24,7 @@ class TournamentList extends Component
     {
         $user = Auth::user();
         $membership = TeamMember::where('user_id', $user->id)
-            ->whereIn('role_id', [7, 8]) // admin or coach
+            ->whereIn('role_id', [7, 8])
             ->first();
 
         if (!$membership) {
@@ -33,7 +33,6 @@ class TournamentList extends Component
 
         $this->clubId = $membership->club_id;
 
-        // Load available years from tournaments (PostgreSQL syntax)
         $this->years = Tournament::where(function ($q) {
                 $q->where('club_id', $this->clubId)
                   ->orWhereHas('tournamentTeams', fn($sub) => $sub->where('club_id', $this->clubId));
@@ -44,7 +43,6 @@ class TournamentList extends Component
             ->pluck('year')
             ->toArray();
 
-        // Set current year as default filter if available
         $currentYear = now()->year;
         if (in_array($currentYear, $this->years)) {
             $this->filterYear = $currentYear;
@@ -53,10 +51,7 @@ class TournamentList extends Component
         }
     }
 
-    public function updatingFilterYear()
-    {
-        $this->resetPage();
-    }
+    public function updatingFilterYear() { $this->resetPage(); }
 
     public function render()
     {
@@ -70,10 +65,9 @@ class TournamentList extends Component
             $query->whereRaw('EXTRACT(YEAR FROM starts_at) = ?', [$this->filterYear]);
         }
 
-        $tournaments = $query->orderBy('starts_at', 'desc')
-            ->paginate(12);
+        $tournaments = $query->orderBy('starts_at', 'desc')->paginate(12);
 
-        return view('livewire.tournament-list', [
+        return view('tournament::livewire.tournament-list', [
             'tournaments' => $tournaments,
         ]);
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire;
+namespace Modules\Training\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -23,7 +23,7 @@ class VenueList extends Component
     {
         $user = Auth::user();
         $membership = TeamMember::where('user_id', $user->id)
-            ->whereIn('role_id', [7, 8]) // admin or coach
+            ->whereIn('role_id', [7, 8])
             ->first();
 
         if (!$membership) {
@@ -95,6 +95,6 @@ class VenueList extends Component
 
     public function render()
     {
-        return view('livewire.venue-list');
+        return view('training::livewire.venue-list');
     }
 }

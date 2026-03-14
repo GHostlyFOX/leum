@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire;
+namespace Modules\Training\Livewire;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -28,7 +28,7 @@ class TrainingList extends Component
     {
         $user = Auth::user();
         $membership = TeamMember::where('user_id', $user->id)
-            ->whereIn('role_id', [7, 8]) // admin or coach
+            ->whereIn('role_id', [7, 8])
             ->first();
 
         if (!$membership) {
@@ -37,32 +37,16 @@ class TrainingList extends Component
 
         $this->clubId = $membership->club_id;
 
-        // Load teams
         $this->teams = Team::where('club_id', $this->clubId)
             ->get()
             ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
             ->toArray();
     }
 
-    public function updatingFilterTeamId()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFilterStatus()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFilterDateFrom()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFilterDateTo()
-    {
-        $this->resetPage();
-    }
+    public function updatingFilterTeamId() { $this->resetPage(); }
+    public function updatingFilterStatus() { $this->resetPage(); }
+    public function updatingFilterDateFrom() { $this->resetPage(); }
+    public function updatingFilterDateTo() { $this->resetPage(); }
 
     public function render()
     {
@@ -72,15 +56,12 @@ class TrainingList extends Component
         if ($this->filterTeamId) {
             $query->where('team_id', $this->filterTeamId);
         }
-
         if ($this->filterStatus) {
             $query->where('status', $this->filterStatus);
         }
-
         if ($this->filterDateFrom) {
             $query->whereDate('training_date', '>=', $this->filterDateFrom);
         }
-
         if ($this->filterDateTo) {
             $query->whereDate('training_date', '<=', $this->filterDateTo);
         }
@@ -89,7 +70,7 @@ class TrainingList extends Component
             ->orderBy('start_time', 'desc')
             ->paginate(10);
 
-        return view('livewire.training-list', [
+        return view('training::livewire.training-list', [
             'trainings' => $trainings,
         ]);
     }

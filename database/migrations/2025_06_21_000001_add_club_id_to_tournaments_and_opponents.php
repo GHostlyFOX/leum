@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -22,12 +23,16 @@ return new class extends Migration
             $table->index('club_id', 'idx_tournaments_club');
         });
 
+        DB::statement("COMMENT ON COLUMN tournaments.club_id IS 'Клуб-создатель турнира (nullable для общих турниров)'");
+
         // opponents: добавляем club_id (nullable, соперник может быть общим)
         Schema::table('opponents', function (Blueprint $table) {
             $table->unsignedBigInteger('club_id')->nullable()->after('name');
             $table->foreign('club_id')->references('id')->on('clubs')->nullOnDelete();
             $table->index('club_id', 'idx_opponents_club');
         });
+
+        DB::statement("COMMENT ON COLUMN opponents.club_id IS 'Клуб, добавивший соперника (nullable для общих соперников)'");
     }
 
     public function down(): void
