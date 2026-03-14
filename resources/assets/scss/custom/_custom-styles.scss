@@ -5461,10 +5461,14 @@ div.dataTables_wrapper div.dataTables_length label {
         width: auto;
         white-space: nowrap;
         transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         
         i {
             color: #5d5d68 !important;
             margin-right: 8px;
+            flex-shrink: 0;
         }
         
         /* Подчёркивание снизу только для активного таба */
