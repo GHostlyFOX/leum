@@ -67,9 +67,12 @@ class MatchCreate extends Component
             ->map(fn($v) => ['id' => $v->id, 'name' => $v->name])
             ->toArray();
 
-        // Load tournaments
-        $this->tournaments = Tournament::where('club_id', $this->clubId)
-            ->where('end_date', '>=', now())
+        // Load tournaments (по прямой связи club_id или через tournament_teams)
+        $this->tournaments = Tournament::where(function ($q) {
+                $q->where('club_id', $this->clubId)
+                  ->orWhereHas('tournamentTeams', fn($sub) => $sub->where('club_id', $this->clubId));
+            })
+            ->where('ends_at', '>=', now())
             ->get()
             ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
             ->toArray();
@@ -108,7 +111,7 @@ class MatchCreate extends Component
             'matchDate' => 'required|date',
             'matchTime' => 'required',
             'halfDuration' => 'required|integer|min:10|max:60',
-            'halvesCount' => 'required|integer|min:1|max=4',
+            'halvesCount' => 'required|integer|min:1|max:4',
             'selectedVenueId' => 'nullable|exists:venues,id',
         ];
 

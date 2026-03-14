@@ -3,6 +3,7 @@
 namespace Modules\Tournament\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Club\Models\Club;
 use Modules\File\Models\File;
 use Modules\Match\Models\GameMatch;
 use Modules\Reference\Models\RefTournamentType;
@@ -12,7 +13,7 @@ class Tournament extends Model
     protected $table = 'tournaments';
 
     protected $fillable = [
-        'tournament_type_id', 'name', 'logo_file_id',
+        'tournament_type_id', 'name', 'club_id', 'logo_file_id',
         'starts_at', 'ends_at', 'half_duration_minutes',
         'halves_count', 'organizer',
     ];
@@ -25,6 +26,11 @@ class Tournament extends Model
         'created_at'            => 'datetime',
         'updated_at'            => 'datetime',
     ];
+
+    public function club()
+    {
+        return $this->belongsTo(Club::class, 'club_id');
+    }
 
     public function tournamentType()
     {

@@ -78,7 +78,7 @@
                         <i class="fe fe-calendar fs-4"></i>
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-0">{{ $trainingsThisWeek ?? 0 }}</h3>
+                        <h3 class="fw-bold mb-0">{{ isset($weekTrainings) && $weekTrainings instanceof \Countable ? $weekTrainings->count() : 0 }}</h3>
                         <small class="text-muted">Тренировок на неделе</small>
                     </div>
                 </div>

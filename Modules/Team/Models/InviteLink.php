@@ -63,6 +63,14 @@ class InviteLink extends Model
     }
 
     /**
+     * Алиас для createdBy (используется в InviteManagement)
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->createdBy();
+    }
+
+    /**
      * Проверка, не истекла ли ссылка
      */
     public function isExpired(): bool

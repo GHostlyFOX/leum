@@ -268,6 +268,84 @@ class ClubController extends Controller
         ));
     }
 
+    /**
+     * Форма редактирования команды.
+     */
+    public function teamEdit($id)
+    {
+        $team = Team::with('club')->findOrFail($id);
+
+        $user = Auth::user();
+        $hasAccess = TeamMember::where('user_id', $user->id)
+            ->where('club_id', $team->club_id)
+            ->whereIn('role_id', [7, 8])
+            ->exists();
+
+        if (!$hasAccess && ($user->global_role ?? null) !== 'admin') {
+            return redirect()->route('club.teams')
+                ->with('error', 'У вас нет доступа к редактированию этой команды');
+        }
+
+        $sportTypes = \Modules\Reference\Models\RefSportType::orderBy('name')->get();
+
+        return view('club::team.edit', compact('team', 'sportTypes'));
+    }
+
+    /**
+     * Обновление команды.
+     */
+    public function teamUpdate(Request $request, $id)
+    {
+        $team = Team::findOrFail($id);
+
+        $user = Auth::user();
+        $hasAccess = TeamMember::where('user_id', $user->id)
+            ->where('club_id', $team->club_id)
+            ->whereIn('role_id', [7, 8])
+            ->exists();
+
+        if (!$hasAccess && ($user->global_role ?? null) !== 'admin') {
+            return redirect()->route('club.teams')
+                ->with('error', 'У вас нет доступа');
+        }
+
+        $validated = $request->validate([
+            'name'       => 'required|string|max:255',
+            'birth_year' => 'required|integer|min:2000|max:' . date('Y'),
+            'gender'     => 'required|in:boys,girls,mixed',
+            'team_color' => 'nullable|string|max:7',
+        ]);
+
+        $team->update($validated);
+
+        return redirect()->route('club.team.show', $team->id)
+            ->with('success', 'Команда обновлена');
+    }
+
+    /**
+     * Удаление команды.
+     */
+    public function teamDelete($id)
+    {
+        $team = Team::findOrFail($id);
+
+        $user = Auth::user();
+        $hasAccess = TeamMember::where('user_id', $user->id)
+            ->where('club_id', $team->club_id)
+            ->where('role_id', 7) // только admin может удалять
+            ->exists();
+
+        if (!$hasAccess && ($user->global_role ?? null) !== 'admin') {
+            return redirect()->route('club.teams')
+                ->with('error', 'Только администратор может удалить команду');
+        }
+
+        $team->delete();
+
+        return redirect()->route('club.teams')
+            ->with('success', 'Команда удалена');
+    }
+
     public function create()
     {
         return view('club::create');

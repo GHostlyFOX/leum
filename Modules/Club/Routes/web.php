@@ -23,6 +23,9 @@ Route::prefix('club')->middleware(['auth', 'onboarded'])->group(function () {
     // Команды (Livewire)
     Route::get('/teams',           TeamManagement::class)->name('club.teams');
     Route::get('/team/{id}',       [ClubController::class, 'teamShow'])->name('club.team.show');
+    Route::get('/team/{id}/edit',  [ClubController::class, 'teamEdit'])->name('club.team.edit');
+    Route::put('/team/{id}',       [ClubController::class, 'teamUpdate'])->name('club.team.update');
+    Route::delete('/team/{id}',    [ClubController::class, 'teamDelete'])->name('club.team.delete');
     
     // Сотрудники
     Route::get('/staff',           ClubStaff::class)->name('club.staff');

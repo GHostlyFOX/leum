@@ -11,7 +11,7 @@ class Opponent extends Model
     protected $table = 'opponents';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'city_id', 'country_id'];
+    protected $fillable = ['name', 'club_id', 'city_id', 'country_id'];
 
     protected $casts = [
         'created_at' => 'datetime',
