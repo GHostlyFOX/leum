@@ -296,7 +296,7 @@
                 <p>Создайте тренировку или матч вручную, или импортируйте расписание.</p>
                 @unless($hasEvents)
                     <div class="d-flex align-items-center gap-2 mt-2 flex-wrap">
-                        <a href="{{ url('trainings') }}" class="btn btn-sm btn-create-event">Создать событие</a>
+                        <button wire:click="openCreateEventModal" class="btn btn-sm btn-create-event">Создать событие</button>
                         <span class="text-muted">или</span>
                         <a href="{{ url('trainings/recurring') }}" class="btn btn-sm btn-import">Импорт расписания</a>
                     </div>
@@ -381,7 +381,7 @@
 
     {{-- Модальное окно приглашений --}}
     @if($showInviteModal)
-        @livewire('invite-modal', ['teamId' => $inviteTeamId], key('invite-modal'))
+        @livewire('invite-modal', ['teamId' => $inviteTeamId, 'role' => $inviteRole], key('invite-modal-' . ($inviteTeamId ?? '0') . '-' . ($inviteRole ?? 'null')))
     @endif
 
     {{-- Модальное окно создания сезона (из онбординга) --}}
@@ -425,6 +425,87 @@
                 <button wire:click="createSeason" wire:loading.attr="disabled" style="flex: 1; background: #6366f1; border: none; color: #fff; font-weight: 600; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">
                     <span wire:loading.remove wire:target="createSeason">Создать</span>
                     <span wire:loading wire:target="createSeason">Создание...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Модальное окно создания события --}}
+    @if($showCreateEventModal)
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1050; display: flex; align-items: center; justify-content: center;" wire:click.self="closeCreateEventModal">
+        <div style="background: #fff; border-radius: 16px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden; animation: inviteSlideUp 0.25s ease-out;" @click.stop>
+            <div style="padding: 20px 24px 0; display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="font-weight: 700; font-size: 1.15rem; margin: 0;">Создать событие</h5>
+                <button wire:click="closeCreateEventModal" style="background: none; border: none; color: #9ca3af; cursor: pointer;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div style="padding: 20px 24px;">
+                <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;">Выберите тип события:</p>
+                
+                <div class="d-grid gap-3">
+                    {{-- Объявление --}}
+                    <button wire:click="selectEventType('announcement')" 
+                            class="btn text-start p-3 {{ $selectedEventType === 'announcement' ? 'border-2 border-success' : 'border' }}" 
+                            style="border-radius: 12px; background: {{ $selectedEventType === 'announcement' ? '#f0fdf4' : '#fff' }}; border-color: {{ $selectedEventType === 'announcement' ? '#8fbd56' : '#e5e7eb' }};">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 44px; height: 44px; background: #fef3c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold mb-1" style="color: #1f2937;">Объявление</h6>
+                                <small style="color: #6b7280;">Опубликовать новость для команды</small>
+                            </div>
+                        </div>
+                    </button>
+
+                    {{-- Тренировка --}}
+                    <button wire:click="selectEventType('training')" 
+                            class="btn text-start p-3 {{ $selectedEventType === 'training' ? 'border-2 border-success' : 'border' }}" 
+                            style="border-radius: 12px; background: {{ $selectedEventType === 'training' ? '#f0fdf4' : '#fff' }}; border-color: {{ $selectedEventType === 'training' ? '#8fbd56' : '#e5e7eb' }};">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 44px; height: 44px; background: #e8f5d6; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a7a25" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold mb-1" style="color: #1f2937;">Тренировка</h6>
+                                <small style="color: #6b7280;">Запланировать тренировку</small>
+                            </div>
+                        </div>
+                    </button>
+
+                    {{-- Матч --}}
+                    <button wire:click="selectEventType('match')" 
+                            class="btn text-start p-3 {{ $selectedEventType === 'match' ? 'border-2 border-success' : 'border' }}" 
+                            style="border-radius: 12px; background: {{ $selectedEventType === 'match' ? '#f0fdf4' : '#fff' }}; border-color: {{ $selectedEventType === 'match' ? '#8fbd56' : '#e5e7eb' }};">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 44px; height: 44px; background: #dbeafe; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <h6 class="fw-semibold mb-1" style="color: #1f2937;">Матч</h6>
+                                <small style="color: #6b7280;">Создать игру или турнир</small>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div style="padding: 16px 24px 20px; display: flex; gap: 10px;">
+                <button wire:click="closeCreateEventModal" style="flex: 1; background: #fff; border: 1.5px solid #e5e7eb; color: #374151; font-weight: 600; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">Отмена</button>
+                <button wire:click="createEvent" wire:loading.attr="disabled" disabled="{{ empty($selectedEventType) ? 'disabled' : '' }}" style="flex: 1; background: #8fbd56; border: none; color: #fff; font-weight: 600; padding: 10px; border-radius: 10px; cursor: {{ empty($selectedEventType) ? 'not-allowed' : 'pointer' }}; font-size: 0.9rem; opacity: {{ empty($selectedEventType) ? '0.6' : '1' }};">
+                    <span wire:loading.remove wire:target="createEvent">Продолжить</span>
+                    <span wire:loading wire:target="createEvent">Создание...</span>
                 </button>
             </div>
         </div>

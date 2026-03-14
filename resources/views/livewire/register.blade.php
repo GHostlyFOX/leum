@@ -519,10 +519,11 @@
                     </div>
                 @else
                     <div class="logo-upload-area">
-                        <input type="file" wire:model="teamLogo" accept="image/*">
+                        <input type="file" wire:model="teamLogo" accept="image/png,image/jpeg,image/jpg,image/gif" max-size="2048">
                         <div class="upload-icon"><i class="fe fe-upload"></i></div>
                         <div class="upload-text">Нажмите для загрузки логотипа</div>
                     </div>
+                    <div class="text-muted small mt-1">Максимальный размер: 2 МБ (PNG, JPG, GIF)</div>
                     <div wire:loading wire:target="teamLogo" class="text-muted small mt-2">Загрузка...</div>
                 @endif
                 @error('teamLogo') <div class="text-danger small mt-1">{{ $message }}</div> @enderror

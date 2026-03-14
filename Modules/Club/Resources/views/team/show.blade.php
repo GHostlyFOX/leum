@@ -19,7 +19,7 @@
                 </div>
                 <div>
                     <h1 class="page-title fw-bold mb-1">{{ $team->name }}</h1>
-                    <p class="text-muted mb-0">{{ $team->birth_year }} г.р. • {{ $team->gender === 'male' ? 'Мужская' : 'Женская' }}</p>
+                    <p class="text-muted mb-0">{{ $team->birth_year }} г.р. • {{ match($team->gender) { 'boys' => 'Мальчики', 'girls' => 'Девочки', 'mixed' => 'Смешанная', default => 'Не указан' } }}</p>
                 </div>
             </div>
         </div>
@@ -27,9 +27,16 @@
             <a href="{{ route('club.teams') }}" class="btn btn-outline-secondary">
                 <i class="fe fe-arrow-left me-1"></i> Назад
             </a>
-            <button wire:click="$dispatch('open-invite-modal', { teamId: {{ $team->id }} })" class="btn btn-success">
-                <i class="fe fe-user-plus me-1"></i> Пригласить игрока
+            <a href="{{ route('club.team.edit', $team->id) }}" class="btn btn-outline-primary">
+                <i class="fe fe-edit-2 me-1"></i> Редактировать
+            </a>
+            <button onclick="if(confirm('Вы уверены, что хотите удалить эту команду?')) { document.getElementById('delete-team-form').submit(); }" class="btn btn-outline-danger">
+                <i class="fe fe-trash-2 me-1"></i> Удалить
             </button>
+            <form id="delete-team-form" action="{{ route('club.team.delete', $team->id) }}" method="POST" class="d-none">
+                @csrf
+                @method('DELETE')
+            </form>
         </div>
     </div>
 
@@ -93,13 +100,67 @@
         </div>
     </div>
 
+    <!-- Announcements Section (Separate block) -->
+    @if(isset($announcements) && $announcements->count() > 0)
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fe fe-bell me-2 text-warning"></i>Объявления</h5>
+            <a href="{{ url('announcements/create') }}" class="btn btn-sm btn-success">
+                <i class="fe fe-plus me-1"></i>Новое
+            </a>
+        </div>
+        <div class="card-body px-4">
+            <div id="announcementsCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @foreach($announcements as $index => $announcement)
+                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                        <div class="p-3 rounded-3" style="background: #f9fafb;">
+                            <h6 class="fw-bold mb-2">{{ $announcement->title }}</h6>
+                            <p class="text-muted mb-2">{{ Str::limit($announcement->content, 200) }}</p>
+                            <small class="text-muted">{{ $announcement->created_at?->diffForHumans() }}</small>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @if($announcements->count() > 1)
+                <button class="carousel-control-prev" type="button" data-bs-target="#announcementsCarousel" data-bs-slide="prev" style="width: 40px;">
+                    <span class="carousel-control-prev-icon" style="filter: invert(1) grayscale(100);"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#announcementsCarousel" data-bs-slide="next" style="width: 40px;">
+                    <span class="carousel-control-next-icon" style="filter: invert(1) grayscale(100);"></span>
+                </button>
+                @endif
+            </div>
+        </div>
+    </div>
+    @else
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fe fe-bell me-2 text-warning"></i>Объявления</h5>
+            <a href="{{ url('announcements/create') }}" class="btn btn-sm btn-success">
+                <i class="fe fe-plus me-1"></i>Добавить
+            </a>
+        </div>
+        <div class="card-body px-4 py-3">
+            <div class="text-center text-muted py-2">
+                <small>Пока нет объявлений</small>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Tabs -->
     <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
         <div class="card-body p-0">
             <ul class="nav nav-tabs" id="teamTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab">
-                        <i class="fe fe-users me-2"></i>Состав
+                    <button class="nav-link active" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab">
+                        <i class="fe fe-calendar me-2"></i>Расписание
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tournaments-tab" data-bs-toggle="tab" data-bs-target="#tournaments" type="button" role="tab">
+                        <i class="fe fe-trophy me-2"></i>Турниры
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -108,18 +169,8 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab">
-                        <i class="fe fe-calendar me-2"></i>Расписание
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements" type="button" role="tab">
-                        <i class="fe fe-bell me-2"></i>Объявления
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tournaments-tab" data-bs-toggle="tab" data-bs-target="#tournaments" type="button" role="tab">
-                        <i class="fe fe-trophy me-2"></i>Турниры
+                    <button class="nav-link" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab">
+                        <i class="fe fe-users me-2"></i>Состав
                     </button>
                 </li>
             </ul>
@@ -127,94 +178,43 @@
     </div>
 
     <div class="tab-content" id="teamTabsContent">
-        <!-- Players Tab -->
-        <div class="tab-pane fade show active" id="players" role="tabpanel">
+        <!-- Schedule Tab (Active by default) -->
+        <div class="tab-pane fade show active" id="schedule" role="tabpanel">
             <div class="card border-0 shadow-sm" style="border-radius: 16px;">
                 <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0">Состав команды</h5>
-                    @if($players->count() > 0)
-                        <span class="badge bg-success">{{ $players->count() }} игроков</span>
-                    @endif
+                    <h5 class="fw-bold mb-0">Расписание на неделю</h5>
+                    <a href="{{ url('trainings/create') }}" class="btn btn-sm btn-success">
+                        <i class="fe fe-plus me-1"></i>Добавить тренировку
+                    </a>
                 </div>
                 <div class="card-body px-4">
-                    @if($players->isEmpty())
+                    @if(empty($weekTrainings) || $weekTrainings->isEmpty())
                         <div class="text-center py-5 text-muted">
-                            <i class="fe fe-users fs-1 mb-3 d-block opacity-25"></i>
-                            <h5>В команде пока нет игроков</h5>
-                            <p class="mb-3">Пригласите игроков, чтобы начать работу с командой</p>
-                            <button class="btn btn-success" wire:click="$dispatch('open-invite-modal', { teamId: {{ $team->id }} })">
-                                <i class="fe fe-user-plus me-2"></i>Пригласить игроков
-                            </button>
+                            <i class="fe fe-calendar fs-1 mb-3 d-block opacity-25"></i>
+                            <h5>Нет тренировок на этой неделе</h5>
+                            <a href="{{ url('trainings/create') }}" class="btn btn-success mt-2">Запланировать тренировку</a>
                         </div>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Игрок</th>
-                                        <th>Роль</th>
-                                        <th>В команде с</th>
-                                        <th>Статус</th>
-                                        <th class="text-end">Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($players as $member)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="rounded-circle d-flex align-items-center justify-content-center" 
-                                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #8fbd56 0%, #6d9e3a 100%); color: #fff; font-weight: 600;">
-                                                        {{ mb_strtoupper(mb_substr($member->user?->first_name ?? '?', 0, 1)) }}
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-semibold">{{ $member->user?->full_name ?? 'Неизвестно' }}</div>
-                                                        <small class="text-muted">{{ $member->user?->email }}</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-light text-dark">
-                                                    {{ match($member->role_id) {
-                                                        6 => 'Игрок',
-                                                        9 => 'Родитель',
-                                                        10 => 'Ассистент',
-                                                        default => 'Участник'
-                                                    } }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $member->joined_at?->format('d.m.Y') ?? '-' }}</td>
-                                            <td>
-                                                @if($member->is_active)
-                                                    <span class="badge bg-success">Активен</span>
-                                                @else
-                                                    <span class="badge bg-secondary">Неактивен</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-end">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                        Действия
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li><a class="dropdown-item" href="#"><i class="fe fe-user me-2"></i>Профиль</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li>
-                                                            <form action="{{ route('team.member.remove', [$team->id, $member->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Исключить игрока из команды?');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="dropdown-item text-danger">
-                                                                    <i class="fe fe-user-x me-2"></i>Исключить
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div class="list-group list-group-flush">
+                            @foreach($weekTrainings as $training)
+                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 48px; height: 48px; background: #f0fdf4; color: #8fbd56;">
+                                            <i class="fe fe-clock fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ $training->title ?? 'Тренировка' }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fe fe-calendar me-1"></i>{{ $training->start_time?->format('d.m.Y H:i') ?? '-' }}
+                                                <span class="mx-2">|</span>
+                                                <i class="fe fe-map-pin me-1"></i>{{ $training->venue?->name ?? 'Место не указано' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success">Запланировано</span>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
                 </div>
@@ -224,14 +224,21 @@
         <!-- Coaches Tab -->
         <div class="tab-pane fade" id="coaches" role="tabpanel">
             <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-                <div class="card-header bg-white border-0 pt-4 px-4">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold mb-0">Тренерский штаб</h5>
+                    <button class="btn btn-sm btn-success" onclick="Livewire.dispatch('open-invite-modal', { teamId: {{ $team->id }}, role: 'coach' })">
+                        <i class="fe fe-user-plus me-1"></i> Пригласить тренера
+                    </button>
                 </div>
                 <div class="card-body px-4">
                     @if($coaches->isEmpty())
                         <div class="text-center py-5 text-muted">
                             <i class="fe fe-user-check fs-1 mb-3 d-block opacity-25"></i>
                             <h5>Нет назначенных тренеров</h5>
+                            <p class="mb-3">Пригласите тренера для работы с командой</p>
+                            <button class="btn btn-success" onclick="Livewire.dispatch('open-invite-modal', { teamId: {{ $team->id }}, role: 'coach' })">
+                                <i class="fe fe-user-plus me-2"></i>Пригласить тренера
+                            </button>
                         </div>
                     @else
                         <div class="row g-4">
@@ -306,36 +313,6 @@
             </div>
         </div>
 
-        <!-- Announcements Tab -->
-        <div class="tab-pane fade" id="announcements" role="tabpanel">
-            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0">Объявления</h5>
-                    <a href="{{ url('announcements/create') }}" class="btn btn-sm btn-success">
-                        <i class="fe fe-plus me-1"></i>Новое объявление
-                    </a>
-                </div>
-                <div class="card-body px-4">
-                    @if(empty($announcements) || $announcements->isEmpty())
-                        <div class="text-center py-5 text-muted">
-                            <i class="fe fe-bell fs-1 mb-3 d-block opacity-25"></i>
-                            <h5>Нет объявлений</h5>
-                        </div>
-                    @else
-                        <div class="list-group list-group-flush">
-                            @foreach($announcements as $announcement)
-                                <div class="list-group-item px-0 py-3">
-                                    <h6 class="fw-bold mb-1">{{ $announcement->title }}</h6>
-                                    <p class="text-muted mb-1">{{ Str::limit($announcement->content, 150) }}</p>
-                                    <small class="text-muted">{{ $announcement->created_at?->diffForHumans() }}</small>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
         <!-- Tournaments Tab -->
         <div class="tab-pane fade" id="tournaments" role="tabpanel">
             <div class="card border-0 shadow-sm" style="border-radius: 16px;">
@@ -368,6 +345,105 @@
                                     <span class="badge bg-warning">Предстоит</span>
                                 </div>
                             @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Players Tab -->
+        <div class="tab-pane fade" id="players" role="tabpanel">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Состав команды</h5>
+                    <div class="d-flex gap-2">
+                        @if($players->count() > 0)
+                            <span class="badge bg-success">{{ $players->count() }} игроков</span>
+                        @endif
+                        <button class="btn btn-sm btn-success" onclick="Livewire.dispatch('open-invite-modal', { teamId: {{ $team->id }}, role: 'player' })">
+                            <i class="fe fe-user-plus me-1"></i> Пригласить игрока
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body px-4">
+                    @if($players->isEmpty())
+                        <div class="text-center py-5 text-muted">
+                            <i class="fe fe-users fs-1 mb-3 d-block opacity-25"></i>
+                            <h5>В команде пока нет игроков</h5>
+                            <p class="mb-3">Пригласите игроков, чтобы начать работу с командой</p>
+                            <button class="btn btn-success" onclick="Livewire.dispatch('open-invite-modal', { teamId: {{ $team->id }}, role: 'player' })">
+                                <i class="fe fe-user-plus me-2"></i>Пригласить игроков
+                            </button>
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Игрок</th>
+                                        <th>Роль</th>
+                                        <th>В команде с</th>
+                                        <th>Статус</th>
+                                        <th class="text-end">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($players as $member)
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                                         style="width: 40px; height: 40px; background: linear-gradient(135deg, #8fbd56 0%, #6d9e3a 100%); color: #fff; font-weight: 600;">
+                                                        {{ mb_strtoupper(mb_substr($member->user?->first_name ?? '?', 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold">{{ $member->user?->full_name ?? 'Неизвестно' }}</div>
+                                                        <small class="text-muted">{{ $member->user?->email }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark">
+                                                    {{ match($member->role_id) {
+                                                        6 => 'Игрок',
+                                                        9 => 'Родитель',
+                                                        10 => 'Ассистент',
+                                                        default => 'Участник'
+                                                    } }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $member->joined_at?->format('d.m.Y') ?? '-' }}</td>
+                                            <td>
+                                                @if($member->is_active)
+                                                    <span class="badge bg-success">Активен</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Неактивен</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        Действия
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li><a class="dropdown-item" href="#"><i class="fe fe-user me-2"></i>Профиль</a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <form action="{{ route('team.member.remove', [$team->id, $member->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Исключить игрока из команды?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    <i class="fe fe-user-x me-2"></i>Исключить
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     @endif
                 </div>

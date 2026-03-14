@@ -100,7 +100,7 @@
             <div class="col-md-6 col-lg-4">
                 <div class="team-card h-100">
                     <div class="d-flex align-items-start justify-content-between mb-3">
-                        <div class="d-flex align-items-center gap-3">
+                        <a href="{{ route('club.team.show', $team->id) }}" class="d-flex align-items-center gap-3 text-decoration-none">
                             <div class="team-avatar" style="background: {{ $team->team_color ?? '#8fbd56' }};">
                                 {{ mb_strtoupper(mb_substr($team->name, 0, 1)) }}
                             </div>
@@ -108,7 +108,7 @@
                                 <h5 class="fw-bold mb-1" style="color: #1f2937;">{{ $team->name }}</h5>
                                 <small class="text-muted">{{ $team->birth_year }} г.р. • {{ match($team->gender) { 'boys' => 'Мальчики', 'girls' => 'Девочки', 'mixed' => 'Смешанная', default => 'Не указан' } }}</small>
                             </div>
-                        </div>
+                        </a>
                     </div>
 
                     <div class="d-flex align-items-center gap-4 mb-3">
@@ -223,9 +223,32 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label fw-semibold">Логотип команды</label>
+                            <div class="d-flex align-items-center gap-3">
+                                @if($teamLogo)
+                                    <img src="{{ $teamLogo->temporaryUrl() }}" class="rounded-3" style="width: 64px; height: 64px; object-fit: cover;" alt="Logo preview">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" wire:click="$set('teamLogo', null)">Удалить</button>
+                                @elseif($existingLogoUrl)
+                                    <img src="{{ $existingLogoUrl }}" class="rounded-3" style="width: 64px; height: 64px; object-fit: cover;" alt="Current logo">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" wire:click="$set('existingLogoUrl', null)">Изменить</button>
+                                @else
+                                    <div class="position-relative">
+                                        <input type="file" wire:model="teamLogo" accept="image/*" class="position-absolute" style="opacity: 0; inset: 0; cursor: pointer; z-index: 2;">
+                                        <div class="rounded-3 d-flex flex-column align-items-center justify-content-center" style="width: 100px; height: 64px; border: 2px dashed #e5e7eb; background: #f9fafb;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                            <small class="text-muted mt-1" style="font-size: 0.7rem;">Загрузить</small>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                            <div wire:loading wire:target="teamLogo" class="text-muted small mt-1">Загрузка...</div>
+                            @error('teamLogo') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-semibold">Цвет команды</label>
                             <div class="d-flex gap-2 flex-wrap">
-                                @foreach(['#8fbd56', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#6b7280'] as $color)
+                                @foreach(['#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6', '#8B5CF6', '#EC4899', '#6B7280'] as $color)
                                     <div class="color-picker-circle {{ $teamColor === $color ? 'selected' : '' }}"
                                          style="background: {{ $color }};"
                                          wire:click="$set('teamColor', '{{ $color }}')">

@@ -5,8 +5,10 @@ namespace App\Livewire;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Modules\Club\Models\Club;
+use Modules\File\Services\FileService;
 use Modules\Team\Models\Team;
 use Modules\Team\Models\TeamMember;
 
@@ -14,6 +16,7 @@ use Modules\Team\Models\TeamMember;
 class TeamManagement extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     public ?int $clubId = null;
     
@@ -22,6 +25,8 @@ class TeamManagement extends Component
     public ?int $teamBirthYear = null;
     public string $teamGender = 'boys';
     public string $teamColor = '#8fbd56';
+    public $teamLogo = null;
+    public ?string $existingLogoUrl = null;
     public ?int $editingTeamId = null;
     
     // UI states
@@ -83,6 +88,8 @@ class TeamManagement extends Component
         $this->teamGender = $team->gender ?? 'boys';
         $this->teamColor = $team->team_color ?? '#8fbd56';
         $this->editingTeamId = $teamId;
+        $this->teamLogo = null;
+        $this->existingLogoUrl = $team->logoFile?->url ?? null;
         $this->showForm = true;
     }
 
@@ -94,7 +101,18 @@ class TeamManagement extends Component
 
     public function saveTeam()
     {
-        $this->validate();
+        $rules = [
+            'teamName' => 'required|string|max:255',
+            'teamBirthYear' => 'required|integer|min:2000|max:2030',
+            'teamGender' => 'required|in:boys,girls,mixed',
+            'teamColor' => 'required|string|size:7',
+        ];
+        
+        if ($this->teamLogo) {
+            $rules['teamLogo'] = 'image|max:2048';
+        }
+        
+        $this->validate($rules);
 
         $club = Club::find($this->clubId);
         
@@ -108,6 +126,12 @@ class TeamManagement extends Component
             'country_id' => $club?->country_id,
             'city_id' => $club?->city_id,
         ];
+
+        // Upload logo if provided
+        if ($this->teamLogo) {
+            $logoFile = app(FileService::class)->uploadPublic($this->teamLogo, 'teams');
+            $teamData['logo_file_id'] = $logoFile->id;
+        }
 
         if ($this->editingTeamId) {
             $team = Team::find($this->editingTeamId);
@@ -170,6 +194,8 @@ class TeamManagement extends Component
         $this->teamBirthYear = null;
         $this->teamGender = 'boys';
         $this->teamColor = '#8fbd56';
+        $this->teamLogo = null;
+        $this->existingLogoUrl = null;
         $this->resetValidation();
     }
 

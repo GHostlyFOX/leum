@@ -20,6 +20,8 @@ use App\Livewire\PlayerImport;
 use App\Livewire\TeamCalendar;
 use App\Livewire\TelegramConnect;
 use App\Livewire\TrainingDetail;
+use App\Livewire\TrainingCreate;
+use App\Livewire\MatchCreate;
 
 use Illuminate\Support\Facades\Route;
 
@@ -65,7 +67,9 @@ Route::middleware(['auth', 'onboarded'])->group(function () {
     Route::get('coach/{coachId}/achievements', CoachAchievements::class)->name('coach.achievements');
     Route::get('team/calendar', TeamCalendar::class)->name('team.calendar');
     Route::get('training/{id}', TrainingDetail::class)->name('training.detail');
+    Route::get('trainings/create', TrainingCreate::class)->name('training.create');
     Route::get('match/{id}', MatchDetail::class)->name('match.detail');
+    Route::get('matches/create', MatchCreate::class)->name('match.create');
     Route::get('admin/activity-log', ActivityLog::class)->name('admin.activity-log');
     Route::get('settings/telegram', TelegramConnect::class)->name('settings.telegram');
 });

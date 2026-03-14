@@ -96,6 +96,8 @@ class Register extends Component
         'clubName.required'   => 'Введите название клуба или лиги',
         'clubTypeId.required' => 'Выберите тип клуба',
         'sportTypeId.required' => 'Выберите вид спорта',
+        'teamLogo.image'      => 'Файл должен быть изображением',
+        'teamLogo.max'        => 'Размер файла не должен превышать 2 МБ',
     ];
 
     // ── Computed properties ─────────────────────────────────────────

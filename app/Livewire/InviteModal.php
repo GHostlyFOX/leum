@@ -29,9 +29,13 @@ class InviteModal extends Component
     public ?string $successMessage = null;
     public ?string $errorMessage = null;
 
-    public function mount(?int $teamId = null)
+    public function mount(?int $teamId = null, ?string $role = null)
     {
         $this->teamId = $teamId;
+        if ($role) {
+            $this->emailRole = $role;
+            $this->linkRole = $role;
+        }
     }
 
     public function switchTab(string $tab)

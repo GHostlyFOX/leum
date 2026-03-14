@@ -21,6 +21,10 @@ class Dashboard extends Component
     public bool $showInviteModal = false;
     public ?int $inviteTeamId = null;
 
+    // Create Event modal
+    public bool $showCreateEventModal = false;
+    public string $selectedEventType = '';
+
     // Season creation modal (from onboarding)
     public bool $showSeasonModal = false;
     public string $seasonName = '';
@@ -40,10 +44,12 @@ class Dashboard extends Component
     }
 
     // ── Invite Modal ──────────────────────────────────────────────
+    public ?string $inviteRole = null;
 
-    public function openInviteModal(?int $teamId = null)
+    public function openInviteModal(?int $teamId = null, ?string $role = null)
     {
         $this->inviteTeamId = $teamId;
+        $this->inviteRole = $role;
         $this->showInviteModal = true;
     }
 
@@ -52,6 +58,41 @@ class Dashboard extends Component
     {
         $this->showInviteModal = false;
         $this->inviteTeamId = null;
+    }
+
+    // ── Create Event Modal ────────────────────────────────────────
+
+    public function openCreateEventModal()
+    {
+        $this->showCreateEventModal = true;
+        $this->selectedEventType = '';
+    }
+
+    public function closeCreateEventModal()
+    {
+        $this->showCreateEventModal = false;
+        $this->selectedEventType = '';
+    }
+
+    public function selectEventType(string $type)
+    {
+        $this->selectedEventType = $type;
+    }
+
+    public function createEvent()
+    {
+        if (empty($this->selectedEventType)) {
+            return;
+        }
+
+        switch ($this->selectedEventType) {
+            case 'announcement':
+                return redirect()->to('/announcements/create');
+            case 'training':
+                return redirect()->to('/trainings/create');
+            case 'match':
+                return redirect()->to('/matches/create');
+        }
     }
 
     // ── Season Modal ──────────────────────────────────────────────
