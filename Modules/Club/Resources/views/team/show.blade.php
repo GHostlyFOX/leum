@@ -116,7 +116,7 @@
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                         <div class="p-3 rounded-3" style="background: #f9fafb;">
                             <h6 class="fw-bold mb-2">{{ $announcement->title }}</h6>
-                            <p class="text-muted mb-2">{{ Str::limit($announcement->content, 200) }}</p>
+                            <p class="text-muted mb-2">{{ Str::limit($announcement->message, 200) }}</p>
                             <small class="text-muted">{{ $announcement->created_at?->diffForHumans() }}</small>
                         </div>
                     </div>
@@ -206,7 +206,7 @@
                                         <div>
                                             <h6 class="fw-bold mb-1">{{ $training->title ?? 'Тренировка' }}</h6>
                                             <small class="text-muted">
-                                                <i class="fe fe-calendar me-1"></i>{{ $training->start_time?->format('d.m.Y H:i') ?? '-' }}
+                                                <i class="fe fe-calendar me-1"></i>{{ ($training->training_date?->format('d.m.Y') ?? '') . ' ' . Str::substr($training->start_time ?? '', 0, 5) }}
                                                 <span class="mx-2">|</span>
                                                 <i class="fe fe-map-pin me-1"></i>{{ $training->venue?->name ?? 'Место не указано' }}
                                             </small>
@@ -264,47 +264,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Schedule Tab -->
-        <div class="tab-pane fade" id="schedule" role="tabpanel">
-            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0">Расписание на неделю</h5>
-                    <a href="{{ url('trainings') }}" class="btn btn-sm btn-outline-success">Все тренировки</a>
-                </div>
-                <div class="card-body px-4">
-                    @if(empty($weekTrainings) || $weekTrainings->isEmpty())
-                        <div class="text-center py-5 text-muted">
-                            <i class="fe fe-calendar fs-1 mb-3 d-block opacity-25"></i>
-                            <h5>Нет тренировок на этой неделе</h5>
-                            <a href="{{ url('trainings/create') }}" class="btn btn-success mt-2">Запланировать тренировку</a>
-                        </div>
-                    @else
-                        <div class="list-group list-group-flush">
-                            @foreach($weekTrainings as $training)
-                                <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-3 d-flex align-items-center justify-content-center" 
-                                             style="width: 48px; height: 48px; background: #f0fdf4; color: #8fbd56;">
-                                            <i class="fe fe-clock fs-4"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="fw-bold mb-1">{{ $training->title ?? 'Тренировка' }}</h6>
-                                            <small class="text-muted">
-                                                <i class="fe fe-calendar me-1"></i>{{ $training->start_time?->format('d.m.Y H:i') ?? '-' }}
-                                                <span class="mx-2">|</span>
-                                                <i class="fe fe-map-pin me-1"></i>{{ $training->venue?->name ?? 'Место не указано' }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <span class="badge bg-success">Запланировано</span>
                                 </div>
                             @endforeach
                         </div>

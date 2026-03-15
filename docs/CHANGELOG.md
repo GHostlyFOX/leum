@@ -12,6 +12,12 @@
 - `Modules/Club/Http/Controllers/ClubController.php` — инициализация `$announcements`, `$weekTrainings`, `$upcomingEvents` как `collect()` вместо `[]` (ошибка `count() on array` на странице команды)
 - `app/Livewire/Dashboard.php` — кнопка «Продолжить» в мастере создания событий: редиректы через `route()` вместо хардкода URL
 - `resources/views/livewire/index.blade.php` — исправлен атрибут `disabled` кнопки «Продолжить» (был всегда disabled из-за HTML-семантики пустого атрибута)
+- **format() on string** — `start_time` это строка `time`, а не Carbon. Исправлено в 4 файлах:
+  - `Modules/Club/Resources/views/team/show.blade.php` — использован `training_date->format() + Str::substr(start_time)`
+  - `resources/views/livewire/index.blade.php` — аналогично
+  - `resources/views/livewire/match-detail.blade.php` — `Str::substr(start_time)`
+  - `app/Livewire/TeamCalendar.php` — защита от строки через `is_string()`
+- `Modules/Club/Resources/views/team/show.blade.php` — удалён дублированный таб «Расписание», исправлен `$announcement->content` → `$announcement->message`
 
 ### Added
 

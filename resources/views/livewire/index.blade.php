@@ -674,7 +674,7 @@
                                         <div>
                                             <h6 class="fw-bold mb-1">{{ $training->title ?? 'Тренировка' }}</h6>
                                             <small class="text-muted">
-                                                <i class="fe fe-calendar me-1"></i>{{ $training->start_time?->format('d.m.Y H:i') ?? '-' }}
+                                                <i class="fe fe-calendar me-1"></i>{{ ($training->training_date?->format('d.m.Y') ?? '') . ' ' . Str::substr($training->start_time ?? '', 0, 5) }}
                                                 <span class="mx-2">|</span>
                                                 <i class="fe fe-map-pin me-1"></i>{{ $training->venue?->name ?? 'Место не указано' }}
                                             </small>

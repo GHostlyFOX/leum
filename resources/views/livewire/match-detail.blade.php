@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div style="margin-top: 16px; font-size: 0.9rem; opacity: 0.9;">
-                    {{ $match->match_date?->format('d.m.Y') }} | {{ $match->start_time?->format('H:i') }}
+                    {{ $match->match_date?->format('d.m.Y') }} | {{ Str::substr($match->start_time ?? '', 0, 5) }}
                     @if($match->status === 'live')
                         <span style="margin-left: 12px; padding: 4px 12px; background: #ef4444; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">LIVE</span>
                     @endif

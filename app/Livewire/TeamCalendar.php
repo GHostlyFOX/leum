@@ -11,6 +11,7 @@ use Livewire\Component;
 use Modules\Match\Models\GameMatch;
 use Modules\Team\Models\Team;
 use Modules\Team\Models\TeamMember;
+use Illuminate\Support\Str;
 use Modules\Training\Models\Training;
 
 #[Layout('layouts.app')]
@@ -108,7 +109,7 @@ class TeamCalendar extends Component
                 'type' => 'match',
                 'title' => 'Матч vs ' . ($m->opponent?->name ?? 'Соперник'),
                 'date' => $m->match_date?->format('Y-m-d'),
-                'time' => $m->start_time?->format('H:i'),
+                'time' => is_string($m->start_time) ? Str::substr($m->start_time, 0, 5) : ($m->start_time?->format('H:i') ?? ''),
                 'score' => $m->score_home . ':' . $m->score_away,
                 'status' => $m->status,
             ]);
