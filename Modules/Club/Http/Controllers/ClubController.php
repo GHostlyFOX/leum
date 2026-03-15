@@ -222,7 +222,7 @@ class ClubController extends Controller
         $players = $members->whereIn('role_id', [6, 9, 10]); // player, parent, assistant
         
         // Тренировки на текущую неделю
-        $weekTrainings = [];
+        $weekTrainings = collect();
         try {
             $weekTrainings = \Modules\Training\Models\Training::where('team_id', $team->id)
                 ->whereBetween('start_time', [now()->startOfWeek(), now()->endOfWeek()])
@@ -232,9 +232,9 @@ class ClubController extends Controller
         } catch (\Exception $e) {
             // Модель может не существовать
         }
-        
+
         // Объявления команды
-        $announcements = [];
+        $announcements = collect();
         try {
             $announcements = \Modules\Training\Models\Announcement::where('team_id', $team->id)
                 ->where('is_published', true)
@@ -244,15 +244,15 @@ class ClubController extends Controller
         } catch (\Exception $e) {
             // Модель может не существовать
         }
-        
+
         // Предстоящие матчи/турниры
         $upcomingMatches = 0;
-        $upcomingEvents = [];
+        $upcomingEvents = collect();
         try {
             $upcomingMatches = \Modules\Match\Models\GameMatch::where('team_id', $team->id)
                 ->where('match_date', '>=', now())
                 ->count();
-            
+
             $upcomingEvents = \Modules\Match\Models\GameMatch::where('team_id', $team->id)
                 ->where('match_date', '>=', now())
                 ->orderBy('match_date')

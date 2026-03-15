@@ -18,6 +18,7 @@ use Modules\Training\Models\RefTrainingType;
 class TrainingCreate extends Component
 {
     public ?int $clubId = null;
+    public ?int $sportTypeId = null;
     public ?int $teamId = null;
     public array $teams = [];
     public array $venues = [];
@@ -35,7 +36,12 @@ class TrainingCreate extends Component
     public bool $notifyParents = true;
     public bool $requireRsvp = true;
 
-    public function mount()
+    // Venue modal fields
+    public bool $showVenueModal = false;
+    public string $venueName = '';
+    public string $venueAddress = '';
+
+    public function mount(): void
     {
         $user = Auth::user();
         $membership = TeamMember::where('user_id', $user->id)
@@ -43,39 +49,77 @@ class TrainingCreate extends Component
             ->first();
 
         if (!$membership) {
-            return redirect()->route('home')->with('error', 'Нет доступа');
+            redirect()->route('home')->with('error', 'Нет доступа');
+            return;
         }
 
         $this->clubId = $membership->club_id;
-        
-        // Load teams
-        $this->teams = Team::where('club_id', $this->clubId)
-            ->get()
-            ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
-            ->toArray();
-        
-        // Load venues
-        $this->venues = Venue::where('club_id', $this->clubId)
-            ->orWhereNull('club_id')
-            ->get()
-            ->map(fn($v) => ['id' => $v->id, 'name' => $v->name])
-            ->toArray();
-        
-        // Load training types
-        $this->trainingTypes = RefTrainingType::all()
-            ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
-            ->toArray();
+
+        $club = Club::find($this->clubId);
+        $this->sportTypeId = $club?->sport_type_id;
+
+        $this->loadTeams();
+        $this->loadVenues();
+        $this->loadTrainingTypes();
 
         // Default values
         $this->trainingDate = now()->format('Y-m-d');
         $this->startTime = '18:00';
-        
+
         if ($this->teamId) {
             $this->selectedTeamId = $this->teamId;
         } elseif (count($this->teams) === 1) {
             $this->selectedTeamId = $this->teams[0]['id'];
         }
     }
+
+    // ── Venue modal ─────────────────────────────────────────────────
+
+    public function openVenueModal(): void
+    {
+        $this->venueName = '';
+        $this->venueAddress = '';
+        $this->showVenueModal = true;
+    }
+
+    public function closeVenueModal(): void
+    {
+        $this->showVenueModal = false;
+        $this->resetErrorBag(['venueName', 'venueAddress']);
+    }
+
+    public function createVenue(): void
+    {
+        $this->validate([
+            'venueName' => 'required|string|max:255',
+            'venueAddress' => 'required|string|max:500',
+        ], [
+            'venueName.required' => 'Введите название площадки',
+            'venueAddress.required' => 'Введите адрес',
+        ]);
+
+        // Получаем city_id и country_id клуба
+        $club = Club::find($this->clubId);
+
+        $venue = Venue::create([
+            'name' => $this->venueName,
+            'address' => $this->venueAddress,
+            'club_id' => $this->clubId,
+            'country_id' => $club?->country_id ?? 1,
+            'city_id' => $club?->city_id ?? 1,
+        ]);
+
+        // Обновляем список площадок
+        $this->loadVenues();
+
+        // Выбираем только что созданную площадку
+        $this->selectedVenueId = $venue->id;
+
+        $this->closeVenueModal();
+        $this->dispatch('notify', type: 'success', message: 'Площадка добавлена');
+    }
+
+    // ── Save training ───────────────────────────────────────────────
 
     public function save()
     {
@@ -112,12 +156,14 @@ class TrainingCreate extends Component
             'comment' => $this->comment,
             'notify_parents' => $this->notifyParents,
             'require_rsvp' => $this->requireRsvp,
-            'status' => 'planned',
+            'status' => 'scheduled',
         ]);
 
         $this->dispatch('notify', type: 'success', message: 'Тренировка создана');
         return redirect()->route('club.team.show', $this->selectedTeamId);
     }
+
+    // ── Render ───────────────────────────────────────────────────────
 
     public function render()
     {
@@ -127,5 +173,43 @@ class TrainingCreate extends Component
                 ->with('user')
                 ->get(),
         ]);
+    }
+
+    // ── Private helpers ─────────────────────────────────────────────
+
+    private function loadTeams(): void
+    {
+        $this->teams = Team::where('club_id', $this->clubId)
+            ->get()
+            ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
+            ->toArray();
+    }
+
+    private function loadVenues(): void
+    {
+        $this->venues = Venue::where('club_id', $this->clubId)
+            ->orWhereNull('club_id')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($v) => ['id' => $v->id, 'name' => $v->name])
+            ->toArray();
+    }
+
+    private function loadTrainingTypes(): void
+    {
+        // Глобальные типы для вида спорта клуба + общие + клубские
+        $this->trainingTypes = RefTrainingType::where(function ($q) {
+                // Глобальные типы для вида спорта клуба
+                $q->whereNull('club_id')
+                  ->where(function ($sub) {
+                      $sub->where('sport_type_id', $this->sportTypeId)
+                          ->orWhereNull('sport_type_id'); // общие для всех видов спорта
+                  });
+            })
+            ->orWhere('club_id', $this->clubId) // клубские типы
+            ->orderBy('name')
+            ->get()
+            ->map(fn($t) => ['id' => $t->id, 'name' => $t->name])
+            ->toArray();
     }
 }

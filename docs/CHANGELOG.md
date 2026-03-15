@@ -7,7 +7,27 @@
 
 ## [Unreleased]
 
+### Fixed
+- `app/Livewire/TrainingCreate.php` — ENUM ошибка: `'planned'` → `'scheduled'` (PostgreSQL ENUM `training_status` не содержит значения `planned`)
+- `Modules/Club/Http/Controllers/ClubController.php` — инициализация `$announcements`, `$weekTrainings`, `$upcomingEvents` как `collect()` вместо `[]` (ошибка `count() on array` на странице команды)
+- `app/Livewire/Dashboard.php` — кнопка «Продолжить» в мастере создания событий: редиректы через `route()` вместо хардкода URL
+- `resources/views/livewire/index.blade.php` — исправлен атрибут `disabled` кнопки «Продолжить» (был всегда disabled из-за HTML-семантики пустого атрибута)
+
 ### Added
+
+**Форма создания тренировки:**
+- `app/Livewire/TrainingCreate.php` — модальное окно быстрого создания площадки, фильтрация типов тренировок по виду спорта клуба
+- `resources/views/livewire/training-create.blade.php` — кнопка «+ Новое место» с модальным окном
+- `database/migrations/2025_06_21_000002_update_trainings_nullable_and_seed_training_types.php`:
+  - `venue_id`, `training_type_id` → nullable в таблице `trainings`
+  - `club_id` → nullable, `sport_type_id` добавлен в `ref_training_types`
+  - Сеяние глобальных типов тренировок по видам спорта (футбол, хоккей, баскетбол, волейбол, теннис, плавание, лёгкая атлетика, гимнастика, единоборства + общие)
+
+**Модуль «Объявления» (Modules/Training/):**
+- `Modules/Training/Livewire/AnnouncementCreate.php` — Livewire-компонент создания объявлений
+- `Modules/Training/Resources/views/livewire/announcement-create.blade.php` — шаблон формы
+  - Маршрут: `/announcements/create`
+- Регистрация компонента в `Modules/Training/Providers/TrainingServiceProvider.php`
 
 **Этап 1 — Критические исправления:**
 - `Modules/Club/Routes/web.php` — добавлены маршруты `club.team.edit`, `club.team.update`, `club.team.delete`

@@ -503,7 +503,7 @@
             </div>
             <div style="padding: 16px 24px 20px; display: flex; gap: 10px;">
                 <button wire:click="closeCreateEventModal" style="flex: 1; background: #fff; border: 1.5px solid #e5e7eb; color: #374151; font-weight: 600; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">Отмена</button>
-                <button wire:click="createEvent" wire:loading.attr="disabled" disabled="{{ empty($selectedEventType) ? 'disabled' : '' }}" style="flex: 1; background: #8fbd56; border: none; color: #fff; font-weight: 600; padding: 10px; border-radius: 10px; cursor: {{ empty($selectedEventType) ? 'not-allowed' : 'pointer' }}; font-size: 0.9rem; opacity: {{ empty($selectedEventType) ? '0.6' : '1' }};">
+                <button wire:click="createEvent" wire:loading.attr="disabled" @if(empty($selectedEventType)) disabled @endif style="flex: 1; background: #8fbd56; border: none; color: #fff; font-weight: 600; padding: 10px; border-radius: 10px; cursor: {{ empty($selectedEventType) ? 'not-allowed' : 'pointer' }}; font-size: 0.9rem; opacity: {{ empty($selectedEventType) ? '0.6' : '1' }};">
                     <span wire:loading.remove wire:target="createEvent">Продолжить</span>
                     <span wire:loading wire:target="createEvent">Создание...</span>
                 </button>

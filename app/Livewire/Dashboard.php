@@ -87,11 +87,11 @@ class Dashboard extends Component
 
         switch ($this->selectedEventType) {
             case 'announcement':
-                return redirect()->to('/announcements/create');
+                return redirect()->route('announcement.create');
             case 'training':
-                return redirect()->to('/trainings/create');
+                return redirect()->route('training.create');
             case 'match':
-                return redirect()->to('/matches/create');
+                return redirect()->route('match.create');
         }
     }
 
