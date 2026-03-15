@@ -21,21 +21,58 @@ jobs:
           script: |
             cd /home/web/liga.itex.kz
 
+            # Запоминаем текущий коммит до pull
+            BEFORE=$(git rev-parse HEAD)
+
             echo "=== Pulling latest changes ==="
             git pull origin main
 
-            echo "=== Installing Composer dependencies ==="
-            /usr/bin/php81 /usr/bin/composer install --no-dev --optimize-autoloader --no-interaction
+            AFTER=$(git rev-parse HEAD)
 
-            echo "=== Running migrations ==="
-            /usr/bin/php81 artisan migrate --force
+            # Получаем список изменённых файлов
+            CHANGED=$(git diff --name-only $BEFORE $AFTER)
 
-            echo "=== Clearing caches ==="
-            /usr/bin/php81 artisan config:cache
-            /usr/bin/php81 artisan route:cache
-            /usr/bin/php81 artisan view:cache
+            # Получаем commit-сообщение для проверки тегов
+            COMMIT_MSG=$(git log --format=%B $BEFORE..$AFTER)
 
-            echo "=== Building frontend assets ==="
-            npm run prod
+            echo "=== Changed files ==="
+            echo "$CHANGED"
+
+            # ── Composer: только если изменились composer.json/composer.lock или тег [composer] ──
+            if echo "$CHANGED" | grep -qE '^composer\.(json|lock)$' || echo "$COMMIT_MSG" | grep -qi '\[composer\]'; then
+              echo "=== Installing Composer dependencies ==="
+              /usr/bin/php81 /usr/bin/composer install --no-dev --optimize-autoloader --no-interaction
+            else
+              echo "=== Composer: skip (no changes in composer.json/lock) ==="
+            fi
+
+            # ── Migrations: только если появились новые файлы миграций или тег [migrate] ──
+            if echo "$CHANGED" | grep -qE '^database/migrations/' || echo "$COMMIT_MSG" | grep -qi '\[migrate\]'; then
+              echo "=== Running migrations ==="
+              /usr/bin/php81 artisan migrate --force
+            else
+              echo "=== Migrations: skip (no new migrations) ==="
+            fi
+
+            # ── Кеши: всегда сбрасываем при изменениях в PHP-файлах ──
+            if echo "$CHANGED" | grep -qE '\.(php|blade\.php)$' || echo "$COMMIT_MSG" | grep -qi '\[cache\]'; then
+              echo "=== Clearing caches ==="
+              /usr/bin/php81 artisan config:cache
+              /usr/bin/php81 artisan route:cache
+              /usr/bin/php81 artisan view:cache
+            else
+              echo "=== Cache: skip (no PHP changes) ==="
+            fi
+
+            # ── npm: только если изменился фронтенд или тег [npm] ──
+            if echo "$CHANGED" | grep -qE '(package\.json|package-lock\.json|resources/|webpack|vite|\.css$|\.js$|\.ts$|\.vue$|\.jsx$|\.scss$)' || echo "$COMMIT_MSG" | grep -qi '\[npm\]'; then
+              echo "=== Installing npm dependencies ==="
+              npm ci --production=false 2>/dev/null || npm install
+
+              echo "=== Building frontend assets ==="
+              npm run prod
+            else
+              echo "=== Frontend: skip (no JS/CSS/resource changes) ==="
+            fi
 
             echo "=== Deploy complete ==="
