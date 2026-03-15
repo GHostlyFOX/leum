@@ -1,0 +1,41 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/web/liga.itex.kz
+
+            echo "=== Pulling latest changes ==="
+            git pull origin main
+
+            echo "=== Installing Composer dependencies ==="
+            /usr/bin/php81 /usr/bin/composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "=== Running migrations ==="
+            /usr/bin/php81 artisan migrate --force
+
+            echo "=== Clearing caches ==="
+            /usr/bin/php81 artisan config:cache
+            /usr/bin/php81 artisan route:cache
+            /usr/bin/php81 artisan view:cache
+
+            echo "=== Building frontend assets ==="
+            npm run prod
+
+            echo "=== Deploy complete ==="
